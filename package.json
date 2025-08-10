@@ -1,0 +1,27 @@
+{
+  "name": "portfolio-volatility-mvp",
+  "version": "1.0.0",
+  "description": "Portfolio Volatility MVP - Frontend and Backend",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "source venv/bin/activate && python run.py",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:backend": "python -m venv venv && source venv/bin/activate && pip install -r requirements.txt",
+    "install:frontend": "cd frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "portfolio",
+    "volatility",
+    "finance",
+    "nextjs",
+    "fastapi"
+  ],
+  "author": "",
+  "license": "MIT"
+}

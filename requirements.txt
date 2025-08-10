@@ -1,0 +1,10 @@
+pandas
+numpy
+yfinance
+fastapi
+uvicorn
+scikit-learn
+python-multipart
+jinja2
+joblib
+python-dotenv

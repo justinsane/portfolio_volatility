@@ -1,0 +1,50 @@
+description: script to start frontend and backend development servers
+globs:
+alwaysApply: false
+---
+
+## Development Startup
+ALWAYS use `./start_dev.sh` to start both frontend and backend development servers:
+- This script automatically starts both Next.js frontend and FastAPI backend concurrently
+- No need to manually start frontend and backend separately
+- The script handles virtual environment activation and dependency checks
+- Provides a single command to launch the entire development environment
+
+## Startup Command
+When starting development:
+1. Make sure you're in the project root directory
+2. Run: `./start_dev.sh`
+3. The script will automatically:
+   - Activate the virtual environment
+   - Check and install frontend dependencies if needed
+   - Start the FastAPI backend on http://localhost:8000
+   - Start the Next.js frontend on http://localhost:3000
+
+## What the Script Does
+- Activates Python virtual environment (`source venv/bin/activate`)
+- Checks if frontend dependencies are installed (`frontend/node_modules`)
+- Installs frontend dependencies if missing (`npm install` in frontend directory)
+- Starts backend server (`python run.py`) in background
+- Starts frontend server (`npm run dev` in frontend directory) in background
+- Provides cleanup on CTRL+C to stop both servers
+
+## Development URLs
+After running `./start_dev.sh`:
+- Frontend application: http://localhost:3000
+- Backend API: http://localhost:8000
+- API documentation: http://localhost:8000/docs
+
+## Stopping Development
+- Press CTRL+C to stop both servers simultaneously
+- The script handles cleanup of background processes
+
+## Troubleshooting
+- If virtual environment is missing: `python -m venv venv && source venv/bin/activate && pip install -r requirements.txt`
+- If frontend dependencies are missing: The script will automatically install them
+- If ports are in use: Check for existing processes on ports 3000 and 8000
+
+## Alternative Manual Startup (Not Recommended)
+Only use manual startup for debugging specific issues:
+- Backend: `source venv/bin/activate && python run.py`
+- Frontend: `cd frontend && npm run dev`
+

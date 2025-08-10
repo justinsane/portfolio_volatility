@@ -1,0 +1,35 @@
+---
+description: ALWAYS activate the virtual environment before running any Python commands or scripts
+globs: 
+alwaysApply: false
+---
+
+## Virtual Environment
+ALWAYS activate the virtual environment before running any Python commands or scripts:
+- Use `source venv/bin/activate` before any Python operations
+- Verify activation with `which python` to ensure you're using the venv Python
+- All pip installs, Python script executions, and testing must happen within the activated venv
+- If venv is not activated, the prompt should show `(venv)` prefix when activated correctly
+
+## Python Command Structure
+When running terminal commands involving Python:
+1. First activate venv: `source venv/bin/activate`
+2. Then run your Python command
+3. Example: `source venv/bin/activate && python app.py`
+
+## Package Management
+- Only install packages within the activated virtual environment
+- Update requirements.txt when adding new dependencies
+- Use `pip freeze > requirements.txt` to update the requirements file
+
+## Environment Variables
+- API keys and sensitive data are stored in `.env` file (git-ignored)
+- Use `python-dotenv` to load environment variables
+- Never commit actual API keys to version control
+
+## Project Structure Awareness
+- Main application files: `app.py`, `run.py`
+- Utilities in `utils/` directory
+- Model files in `model/` directory
+- Test data in `data/` directory
+- Templates in `templates/` directory
