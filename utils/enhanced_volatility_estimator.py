@@ -36,6 +36,24 @@ class EnhancedVolatilityEstimator:
         # Sector-based volatility averages
         self.sector_volatilities = self._build_sector_volatilities()
         
+        # Cache for API calls to avoid repeated requests
+        self._api_cache = {}
+        self._cache_ttl = 3600  # 1 hour cache TTL
+        
+    def _get_cached_data(self, key: str) -> Optional[Dict]:
+        """Get data from cache if not expired."""
+        if key in self._api_cache:
+            timestamp, data = self._api_cache[key]
+            if time.time() - timestamp < self._cache_ttl:
+                return data
+            else:
+                del self._api_cache[key]
+        return None
+    
+    def _set_cached_data(self, key: str, data: Dict):
+        """Store data in cache with timestamp."""
+        self._api_cache[key] = (time.time(), data)
+        
     def _build_enhanced_volatility_map(self) -> Dict[str, float]:
         """Build comprehensive volatility map covering more asset classes"""
         return {
@@ -212,7 +230,13 @@ class EnhancedVolatilityEstimator:
         }
     
     def get_asset_fundamentals(self, symbol: str) -> Optional[Dict]:
-        """Get asset fundamentals from Alpha Vantage"""
+        """Get asset fundamentals from Alpha Vantage with caching"""
+        # Check cache first
+        cache_key = f"fundamentals_{symbol}"
+        cached_data = self._get_cached_data(cache_key)
+        if cached_data is not None:
+            return cached_data
+            
         if not self.alpha_vantage_key:
             return None
             
@@ -228,7 +252,7 @@ class EnhancedVolatilityEstimator:
             data = response.json()
             
             if 'Symbol' in data:
-                return {
+                result = {
                     'name': data.get('Name'),
                     'asset_type': data.get('AssetType', 'Unknown'),
                     'sector': data.get('Sector', 'Unknown'),
@@ -237,12 +261,21 @@ class EnhancedVolatilityEstimator:
                     'beta': float(data.get('Beta', '1.0')) if data.get('Beta', '').replace('.','').isdigit() else 1.0,
                     'pe_ratio': data.get('PERatio', 'N/A')
                 }
+                # Cache the result
+                self._set_cached_data(cache_key, result)
+                return result
         except Exception as e:
             print(f"Alpha Vantage API error for {symbol}: {e}")
             return None
     
     def get_historical_volatility_fmp(self, symbol: str) -> Optional[float]:
-        """Calculate realized volatility using Financial Modeling Prep"""
+        """Calculate realized volatility using Financial Modeling Prep with caching"""
+        # Check cache first
+        cache_key = f"volatility_fmp_{symbol}"
+        cached_data = self._get_cached_data(cache_key)
+        if cached_data is not None:
+            return cached_data
+            
         if not self.fmp_key:
             return None
             
@@ -263,6 +296,8 @@ class EnhancedVolatilityEstimator:
                 if len(prices) > 30:
                     returns = np.diff(np.log(prices))
                     volatility = np.std(returns) * np.sqrt(252)
+                    # Cache the result
+                    self._set_cached_data(cache_key, volatility)
                     return volatility
         except Exception as e:
             print(f"FMP API error for {symbol}: {e}")
