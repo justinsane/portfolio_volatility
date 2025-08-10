@@ -13,7 +13,7 @@ import io
 import json
 
 # Import our custom modules
-from utils.model_predict import predict_volatility, _model_cache
+from utils.model_predict import predict_volatility
 from utils.risk_analysis.risk_analyzer import RiskAnalyzer
 
 # Initialize FastAPI app
@@ -42,30 +42,10 @@ risk_analyzer = RiskAnalyzer()
 
 @app.on_event("startup")
 async def startup_event():
-    """Pre-load models and warm up cache on startup."""
+    """Startup event for the application."""
     print("🚀 Starting Portfolio Volatility Predictor...")
-    print("📊 Pre-loading ML models for faster response times...")
-    
-    try:
-        # Pre-load enhanced model
-        enhanced_model = _model_cache.get_enhanced_model()
-        if enhanced_model:
-            print("✅ Enhanced model loaded successfully")
-        else:
-            print("⚠️ Enhanced model not available, will use fallback")
-        
-        # Pre-load original trainer
-        original_trainer = _model_cache.get_original_trainer()
-        if original_trainer and original_trainer.model is not None:
-            print("✅ Original model loaded successfully")
-        else:
-            print("⚠️ Original model not available, will train on demand")
-        
-        print("🎯 Models pre-loaded and ready for requests!")
-        
-    except Exception as e:
-        print(f"❌ Error pre-loading models: {e}")
-        print("🔄 Models will be loaded on first request")
+    print("📊 Models will be loaded on first request for optimal performance")
+    print("🎯 API ready to receive requests!")
 
 @app.get("/")
 async def root():

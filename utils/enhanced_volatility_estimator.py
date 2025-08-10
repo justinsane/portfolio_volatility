@@ -3,9 +3,6 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import requests
-import json
-import tempfile
-from pathlib import Path
 from datetime import datetime, timedelta
 import warnings
 import time
@@ -39,38 +36,23 @@ class EnhancedVolatilityEstimator:
         # Sector-based volatility averages
         self.sector_volatilities = self._build_sector_volatilities()
         
-        # File-based cache for API calls to persist across container restarts
-        self._cache_dir = Path(tempfile.gettempdir()) / "portfolio_volatility_api_cache"
-        self._cache_dir.mkdir(exist_ok=True)
+        # Simple in-memory cache for API calls
+        self._api_cache = {}
         self._cache_ttl = 3600  # 1 hour cache TTL
         
     def _get_cached_data(self, key: str) -> Optional[Dict]:
         """Get data from cache if not expired."""
-        cache_file = self._cache_dir / f"{key}.json"
-        if cache_file.exists():
-            try:
-                with open(cache_file, 'r') as f:
-                    data = json.load(f)
-                    # Check if the cache is expired
-                    if time.time() - data['timestamp'] < self._cache_ttl:
-                        return data['data']
-                    else:
-                        cache_file.unlink() # Delete expired cache
-                        return None
-            except json.JSONDecodeError:
-                print(f"Error decoding JSON from cache file {cache_file}")
-                cache_file.unlink()
-                return None
+        if key in self._api_cache:
+            timestamp, data = self._api_cache[key]
+            if time.time() - timestamp < self._cache_ttl:
+                return data
+            else:
+                del self._api_cache[key]
         return None
     
     def _set_cached_data(self, key: str, data: Dict):
         """Store data in cache with timestamp."""
-        cache_file = self._cache_dir / f"{key}.json"
-        try:
-            with open(cache_file, 'w') as f:
-                json.dump({'timestamp': time.time(), 'data': data}, f)
-        except IOError as e:
-            print(f"Error writing to cache file {cache_file}: {e}")
+        self._api_cache[key] = (time.time(), data)
         
     def _build_enhanced_volatility_map(self) -> Dict[str, float]:
         """Build comprehensive volatility map covering more asset classes"""
