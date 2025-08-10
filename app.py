@@ -11,6 +11,11 @@ from typing import List, Optional, Dict, Any
 import pandas as pd
 import io
 import json
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Import our custom modules
 from utils.model_predict import predict_volatility
@@ -193,3 +198,70 @@ async def resolve_tickers(payload: Dict = Body(...)):
         return JSONResponse(content=resolved)
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+# --- Feedback endpoint ---
+
+class FeedbackRequest(BaseModel):
+    name: Optional[str] = None
+    message: str
+
+@app.post("/api/feedback")
+async def submit_feedback(feedback: FeedbackRequest):
+    """Submit feedback via email"""
+    try:
+        # Email configuration - only create if environment variables are set
+        mail_username = os.getenv("MAIL_USERNAME")
+        mail_password = os.getenv("MAIL_PASSWORD")
+        mail_from = os.getenv("MAIL_FROM")
+        
+        if not all([mail_username, mail_password, mail_from]):
+            return JSONResponse(
+                status_code=500,
+                content={"error": "Email configuration not set up. Please configure MAIL_USERNAME, MAIL_PASSWORD, and MAIL_FROM environment variables."}
+            )
+        
+        email_config = ConnectionConfig(
+            MAIL_USERNAME=mail_username,
+            MAIL_PASSWORD=mail_password,
+            MAIL_FROM=mail_from,
+            MAIL_PORT=587,
+            MAIL_SERVER="smtp.gmail.com",
+            MAIL_STARTTLS=True,
+            MAIL_SSL_TLS=False,
+            USE_CREDENTIALS=True
+        )
+        
+        fastmail = FastMail(email_config)
+        
+        # Prepare email content
+        subject = "Portfolio Volatility Predictor - New Feedback"
+        
+        # Build email body
+        body = f"""
+New feedback received from Portfolio Volatility Predictor:
+
+Name: {feedback.name or 'Anonymous'}
+Message: {feedback.message}
+
+---
+Sent from Portfolio Volatility Predictor API
+        """.strip()
+        
+        # Create message
+        message = MessageSchema(
+            subject=subject,
+            recipients=[os.getenv("FEEDBACK_EMAIL", "test@gmail.com")],
+            body=body,
+            subtype="plain"
+        )
+        
+        # Send email
+        await fastmail.send_message(message)
+        
+        return JSONResponse(content={"message": "Feedback submitted successfully"})
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to send feedback: {str(e)}"}
+        )

@@ -266,6 +266,24 @@ python run.py
 - `HOST`: Backend host (default: 0.0.0.0)
 - `DEBUG`: Enable debug mode
 
+## 📧 Feedback System
+
+The application includes a feedback form that sends emails to your specified address. See [FEEDBACK_SETUP.md](./FEEDBACK_SETUP.md) for detailed setup instructions.
+
+### Quick Setup
+1. Create a `.env` file with email configuration
+2. Set up Gmail App Password
+3. Configure environment variables
+4. Restart the development server
+
+### Environment Variables for Feedback
+```bash
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_FROM=your-email@gmail.com
+FEEDBACK_EMAIL=test@gmail.com
+```
+
 ## 🤝 Contributing
 
 ### Development Guidelines

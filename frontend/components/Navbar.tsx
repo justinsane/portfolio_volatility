@@ -36,7 +36,7 @@ export default function Navbar() {
           {NAV_ITEMS.map(item => {
             const isActive = router.pathname === item.href;
             return (
-              <Link key={item.href} href={item.href} passHref legacyBehavior>
+              <Link key={item.href} href={item.href}>
                 <Button
                   asChild
                   variant={isActive ? 'default' : 'ghost'}
@@ -46,13 +46,12 @@ export default function Navbar() {
                       ? 'gap-2'
                       : 'gap-2 text-gray-700 hover:text-gray-900'
                   }
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  <a aria-current={isActive ? 'page' : undefined}>
-                    <span className='inline-flex items-center gap-2'>
-                      {item.icon}
-                      <span className='text-sm'>{item.label}</span>
-                    </span>
-                  </a>
+                  <span className='inline-flex items-center gap-2'>
+                    {item.icon}
+                    <span className='text-sm'>{item.label}</span>
+                  </span>
                 </Button>
               </Link>
             );

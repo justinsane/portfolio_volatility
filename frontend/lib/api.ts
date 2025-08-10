@@ -132,3 +132,32 @@ export async function resolveTickersBatch(
   }
   return response.json();
 }
+
+// Feedback API
+export interface FeedbackRequest {
+  name?: string;
+  message: string;
+}
+
+export interface FeedbackResponse {
+  message: string;
+}
+
+export async function submitFeedback(
+  feedback: FeedbackRequest
+): Promise<FeedbackResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(feedback),
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+
+  return response.json();
+}
