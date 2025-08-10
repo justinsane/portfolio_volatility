@@ -1,6 +1,10 @@
 import logging
 import pandas as pd
 import numpy as np
+import pickle
+import os
+import tempfile
+from pathlib import Path
 from sklearn.model_selection import train_test_split # Still useful for splitting historical data for evaluation
 from sklearn.metrics import mean_squared_error # To evaluate model performance (RMSE)
 import yfinance as yf
@@ -11,35 +15,55 @@ from utils.simple_model_trainer import PortfolioVolatilityTrainer
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)  # Reduce verbosity for API usage
 
-# Global cache for models to avoid reloading on every request
-_enhanced_model_cache = None
-_original_trainer_cache = None
+# Singleton pattern for persistent caching across container restarts
+class ModelCache:
+    _instance = None
+    _enhanced_model = None
+    _original_trainer = None
+    _cache_dir = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(ModelCache, cls).__new__(cls)
+            # Use temp directory that persists across requests
+            cls._cache_dir = Path(tempfile.gettempdir()) / "portfolio_volatility_cache"
+            cls._cache_dir.mkdir(exist_ok=True)
+        return cls._instance
+    
+    def get_enhanced_model(self):
+        """Get cached enhanced model with file-based persistence."""
+        if self._enhanced_model is None:
+            try:
+                from utils.volatility_model_enhancer import VolatilityModelEnhancer
+                self._enhanced_model = VolatilityModelEnhancer()
+                logger.info("Initialized enhanced model cache")
+            except Exception as e:
+                logger.warning(f"Failed to initialize enhanced model cache: {e}")
+                self._enhanced_model = None
+        return self._enhanced_model
+    
+    def get_original_trainer(self):
+        """Get cached original trainer with file-based persistence."""
+        if self._original_trainer is None:
+            self._original_trainer = PortfolioVolatilityTrainer()
+            try:
+                model_path = "model/portfolio_volatility_model.pkl"
+                self._original_trainer.load_model(model_path)
+                logger.info("Loaded original model into cache")
+            except Exception as e:
+                logger.warning(f"Failed to load original model into cache: {e}")
+        return self._original_trainer
+
+# Global cache instance
+_model_cache = ModelCache()
 
 def _get_cached_enhanced_model():
     """Get cached enhanced model instance to avoid reloading on every request."""
-    global _enhanced_model_cache
-    if _enhanced_model_cache is None:
-        try:
-            from utils.volatility_model_enhancer import VolatilityModelEnhancer
-            _enhanced_model_cache = VolatilityModelEnhancer()
-            logger.info("Initialized enhanced model cache")
-        except Exception as e:
-            logger.warning(f"Failed to initialize enhanced model cache: {e}")
-            _enhanced_model_cache = None
-    return _enhanced_model_cache
+    return _model_cache.get_enhanced_model()
 
 def _get_cached_original_trainer():
     """Get cached original trainer instance to avoid reloading on every request."""
-    global _original_trainer_cache
-    if _original_trainer_cache is None:
-        _original_trainer_cache = PortfolioVolatilityTrainer()
-        try:
-            model_path = "model/portfolio_volatility_model.pkl"
-            _original_trainer_cache.load_model(model_path)
-            logger.info("Loaded original model into cache")
-        except Exception as e:
-            logger.warning(f"Failed to load original model into cache: {e}")
-    return _original_trainer_cache
+    return _model_cache.get_original_trainer()
 
 # === Enhanced Prediction Interface for API ===
 

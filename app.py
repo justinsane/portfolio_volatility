@@ -13,7 +13,7 @@ import io
 import json
 
 # Import our custom modules
-from utils.model_predict import predict_volatility
+from utils.model_predict import predict_volatility, _model_cache
 from utils.risk_analysis.risk_analyzer import RiskAnalyzer
 
 # Initialize FastAPI app
@@ -40,10 +40,46 @@ app.add_middleware(
 # Initialize risk analyzer
 risk_analyzer = RiskAnalyzer()
 
+@app.on_event("startup")
+async def startup_event():
+    """Pre-load models and warm up cache on startup."""
+    print("🚀 Starting Portfolio Volatility Predictor...")
+    print("📊 Pre-loading ML models for faster response times...")
+    
+    try:
+        # Pre-load enhanced model
+        enhanced_model = _model_cache.get_enhanced_model()
+        if enhanced_model:
+            print("✅ Enhanced model loaded successfully")
+        else:
+            print("⚠️ Enhanced model not available, will use fallback")
+        
+        # Pre-load original trainer
+        original_trainer = _model_cache.get_original_trainer()
+        if original_trainer and original_trainer.model is not None:
+            print("✅ Original model loaded successfully")
+        else:
+            print("⚠️ Original model not available, will train on demand")
+        
+        print("🎯 Models pre-loaded and ready for requests!")
+        
+    except Exception as e:
+        print(f"❌ Error pre-loading models: {e}")
+        print("🔄 Models will be loaded on first request")
+
 @app.get("/")
 async def root():
-    """API root endpoint - redirects to frontend"""
-    return {"message": "Portfolio Volatility API", "status": "running"}
+    """API status and health check"""
+    return {
+        "message": "Portfolio Volatility Predictor API",
+        "status": "running",
+        "version": "1.0.0",
+        "endpoints": {
+            "predict": "/api/predict",
+            "sample": "/sample",
+            "docs": "/docs"
+        }
+    }
 
 @app.get("/sample")
 async def download_sample():
