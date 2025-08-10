@@ -19,8 +19,8 @@ import {
   predictVolatility,
   getSampleDownloadUrl,
   PredictionResult,
-} from '../lib/api';
-import { getETFInfo } from '../lib/etf-mapping';
+} from '@/lib/api';
+import { getETFInfo } from '@/lib/etf-mapping';
 
 export default function FileUpload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

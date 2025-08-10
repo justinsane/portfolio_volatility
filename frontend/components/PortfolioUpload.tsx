@@ -22,7 +22,7 @@ import {
   predictVolatility,
   getSampleDownloadUrl,
   PredictionResult,
-} from '../lib/api';
+} from '@/lib/api';
 import PortfolioResults from './PortfolioResults';
 
 interface PortfolioAsset {

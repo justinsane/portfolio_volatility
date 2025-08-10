@@ -15,9 +15,9 @@ import {
   Building2,
   Zap,
 } from 'lucide-react';
-import { PredictionResult } from '../lib/api';
-import { getETFInfo } from '../lib/etf-mapping';
-import { getDisplayName, getCategory } from '../lib/tickerDirectory';
+import { PredictionResult } from '@/lib/api';
+import { getETFInfo } from '@/lib/etf-mapping';
+import { getDisplayName, getCategory } from '@/lib/tickerDirectory';
 import { useEffect } from 'react';
 import {
   ensureTickersResolved,

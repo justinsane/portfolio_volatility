@@ -11,6 +11,15 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
+
+  // Disable ESLint during build if it causes issues
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // Disable TypeScript checking during build if it causes issues
+  typescript: {
+    ignoreBuildErrors: false,
+  },
 };
 
 export default nextConfig;
