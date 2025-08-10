@@ -1,18 +1,37 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi import Body
-from fastapi.responses import FileResponse, JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-import pandas as pd
-from utils.model_predict import predict_volatility
-from utils.risk_analysis import RiskAnalyzer
+#!/usr/bin/env python3
+"""
+Portfolio Volatility Predictor - FastAPI Backend
+"""
 import os
+from fastapi import FastAPI, HTTPException, UploadFile, File, Body
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, FileResponse
+from pydantic import BaseModel
+from typing import List, Optional, Dict, Any
+import pandas as pd
+import io
+import json
 
-app = FastAPI()
+# Import our custom modules
+from utils.model_predict import predict_volatility
+from utils.risk_analysis.risk_analyzer import RiskAnalyzer
 
-# Add CORS middleware
+# Initialize FastAPI app
+app = FastAPI(
+    title="Portfolio Volatility Predictor API",
+    description="ML-powered portfolio volatility prediction with enhanced risk analysis",
+    version="1.0.0"
+)
+
+# Configure CORS for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=[
+        "http://localhost:3000",  # Local development
+        "https://portfolio-volatility.vercel.app",  # Vercel frontend
+        "https://*.vercel.app",  # Any Vercel subdomain
+        os.getenv("FRONTEND_URL", ""),  # Custom frontend URL
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -57,8 +76,7 @@ async def predict_api(file: UploadFile = File(...)):
         content = await file.read()
         
         # Create a StringIO object from the content
-        from io import StringIO
-        csv_string = StringIO(content.decode('utf-8'))
+        csv_string = io.StringIO(content.decode('utf-8'))
         
         # Read CSV from the StringIO object
         df = pd.read_csv(csv_string)
@@ -98,8 +116,10 @@ async def predict(file: UploadFile = File(...)):
     return await predict_api(file)
 
 
+# Initialize risk analyzer
+risk_analyzer = RiskAnalyzer()
+
 # --- Batch ticker metadata resolver ---
-from typing import List, Dict
 
 
 @app.post("/api/tickers/resolve")
