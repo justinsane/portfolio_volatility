@@ -331,7 +331,8 @@ export default function SnapTradeConnection({
                     <p className='flex items-start gap-2'>
                       <span className='text-blue-600 mt-0.5'>1.</span>
                       <span>
-                        Click "Connect Account" to open the secure portal
+                        Click &ldquo;Connect Account&ldquo; to open the secure
+                        portal
                       </span>
                     </p>
                     <p className='flex items-start gap-2'>
@@ -341,7 +342,7 @@ export default function SnapTradeConnection({
                     <p className='flex items-start gap-2'>
                       <span className='text-blue-600 mt-0.5'>3.</span>
                       <span>
-                        We'll extract your current portfolio positions
+                        We&lsquo;ll extract your current portfolio positions
                       </span>
                     </p>
                     <p className='flex items-start gap-2'>
@@ -357,7 +358,7 @@ export default function SnapTradeConnection({
               <div className='p-2 -m-2'>
                 <Button
                   onClick={startConnection}
-                  className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none'
+                  className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
                   size='lg'
                   style={{ minHeight: '48px' }}
                 >

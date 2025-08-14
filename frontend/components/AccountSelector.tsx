@@ -185,13 +185,18 @@ export default function AccountSelector({
           {accounts.map(account => (
             <div
               key={account.id}
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+              className={`p-4 border rounded-lg cursor-pointer transition-all duration-300 relative ${
                 selectedAccount === account.id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-blue-500 bg-blue-50 shadow-lg'
+                  : 'border-gray-200 hover:border-gray-300 animate-pulse-glow'
               }`}
               onClick={() => handleAccountSelect(account.id)}
             >
+              {/* Animated border overlay for unselected accounts */}
+              {selectedAccount !== account.id && (
+                <div className='absolute inset-0 rounded-lg border-2 border-blue-400 opacity-0 animate-pulse-glow-border pointer-events-none' />
+              )}
+
               <div className='flex items-center justify-between'>
                 <div className='flex-1'>
                   <div className='flex items-center gap-2 mb-1'>
