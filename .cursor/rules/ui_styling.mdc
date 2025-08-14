@@ -1,0 +1,170 @@
+---
+description: Utilize when styling or UI work is required
+alwaysApply: false
+---
+
+## Button Styling Standards
+ALWAYS use consistent button styling across the application:
+
+### Primary Action Buttons
+Use this styling for main call-to-action buttons:
+```tsx
+className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
+```
+
+### Button Structure
+- Always include `cursor-pointer` for proper hover behavior
+- Use `touch-manipulation` for better mobile touch response
+- Include `select-none` to prevent text selection on mobile
+- Set `minHeight: '48px'` for consistent button sizing
+
+### Responsive Text Patterns
+For buttons with long text, use responsive text patterns:
+```tsx
+<span className='whitespace-nowrap'>
+  <span className='hidden sm:inline'>
+    Full Text for Larger Screens
+  </span>
+  <span className='sm:hidden'>Short Text</span>
+</span>
+```
+
+### Icon Integration
+- Use `mr-3` for icon spacing (not `mr-2`)
+- Set icons to `h-5 w-5` for consistent sizing
+- Add `flex-shrink-0` to prevent icon compression
+
+## Mobile-First Responsive Design
+
+### Tab Layouts
+ALWAYS use responsive tab layouts for mobile compatibility:
+```tsx
+<TabsList className='flex flex-col sm:flex-row w-full gap-1'>
+  <TabsTrigger className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'>
+    <Icon className='h-4 w-4' />
+    <span className='whitespace-nowrap'>Tab Text</span>
+  </TabsTrigger>
+</TabsList>
+```
+
+### Key Mobile Tab Principles
+- **Vertical stacking on mobile**: `flex-col` for mobile, `sm:flex-row` for desktop
+- **Full width on mobile**: `w-full sm:w-auto` for proper touch targets
+- **Adequate padding**: `py-3 sm:py-1.5` for touch-friendly sizing
+- **No text wrapping**: `whitespace-nowrap` prevents text overflow
+
+### Touch-Friendly Button Wrappers
+For better mobile interaction, wrap buttons in touch-friendly containers:
+```tsx
+<div className='p-2 -m-2'>
+  <Button className='w-full ...'>
+    Button Content
+  </Button>
+</div>
+```
+
+### Responsive Layout Patterns
+
+#### Horizontal Button Groups
+For button groups that need to stack on mobile:
+```tsx
+<div className='flex flex-col sm:flex-row gap-2'>
+  <Button className='w-full sm:w-auto'>Action 1</Button>
+  <Button className='w-full sm:w-auto'>Action 2</Button>
+</div>
+```
+
+#### Demo/Utility Button Layouts
+For demo buttons and utility actions:
+```tsx
+<div className='mt-3 space-y-2 sm:space-y-0'>
+  <div className='flex flex-wrap gap-2'>
+    {/* Primary action buttons */}
+  </div>
+  <div className='flex flex-col sm:flex-row gap-2'>
+    {/* Demo/utility buttons */}
+  </div>
+</div>
+```
+
+## Enhanced Card Design
+
+### Privacy/Security Information Cards
+Use structured card layouts for important information:
+```tsx
+<div className='bg-green-50 rounded-lg p-4 border border-green-200'>
+  <h3 className='font-semibold text-green-800 mb-2 flex items-center gap-2'>
+    <CheckCircle className='h-4 w-4 text-green-600' />
+    Privacy & Security
+  </h3>
+  <div className='space-y-2 text-sm text-green-700'>
+    <p className='flex items-start gap-2'>
+      <span className='text-green-600 mt-0.5'>•</span>
+      <span><strong>Key point:</strong> Detailed explanation</span>
+    </p>
+  </div>
+</div>
+```
+
+### Process/How-To Cards
+For step-by-step instructions:
+```tsx
+<div className='bg-blue-50 rounded-lg p-4 border border-blue-200'>
+  <h3 className='font-semibold text-blue-800 mb-2 flex items-center gap-2'>
+    <ExternalLink className='h-4 w-4 text-blue-600' />
+    How It Works
+  </h3>
+  <div className='space-y-2 text-sm text-blue-700'>
+    <p className='flex items-start gap-2'>
+      <span className='text-blue-600 mt-0.5'>1.</span>
+      <span>Step description</span>
+    </p>
+  </div>
+</div>
+```
+
+## Color Scheme
+- Primary blue: `bg-blue-600` with `hover:bg-blue-700` and `active:bg-blue-800`
+- Success green: `bg-green-600` with `hover:bg-green-700` and `active:bg-green-800`
+- Information blue: `bg-blue-50` with `border-blue-200` and `text-blue-700`
+- Success green: `bg-green-50` with `border-green-200` and `text-green-700`
+- White text: `text-white`
+- Consistent shadow progression: `shadow-lg hover:shadow-xl active:shadow-inner`
+
+## Responsive Design
+- Use `py-4 sm:py-3` for responsive padding
+- Implement responsive text with `hidden sm:inline` and `sm:hidden`
+- Ensure buttons are `w-full` for mobile-first design
+- Use `space-y-2 sm:space-y-0` for responsive vertical spacing
+- Apply `gap-2` consistently for button spacing
+
+## Transition Effects
+- Use `transition-all duration-200` for smooth interactions
+- Include hover, active, and focus states
+- Maintain consistent timing across all interactive elements
+
+## Accessibility
+- Always include `cursor-pointer` for clickable elements
+- Use semantic button elements with proper onClick handlers
+- Ensure sufficient color contrast with white text on blue backgrounds
+- Include proper focus states for keyboard navigation
+- Meet WCAG touch target guidelines (48px minimum)
+- Use `touch-manipulation` for better mobile interaction
+
+## Component Consistency
+- Apply these patterns to all primary action buttons
+- Maintain consistent spacing and typography
+- Use the same shadow and transition effects throughout
+- Ensure responsive behavior works across all screen sizes
+- Follow mobile-first design principles
+- Use consistent icon sizing and spacing
+
+## Mobile UI Best Practices
+- **Touch targets**: Minimum 48px height for all interactive elements
+- **Text truncation**: Use `whitespace-nowrap` to prevent text wrapping
+- **Responsive text**: Short text on mobile, full text on desktop
+- **Vertical stacking**: Stack elements vertically on mobile for better UX
+- **Touch feedback**: Include active states and visual feedback
+- **Loading states**: Provide clear loading indicators with progress
+- **Error handling**: Show user-friendly error messages
+- **Privacy messaging**: Include clear privacy and security information

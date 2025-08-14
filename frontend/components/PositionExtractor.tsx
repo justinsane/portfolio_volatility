@@ -271,9 +271,19 @@ export default function PositionExtractor({
           </AlertDescription>
         </Alert>
 
-        <Button onClick={handleContinue} className='w-full' size='lg'>
-          <ArrowRight className='mr-2 h-4 w-4' />
-          Continue to Manual Adjustment
+        <Button
+          onClick={handleContinue}
+          className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
+          size='lg'
+          style={{ minHeight: '48px' }}
+        >
+          <ArrowRight className='mr-3 h-5 w-5 flex-shrink-0' />
+          <span className='whitespace-nowrap'>
+            <span className='hidden sm:inline'>
+              Continue to Manual Adjustment
+            </span>
+            <span className='sm:hidden'>Continue</span>
+          </span>
         </Button>
       </CardContent>
     </Card>
