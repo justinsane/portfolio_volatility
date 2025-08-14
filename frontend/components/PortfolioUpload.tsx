@@ -45,7 +45,7 @@ export default function PortfolioUpload() {
   const [manualAssets, setManualAssets] = useState<PortfolioAsset[]>([
     { ticker: '', weight: 0 },
   ]);
-  const [activeTab, setActiveTab] = useState('csv');
+  const [activeTab, setActiveTab] = useState('snaptrade');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
@@ -417,23 +417,79 @@ export default function PortfolioUpload() {
             onValueChange={setActiveTab}
             className='w-full'
           >
-            <TabsList className='grid w-full grid-cols-3'>
-              <TabsTrigger value='csv' className='flex items-center gap-2'>
-                <FileSpreadsheet className='h-4 w-4' />
-                CSV Upload
-              </TabsTrigger>
-              <TabsTrigger value='manual' className='flex items-center gap-2'>
-                <Edit3 className='h-4 w-4' />
-                Manual Entry
-              </TabsTrigger>
+            <TabsList className='flex flex-col sm:flex-row w-full gap-1'>
               <TabsTrigger
                 value='snaptrade'
-                className='flex items-center gap-2'
+                className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'
               >
                 <Building2 className='h-4 w-4' />
                 SnapTrade
               </TabsTrigger>
+              <TabsTrigger
+                value='csv'
+                className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'
+              >
+                <FileSpreadsheet className='h-4 w-4' />
+                CSV Upload
+              </TabsTrigger>
+              <TabsTrigger
+                value='manual'
+                className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'
+              >
+                <Edit3 className='h-4 w-4' />
+                Manual Entry
+              </TabsTrigger>
             </TabsList>
+
+            {/* SnapTrade Tab */}
+            <TabsContent value='snaptrade' className='space-y-4'>
+              {snapTradeStep === 'connection' && (
+                <SnapTradeConnection
+                  onConnectionSuccess={handleSnapTradeConnectionSuccess}
+                  onError={handleSnapTradeError}
+                />
+              )}
+
+              {snapTradeStep === 'account' && snapTradeUserData && (
+                <AccountSelector
+                  userData={snapTradeUserData}
+                  onAccountSelect={handleAccountSelect}
+                  onError={handleSnapTradeError}
+                />
+              )}
+
+              {snapTradeStep === 'positions' &&
+                snapTradeUserData &&
+                selectedAccountId && (
+                  <PositionExtractor
+                    userData={snapTradeUserData}
+                    accountId={selectedAccountId}
+                    onPositionsExtracted={handlePositionsExtracted}
+                    onError={handleSnapTradeError}
+                  />
+                )}
+
+              {snapTradeStep === 'manual' && (
+                <div className='space-y-4'>
+                  <Alert>
+                    <CheckCircle className='h-4 w-4' />
+                    <AlertDescription>
+                      Your portfolio positions have been extracted and loaded
+                      into the manual adjustment form. You can now review and
+                      modify the data before running the volatility analysis.
+                    </AlertDescription>
+                  </Alert>
+                  <Button
+                    onClick={() => setActiveTab('manual')}
+                    className='w-full'
+                    size='lg'
+                  >
+                    <Edit3 className='mr-2 h-4 w-4' />
+                    Go to Manual Adjustment
+                  </Button>
+                </div>
+              )}
+            </TabsContent>
 
             {/* CSV Upload Tab */}
             <TabsContent value='csv' className='space-y-4'>
@@ -588,35 +644,37 @@ export default function PortfolioUpload() {
                       Total weight should equal 100%
                     </p>
                   )}
-                  <div className='mt-3 flex flex-wrap gap-2'>
-                    <Button
-                      size='sm'
-                      className='h-7 px-2 text-xs'
-                      variant='outline'
-                      onClick={normalizeWeights}
-                    >
-                      Normalize to 100%
-                    </Button>
-                    <Button
-                      size='sm'
-                      className='h-7 px-2 text-xs'
-                      variant='outline'
-                      onClick={evenSplitWeights}
-                    >
-                      Even Split
-                    </Button>
-                    <Button
-                      size='sm'
-                      className='h-7 px-2 text-xs'
-                      variant='ghost'
-                      onClick={clearAllAssets}
-                    >
-                      Clear All
-                    </Button>
-                    <div className='ml-auto flex gap-2'>
+                  <div className='mt-3 space-y-2 sm:space-y-0'>
+                    <div className='flex flex-wrap gap-2'>
                       <Button
                         size='sm'
                         className='h-7 px-2 text-xs'
+                        variant='outline'
+                        onClick={normalizeWeights}
+                      >
+                        Normalize to 100%
+                      </Button>
+                      <Button
+                        size='sm'
+                        className='h-7 px-2 text-xs'
+                        variant='outline'
+                        onClick={evenSplitWeights}
+                      >
+                        Even Split
+                      </Button>
+                      <Button
+                        size='sm'
+                        className='h-7 px-2 text-xs'
+                        variant='ghost'
+                        onClick={clearAllAssets}
+                      >
+                        Clear All
+                      </Button>
+                    </div>
+                    <div className='flex flex-col sm:flex-row gap-2'>
+                      <Button
+                        size='sm'
+                        className='h-7 px-2 text-xs w-full sm:w-auto'
                         variant='secondary'
                         onClick={loadDemoETF}
                       >
@@ -624,7 +682,7 @@ export default function PortfolioUpload() {
                       </Button>
                       <Button
                         size='sm'
-                        className='h-7 px-2 text-xs'
+                        className='h-7 px-2 text-xs w-full sm:w-auto'
                         variant='secondary'
                         onClick={loadDemoMutualFunds}
                       >
@@ -660,56 +718,6 @@ export default function PortfolioUpload() {
                   </div>
                 </div>
               </div>
-            </TabsContent>
-
-            {/* SnapTrade Tab */}
-            <TabsContent value='snaptrade' className='space-y-4'>
-              {snapTradeStep === 'connection' && (
-                <SnapTradeConnection
-                  onConnectionSuccess={handleSnapTradeConnectionSuccess}
-                  onError={handleSnapTradeError}
-                />
-              )}
-
-              {snapTradeStep === 'account' && snapTradeUserData && (
-                <AccountSelector
-                  userData={snapTradeUserData}
-                  onAccountSelect={handleAccountSelect}
-                  onError={handleSnapTradeError}
-                />
-              )}
-
-              {snapTradeStep === 'positions' &&
-                snapTradeUserData &&
-                selectedAccountId && (
-                  <PositionExtractor
-                    userData={snapTradeUserData}
-                    accountId={selectedAccountId}
-                    onPositionsExtracted={handlePositionsExtracted}
-                    onError={handleSnapTradeError}
-                  />
-                )}
-
-              {snapTradeStep === 'manual' && (
-                <div className='space-y-4'>
-                  <Alert>
-                    <CheckCircle className='h-4 w-4' />
-                    <AlertDescription>
-                      Your portfolio positions have been extracted and loaded
-                      into the manual adjustment form. You can now review and
-                      modify the data before running the volatility analysis.
-                    </AlertDescription>
-                  </Alert>
-                  <Button
-                    onClick={() => setActiveTab('manual')}
-                    className='w-full'
-                    size='lg'
-                  >
-                    <Edit3 className='mr-2 h-4 w-4' />
-                    Go to Manual Adjustment
-                  </Button>
-                </div>
-              )}
             </TabsContent>
           </Tabs>
 

@@ -200,22 +200,59 @@ export default function SnapTradeConnection({
 
   if (step === 'success') {
     return (
-      <Card className='w-full'>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2 text-green-600'>
-            <CheckCircle className='h-5 w-5' />
+      <Card className='w-full border-2 border-green-100 bg-gradient-to-br from-green-50 to-emerald-50'>
+        <CardHeader className='pb-4'>
+          <CardTitle className='flex items-center gap-3 text-xl font-bold text-green-800'>
+            <div className='flex items-center justify-center w-10 h-10 bg-green-600 rounded-lg'>
+              <CheckCircle className='h-6 w-6 text-white' />
+            </div>
             Connection Successful!
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert>
-            <CheckCircle className='h-4 w-4' />
-            <AlertDescription>
-              Your brokerage account has been connected successfully. You can
-              now proceed to select an account and extract your portfolio
-              positions.
-            </AlertDescription>
-          </Alert>
+          <div className='bg-white rounded-lg p-6 border border-green-200'>
+            <div className='flex items-center justify-center mb-4'>
+              <div className='flex items-center justify-center w-16 h-16 bg-green-100 rounded-full'>
+                <CheckCircle className='h-8 w-8 text-green-600' />
+              </div>
+            </div>
+
+            <div className='text-center space-y-3'>
+              <h3 className='font-semibold text-green-800 text-lg'>
+                Brokerage Account Connected!
+              </h3>
+              <p className='text-sm text-green-700 leading-relaxed'>
+                Your brokerage account has been connected successfully. You can
+                now proceed to select an account and extract your portfolio
+                positions for volatility analysis.
+              </p>
+            </div>
+
+            <div className='mt-6 p-4 bg-green-50 rounded-lg border border-green-200'>
+              <h4 className='font-semibold text-green-800 mb-2 flex items-center gap-2'>
+                <CheckCircle className='h-4 w-4 text-green-600' />
+                Next Steps
+              </h4>
+              <div className='space-y-2 text-sm text-green-700'>
+                <p className='flex items-start gap-2'>
+                  <span className='text-green-600 mt-0.5'>1.</span>
+                  <span>Select your brokerage account from the list</span>
+                </p>
+                <p className='flex items-start gap-2'>
+                  <span className='text-green-600 mt-0.5'>2.</span>
+                  <span>Extract your current portfolio positions</span>
+                </p>
+                <p className='flex items-start gap-2'>
+                  <span className='text-green-600 mt-0.5'>3.</span>
+                  <span>Review and adjust your portfolio data</span>
+                </p>
+                <p className='flex items-start gap-2'>
+                  <span className='text-green-600 mt-0.5'>4.</span>
+                  <span>Run volatility analysis on your portfolio</span>
+                </p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     );
@@ -223,71 +260,199 @@ export default function SnapTradeConnection({
 
   return (
     <>
-      <Card className='w-full'>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <Building2 className='h-5 w-5' />
+      <Card className='w-full border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 touch-manipulation'>
+        <CardHeader className='pb-4'>
+          <CardTitle className='flex items-center gap-3 text-xl font-bold text-gray-800'>
+            <div className='flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg'>
+              <Building2 className='h-6 w-6 text-white' />
+            </div>
             Connect Your Brokerage Account
           </CardTitle>
         </CardHeader>
-        <CardContent className='space-y-4'>
+        <CardContent className='space-y-6'>
           {step === 'initial' && (
             <>
-              <p className='text-sm text-gray-600'>
-                Connect your brokerage account to automatically extract your
-                portfolio positions. This will open a secure connection portal
-                where you can link your account.
-              </p>
-              <Button onClick={startConnection} className='w-full' size='lg'>
-                <Link className='mr-2 h-4 w-4' />
-                Connect Brokerage Account
-              </Button>
+              <div className='space-y-4'>
+                <div className='bg-white rounded-lg p-4 border border-blue-200'>
+                  <h3 className='font-semibold text-gray-800 mb-2 flex items-center gap-2'>
+                    <Link className='h-4 w-4 text-blue-600' />
+                    Secure Connection Portal
+                  </h3>
+                  <p className='text-sm text-gray-600 leading-relaxed'>
+                    Connect your brokerage account to automatically extract your
+                    portfolio positions. Our secure connection portal uses
+                    industry-standard encryption to protect your data.
+                  </p>
+                </div>
+
+                <div className='bg-green-50 rounded-lg p-4 border border-green-200'>
+                  <h3 className='font-semibold text-green-800 mb-2 flex items-center gap-2'>
+                    <CheckCircle className='h-4 w-4 text-green-600' />
+                    Privacy & Security
+                  </h3>
+                  <div className='space-y-2 text-sm text-green-700'>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-green-600 mt-0.5'>•</span>
+                      <span>
+                        <strong>Read-only access:</strong> We can only view your
+                        positions, never trade or modify your account
+                      </span>
+                    </p>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-green-600 mt-0.5'>•</span>
+                      <span>
+                        <strong>No data storage:</strong> Your portfolio data is
+                        never saved to our database
+                      </span>
+                    </p>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-green-600 mt-0.5'>•</span>
+                      <span>
+                        <strong>Secure connection:</strong> All data is
+                        transmitted over encrypted connections
+                      </span>
+                    </p>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-green-600 mt-0.5'>•</span>
+                      <span>
+                        <strong>Instant analysis:</strong> Your data is
+                        processed in real-time and immediately discarded
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className='bg-blue-50 rounded-lg p-4 border border-blue-200'>
+                  <h3 className='font-semibold text-blue-800 mb-2 flex items-center gap-2'>
+                    <ExternalLink className='h-4 w-4 text-blue-600' />
+                    How It Works
+                  </h3>
+                  <div className='space-y-2 text-sm text-blue-700'>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-blue-600 mt-0.5'>1.</span>
+                      <span>
+                        Click "Connect Account" to open the secure portal
+                      </span>
+                    </p>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-blue-600 mt-0.5'>2.</span>
+                      <span>Select your brokerage and log in securely</span>
+                    </p>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-blue-600 mt-0.5'>3.</span>
+                      <span>
+                        We'll extract your current portfolio positions
+                      </span>
+                    </p>
+                    <p className='flex items-start gap-2'>
+                      <span className='text-blue-600 mt-0.5'>4.</span>
+                      <span>
+                        Review and adjust your portfolio before analysis
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className='p-2 -m-2'>
+                <Button
+                  onClick={startConnection}
+                  className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none'
+                  size='lg'
+                  style={{ minHeight: '48px' }}
+                >
+                  <Link className='mr-3 h-5 w-5 flex-shrink-0' />
+                  <span className='whitespace-nowrap'>
+                    <span className='hidden sm:inline'>
+                      Connect Brokerage Account
+                    </span>
+                    <span className='sm:hidden'>Connect</span>
+                  </span>
+                </Button>
+              </div>
             </>
           )}
 
           {(step === 'registering' || step === 'connecting') && (
             <>
-              <div className='space-y-2'>
-                <div className='flex items-center justify-between text-sm'>
-                  <span>
-                    {step === 'registering'
-                      ? 'Registering user...'
-                      : 'Generating connection portal...'}
-                  </span>
-                  <span>{progress}%</span>
+              <div className='bg-white rounded-lg p-6 border border-blue-200'>
+                <div className='flex items-center justify-center mb-4'>
+                  <div className='flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full'>
+                    <Loader2 className='h-6 w-6 animate-spin text-blue-600' />
+                  </div>
                 </div>
-                <Progress value={progress} className='w-full' />
-              </div>
 
-              <div className='flex items-center justify-center py-4'>
-                <Loader2 className='h-6 w-6 animate-spin' />
+                <div className='text-center space-y-3'>
+                  <h3 className='font-semibold text-gray-800'>
+                    {step === 'registering'
+                      ? 'Setting up secure connection...'
+                      : 'Generating connection portal...'}
+                  </h3>
+                  <p className='text-sm text-gray-600'>
+                    {step === 'registering'
+                      ? 'Creating your secure user session with SnapTrade'
+                      : 'Preparing the secure connection portal for your brokerage'}
+                  </p>
+                </div>
+
+                <div className='mt-6 space-y-2'>
+                  <div className='flex items-center justify-between text-sm'>
+                    <span className='text-gray-600'>Progress</span>
+                    <span className='font-semibold text-blue-600'>
+                      {progress}%
+                    </span>
+                  </div>
+                  <Progress value={progress} className='w-full h-2' />
+                </div>
               </div>
             </>
           )}
 
           {step === 'connecting' && loginUrl && (
             <>
-              <Alert>
-                <AlertCircle className='h-4 w-4' />
-                <AlertDescription>
-                  Connection portal ready! Click the button below to open the
-                  secure connection window.
-                </AlertDescription>
-              </Alert>
+              <div className='bg-green-50 rounded-lg p-6 border border-green-200'>
+                <div className='flex items-center justify-center mb-4'>
+                  <div className='flex items-center justify-center w-12 h-12 bg-green-100 rounded-full'>
+                    <CheckCircle className='h-6 w-6 text-green-600' />
+                  </div>
+                </div>
 
-              <Button
-                onClick={openConnectionPortal}
-                className='w-full'
-                size='lg'
-              >
-                <ExternalLink className='mr-2 h-4 w-4' />
-                Open Connection Portal
-              </Button>
+                <div className='text-center space-y-3'>
+                  <h3 className='font-semibold text-green-800'>
+                    Connection Portal Ready!
+                  </h3>
+                  <p className='text-sm text-green-700'>
+                    Your secure connection portal is ready. Click the button
+                    below to open the SnapTrade connection window and link your
+                    brokerage account.
+                  </p>
+                </div>
 
-              <p className='text-xs text-gray-500 text-center'>
-                After connecting your account, the modal will automatically
-                close and you can continue.
-              </p>
+                <div className='p-2 -m-2 mt-4'>
+                  <Button
+                    onClick={openConnectionPortal}
+                    className='w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none'
+                    size='lg'
+                    style={{ minHeight: '48px' }}
+                  >
+                    <ExternalLink className='mr-3 h-5 w-5 flex-shrink-0' />
+                    <span className='whitespace-nowrap'>
+                      <span className='hidden sm:inline'>
+                        Open Connection Portal
+                      </span>
+                      <span className='sm:hidden'>Open Portal</span>
+                    </span>
+                  </Button>
+                </div>
+
+                <div className='mt-4 p-3 bg-white rounded-lg border border-green-200'>
+                  <p className='text-xs text-green-700 text-center'>
+                    <strong>Note:</strong> After connecting your account, the
+                    modal will automatically close and you can continue with
+                    portfolio analysis.
+                  </p>
+                </div>
+              </div>
             </>
           )}
         </CardContent>
