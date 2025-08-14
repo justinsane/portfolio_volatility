@@ -9,3 +9,4 @@ jinja2
 joblib
 python-dotenv
 fastapi-mail
+snaptrade-python-sdk

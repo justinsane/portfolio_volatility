@@ -17,6 +17,7 @@ import {
   Calculator,
   FileSpreadsheet,
   Edit3,
+  Building2,
 } from 'lucide-react';
 import {
   predictVolatility,
@@ -24,6 +25,9 @@ import {
   PredictionResult,
 } from '@/lib/api';
 import PortfolioResults from './PortfolioResults';
+import SnapTradeConnection from './SnapTradeConnection';
+import AccountSelector from './AccountSelector';
+import PositionExtractor from './PositionExtractor';
 
 interface PortfolioAsset {
   ticker: string;
@@ -48,6 +52,16 @@ export default function PortfolioUpload() {
   const [isDragOver, setIsDragOver] = useState(false);
   const tickerRefs = useRef<Array<HTMLInputElement | null>>([]);
   const weightRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  // SnapTrade state
+  const [snapTradeStep, setSnapTradeStep] = useState<
+    'connection' | 'account' | 'positions' | 'manual'
+  >('connection');
+  const [snapTradeUserData, setSnapTradeUserData] = useState<{
+    userId: string;
+    userSecret: string;
+  } | null>(null);
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
 
   // CSV Upload Handlers
   const handleFileSelect = useCallback((file: File) => {
@@ -97,6 +111,39 @@ export default function PortfolioUpload() {
   const addAsset = useCallback(() => {
     setManualAssets(prev => [...prev, { ticker: '', weight: 0 }]);
   }, []);
+
+  // SnapTrade Handlers
+  const handleSnapTradeConnectionSuccess = useCallback(
+    (userData: { userId: string; userSecret: string }) => {
+      setSnapTradeUserData(userData);
+      setSnapTradeStep('account');
+      setError(null);
+    },
+    []
+  );
+
+  const handleSnapTradeError = useCallback((error: string) => {
+    setError(error);
+  }, []);
+
+  const handleAccountSelect = useCallback((accountId: string) => {
+    setSelectedAccountId(accountId);
+    setSnapTradeStep('positions');
+  }, []);
+
+  const handlePositionsExtracted = useCallback(
+    (portfolioAssets: Array<{ Ticker: string; Weight: number }>) => {
+      // Convert to manual assets format and populate the manual entry form
+      const convertedAssets = portfolioAssets.map(asset => ({
+        ticker: asset.Ticker,
+        weight: asset.Weight,
+      }));
+      setManualAssets(convertedAssets);
+      setSnapTradeStep('manual');
+      setActiveTab('manual');
+    },
+    []
+  );
 
   const removeAsset = useCallback((index: number) => {
     setManualAssets(prev => prev.filter((_, i) => i !== index));
@@ -370,7 +417,7 @@ export default function PortfolioUpload() {
             onValueChange={setActiveTab}
             className='w-full'
           >
-            <TabsList className='grid w-full grid-cols-2'>
+            <TabsList className='grid w-full grid-cols-3'>
               <TabsTrigger value='csv' className='flex items-center gap-2'>
                 <FileSpreadsheet className='h-4 w-4' />
                 CSV Upload
@@ -378,6 +425,13 @@ export default function PortfolioUpload() {
               <TabsTrigger value='manual' className='flex items-center gap-2'>
                 <Edit3 className='h-4 w-4' />
                 Manual Entry
+              </TabsTrigger>
+              <TabsTrigger
+                value='snaptrade'
+                className='flex items-center gap-2'
+              >
+                <Building2 className='h-4 w-4' />
+                SnapTrade
               </TabsTrigger>
             </TabsList>
 
@@ -606,6 +660,56 @@ export default function PortfolioUpload() {
                   </div>
                 </div>
               </div>
+            </TabsContent>
+
+            {/* SnapTrade Tab */}
+            <TabsContent value='snaptrade' className='space-y-4'>
+              {snapTradeStep === 'connection' && (
+                <SnapTradeConnection
+                  onConnectionSuccess={handleSnapTradeConnectionSuccess}
+                  onError={handleSnapTradeError}
+                />
+              )}
+
+              {snapTradeStep === 'account' && snapTradeUserData && (
+                <AccountSelector
+                  userData={snapTradeUserData}
+                  onAccountSelect={handleAccountSelect}
+                  onError={handleSnapTradeError}
+                />
+              )}
+
+              {snapTradeStep === 'positions' &&
+                snapTradeUserData &&
+                selectedAccountId && (
+                  <PositionExtractor
+                    userData={snapTradeUserData}
+                    accountId={selectedAccountId}
+                    onPositionsExtracted={handlePositionsExtracted}
+                    onError={handleSnapTradeError}
+                  />
+                )}
+
+              {snapTradeStep === 'manual' && (
+                <div className='space-y-4'>
+                  <Alert>
+                    <CheckCircle className='h-4 w-4' />
+                    <AlertDescription>
+                      Your portfolio positions have been extracted and loaded
+                      into the manual adjustment form. You can now review and
+                      modify the data before running the volatility analysis.
+                    </AlertDescription>
+                  </Alert>
+                  <Button
+                    onClick={() => setActiveTab('manual')}
+                    className='w-full'
+                    size='lg'
+                  >
+                    <Edit3 className='mr-2 h-4 w-4' />
+                    Go to Manual Adjustment
+                  </Button>
+                </div>
+              )}
             </TabsContent>
           </Tabs>
 

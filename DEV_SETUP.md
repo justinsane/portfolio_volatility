@@ -52,6 +52,30 @@ npm run dev
 - **NPM Scripts**: Press `Ctrl+C` to stop both servers  
 - **Manual**: Press `Ctrl+C` in each terminal
 
+## SnapTrade Management
+
+### Quick Cleanup (Recommended)
+```bash
+# Delete all SnapTrade users and connections (nuclear option)
+python comprehensive_snaptrade_cleanup.py
+# Choose option 3: Delete ALL users
+```
+
+### Connection Management
+```bash
+# Interactive connection management
+./snaptrade_curl_commands.sh
+
+# Python-based management
+python manage_snaptrade_connections.py
+```
+
+### User Discovery
+```bash
+# Find and manage all SnapTrade users
+python discover_snaptrade_users.py
+```
+
 ## Troubleshooting
 
 ### Virtual Environment Issues
@@ -72,3 +96,8 @@ npm install
 - Backend uses port 8000
 - Frontend uses port 3000
 - If ports are in use, modify the respective config files
+
+### SnapTrade Issues
+- **Free tier limit**: 5 connections maximum
+- **Clean slate**: Use `comprehensive_snaptrade_cleanup.py` to reset
+- **User management**: Use `snaptrade_curl_commands.sh` for daily operations

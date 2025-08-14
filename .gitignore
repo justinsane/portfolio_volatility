@@ -1,6 +1,10 @@
 # Environment variables
 .env
 
+# SnapTrade sensitive files
+.snaptrade_credentials
+.snaptrade_users
+
 # Python
 __pycache__/
 *.py[cod]

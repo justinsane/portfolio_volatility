@@ -20,6 +20,7 @@ load_dotenv()
 # Import our custom modules
 from utils.model_predict import predict_volatility
 from utils.risk_analysis.risk_analyzer import RiskAnalyzer
+from utils.snaptrade_utils import SnapTradeManager, generate_user_id
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -44,6 +45,14 @@ app.add_middleware(
 
 # Initialize risk analyzer
 risk_analyzer = RiskAnalyzer()
+
+# Initialize SnapTrade manager
+try:
+    snaptrade_manager = SnapTradeManager()
+    print("✅ SnapTrade manager initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize SnapTrade manager: {e}")
+    snaptrade_manager = None
 
 @app.on_event("startup")
 async def startup_event():
@@ -264,4 +273,280 @@ Sent from Portfolio Volatility Predictor API
         return JSONResponse(
             status_code=500,
             content={"error": f"Failed to send feedback: {str(e)}"}
+        )
+
+# --- SnapTrade API endpoints ---
+
+class SnapTradeUserRequest(BaseModel):
+    user_id: Optional[str] = None
+
+class SnapTradeLoginRequest(BaseModel):
+    user_id: str
+    user_secret: str
+
+class SnapTradeAccountRequest(BaseModel):
+    user_id: str
+    user_secret: str
+
+class SnapTradePositionsRequest(BaseModel):
+    user_id: str
+    user_secret: str
+    account_id: str
+
+class SnapTradeConnectionRequest(BaseModel):
+    user_id: str
+    user_secret: str
+
+class SnapTradeDeleteConnectionRequest(BaseModel):
+    user_id: str
+    user_secret: str
+    authorization_id: str
+
+@app.post("/api/snaptrade/register-user")
+async def register_snaptrade_user(request: SnapTradeUserRequest):
+    """Register a new user with SnapTrade"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # Generate user ID if not provided
+        user_id = request.user_id or generate_user_id()
+        
+        # Register user with SnapTrade
+        result = snaptrade_manager.register_user(user_id)
+        
+        if result["success"]:
+            return JSONResponse(content={
+                "success": True,
+                "user_id": result["user_id"],
+                "user_secret": result["user_secret"],
+                "message": "User registered successfully"
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to register user: {str(e)}"}
+        )
+
+@app.post("/api/snaptrade/login-url")
+async def get_snaptrade_login_url(request: SnapTradeLoginRequest):
+    """Generate SnapTrade connection portal URL"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # Generate login URL
+        result = snaptrade_manager.get_login_url(
+            user_id=request.user_id,
+            user_secret=request.user_secret
+        )
+        
+        if result["success"]:
+            return JSONResponse(content={
+                "success": True,
+                "redirect_uri": result["redirect_uri"],
+                "message": "Login URL generated successfully"
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to generate login URL: {str(e)}"}
+        )
+
+@app.post("/api/snaptrade/accounts")
+async def list_snaptrade_accounts(request: SnapTradeAccountRequest):
+    """List connected SnapTrade accounts"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # List accounts
+        result = snaptrade_manager.list_accounts(
+            user_id=request.user_id,
+            user_secret=request.user_secret
+        )
+        
+        if result["success"]:
+            return JSONResponse(content={
+                "success": True,
+                "accounts": result["accounts"],
+                "count": result["count"],
+                "message": f"Found {result['count']} accounts"
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to list accounts: {str(e)}"}
+        )
+
+@app.post("/api/snaptrade/refresh-holdings")
+async def refresh_snaptrade_holdings(request: SnapTradePositionsRequest):
+    """Refresh holdings for a specific SnapTrade account"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # Refresh holdings
+        result = snaptrade_manager.refresh_account_holdings(
+            user_id=request.user_id,
+            user_secret=request.user_secret,
+            account_id=request.account_id
+        )
+        
+        if result["success"]:
+            return JSONResponse(content={
+                "success": True,
+                "message": "Holdings refreshed successfully"
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to refresh holdings: {str(e)}"}
+        )
+
+@app.post("/api/snaptrade/positions")
+async def get_snaptrade_positions(request: SnapTradePositionsRequest):
+    """Get positions for a specific SnapTrade account"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # Get positions
+        result = snaptrade_manager.get_account_positions(
+            user_id=request.user_id,
+            user_secret=request.user_secret,
+            account_id=request.account_id
+        )
+        
+        if result["success"]:
+            # Transform positions to portfolio format
+            portfolio_assets = snaptrade_manager.transform_positions_to_portfolio(
+                result["positions"]
+            )
+            
+            return JSONResponse(content={
+                "success": True,
+                "positions": result["positions"],
+                "portfolio_assets": portfolio_assets,
+                "count": result["count"],
+                "message": f"Retrieved {result['count']} positions"
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to get positions: {str(e)}"}
+        )
+
+@app.post("/api/snaptrade/connections")
+async def list_snaptrade_connections(request: SnapTradeConnectionRequest):
+    """List all brokerage connections for a user"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # List connections
+        result = snaptrade_manager.list_brokerage_authorizations(
+            user_id=request.user_id,
+            user_secret=request.user_secret
+        )
+        
+        if result["success"]:
+            return JSONResponse(content={
+                "success": True,
+                "authorizations": result["authorizations"],
+                "count": result["count"],
+                "message": f"Found {result['count']} connections"
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to list connections: {str(e)}"}
+        )
+
+@app.delete("/api/snaptrade/connections")
+async def delete_snaptrade_connection(request: SnapTradeDeleteConnectionRequest):
+    """Delete a specific brokerage connection"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # Delete connection
+        result = snaptrade_manager.delete_brokerage_authorization(
+            user_id=request.user_id,
+            user_secret=request.user_secret,
+            authorization_id=request.authorization_id
+        )
+        
+        if result["success"]:
+            return JSONResponse(content={
+                "success": True,
+                "message": result["message"]
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to delete connection: {str(e)}"}
         )
