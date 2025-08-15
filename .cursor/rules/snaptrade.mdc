@@ -110,3 +110,103 @@ positions = snaptrade.account_information.get_user_account_positions(
     account_id=account_id, user_id=user_id, user_secret=user_secret
 )
 print(json.dumps(positions.body, indent=2))
+
+## Deleting a user
+
+Authentication
+Delete user
+delete
+https://api.snaptrade.com/api/v1/snapTrade/deleteUser
+Deletes a registered user and all associated data. This action is irreversible. This API is asynchronous and will return a 200 status code if the request is accepted. The user and all associated data will be queued for deletion. Once deleted, a USER_DELETED webhook will be sent.
+
+Execute an API Request
+Query
+userId
+string
+required
+SnapTrade User ID. This is chosen by the API partner and can be any string that is a) unique to the user, and b) immutable for the user. It is recommended to NOT use email addresses for this property because they are usually not immutable.
+
+Authorization
+clientId *
+
+consumerKey *
+
+Request
+from pprint import pprint
+from snaptrade_client import SnapTrade
+
+snaptrade = SnapTrade(
+    client_id="PARTNER_CLIENT_ID",
+    consumer_key="CONSUMER_KEY"
+)
+
+response = snaptrade.authentication.delete_snap_trade_user(
+    user_id="snaptrade-user-123"
+)
+pprint(response.body)
+
+
+Response fields
+
+200
+
+
+object
+status
+string
+This is always deleted when a user is queued for deletion.
+
+detail
+string
+Human friendly message about the deletion status.
+
+userId
+string
+SnapTrade User ID. This is chosen by the API partner and can be any string that is a) unique to the user, and b) immutable for the user. It is recommended to NOT use email addresses for this property because they are usually not immutable.
+
+
+{
+  "status": "deleted",
+  "detail": "User queued for deletion; please wait for webhook for confirmation.",
+  "userId": "snaptrade-user-123"
+}
+
+List all users
+get
+https://api.snaptrade.com/api/v1/snapTrade/listUsers
+Returns a list of all registered user IDs. Please note that the response is not currently paginated.
+
+Execute an API Request
+No request parameters.
+Authorization
+clientId *
+
+consumerKey *
+
+from pprint import pprint
+from snaptrade_client import SnapTrade
+
+snaptrade = SnapTrade(
+    client_id="PARTNER_CLIENT_ID",
+    consumer_key="CONSUMER_KEY"
+)
+
+response = snaptrade.authentication.list_snap_trade_users()
+pprint(response.body)
+
+
+Response fields
+
+200
+array of strings
+List of registered SnapTrade user IDs
+
+string
+SnapTrade User ID. This is chosen by the API partner and can be any string that is a) unique to the user, and b) immutable for the user. It is recommended to NOT use email addresses for this property because they are usually not immutable.
+
+
+[
+  "user1",
+  "user2",
+  "user3"
+  ]

@@ -550,3 +550,36 @@ async def delete_snaptrade_connection(request: SnapTradeDeleteConnectionRequest)
             status_code=500,
             content={"error": f"Failed to delete connection: {str(e)}"}
         )
+
+class SnapTradeDeleteUserRequest(BaseModel):
+    user_id: str
+
+@app.delete("/api/snaptrade/delete-user")
+async def delete_snaptrade_user(request: SnapTradeDeleteUserRequest):
+    """Delete a SnapTrade user and all associated data"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # Delete user
+        result = snaptrade_manager.delete_user(user_id=request.user_id)
+        
+        if result["success"]:
+            return JSONResponse(content={
+                "success": True,
+                "message": result["message"]
+            })
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to delete user: {str(e)}"}
+        )

@@ -101,3 +101,15 @@ npm install
 - **Free tier limit**: 5 connections maximum
 - **Clean slate**: Use `comprehensive_snaptrade_cleanup.py` to reset
 - **User management**: Use `snaptrade_curl_commands.sh` for daily operations
+
+
+`delete_snaptrade_users_python.py` - Working Python script that successfully deleted all users
+
+
+If you need to delete SnapTrade users again, use the Python script:
+py
+The script will:
+List all current users
+Ask for confirmation before deletion
+Delete all users and show progress
+Provide a summary of the operation
