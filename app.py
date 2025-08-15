@@ -21,6 +21,7 @@ load_dotenv()
 from utils.model_predict import predict_volatility
 from utils.risk_analysis.risk_analyzer import RiskAnalyzer
 from utils.snaptrade_utils import SnapTradeManager, generate_user_id
+from utils.enhanced_volatility_estimator import EnhancedVolatilityEstimator
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -53,6 +54,14 @@ try:
 except Exception as e:
     print(f"❌ Failed to initialize SnapTrade manager: {e}")
     snaptrade_manager = None
+
+# Initialize volatility estimator for symbol validation
+try:
+    volatility_estimator = EnhancedVolatilityEstimator()
+    print("✅ Volatility estimator initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize volatility estimator: {e}")
+    volatility_estimator = None
 
 @app.on_event("startup")
 async def startup_event():
@@ -369,6 +378,122 @@ async def get_snaptrade_login_url(request: SnapTradeLoginRequest):
         return JSONResponse(
             status_code=500,
             content={"error": f"Failed to generate login URL: {str(e)}"}
+        )
+
+class SymbolValidationRequest(BaseModel):
+    symbols: List[str]
+
+@app.post("/api/validate-symbols")
+async def validate_symbols(request: SymbolValidationRequest):
+    """Validate a list of symbols using pattern recognition and basic validation"""
+    try:
+        symbols = request.symbols
+        
+        if not symbols:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "No symbols provided"}
+            )
+        
+        validation_results = {}
+        
+        # Basic pattern recognition for common asset types
+        def classify_symbol(symbol: str) -> dict:
+            symbol_upper = symbol.upper().strip()
+            
+            # Mutual fund patterns (5-letter codes ending with X)
+            if len(symbol_upper) == 5 and symbol_upper.endswith('X'):
+                return {
+                    'isValid': True,
+                    'source': 'Pattern Recognition',
+                    'name': f'Mutual Fund ({symbol_upper})',
+                    'assetType': 'Mutual Fund',
+                    'sector': 'Unknown',
+                    'industry': 'Unknown'
+                }
+            
+            # Vanguard mutual funds
+            if symbol_upper.startswith('V') and len(symbol_upper) >= 4:
+                return {
+                    'isValid': True,
+                    'source': 'Pattern Recognition',
+                    'name': f'Vanguard Fund ({symbol_upper})',
+                    'assetType': 'Mutual Fund',
+                    'sector': 'Unknown',
+                    'industry': 'Unknown'
+                }
+            
+            # Fidelity mutual funds
+            if symbol_upper.startswith('F') and len(symbol_upper) >= 4:
+                return {
+                    'isValid': True,
+                    'source': 'Pattern Recognition',
+                    'name': f'Fidelity Fund ({symbol_upper})',
+                    'assetType': 'Mutual Fund',
+                    'sector': 'Unknown',
+                    'industry': 'Unknown'
+                }
+            
+            # Schwab mutual funds
+            if symbol_upper.startswith('SW') and len(symbol_upper) >= 4:
+                return {
+                    'isValid': True,
+                    'source': 'Pattern Recognition',
+                    'name': f'Schwab Fund ({symbol_upper})',
+                    'assetType': 'Mutual Fund',
+                    'sector': 'Unknown',
+                    'industry': 'Unknown'
+                }
+            
+            # Crypto patterns
+            if symbol_upper in ['BTC', 'ETH', 'USDT', 'USDC', 'BNB', 'ADA', 'SOL', 'DOT', 'AVAX', 'MATIC']:
+                return {
+                    'isValid': True,
+                    'source': 'Pattern Recognition',
+                    'name': f'Cryptocurrency ({symbol_upper})',
+                    'assetType': 'Cryptocurrency',
+                    'sector': 'Crypto',
+                    'industry': 'Blockchain'
+                }
+            
+            # Common stock patterns (1-5 letters, no special characters)
+            if len(symbol_upper) <= 5 and symbol_upper.isalpha():
+                return {
+                    'isValid': True,
+                    'source': 'Pattern Recognition',
+                    'name': f'Stock ({symbol_upper})',
+                    'assetType': 'Stock',
+                    'sector': 'Unknown',
+                    'industry': 'Unknown'
+                }
+            
+            # Unknown symbol
+            return {
+                'isValid': False,
+                'source': 'Not Found',
+                'name': None,
+                'assetType': 'Unknown',
+                'sector': 'Unknown',
+                'industry': 'Unknown'
+            }
+        
+        for symbol in symbols:
+            validation_results[symbol.upper().strip()] = classify_symbol(symbol)
+        
+        return JSONResponse(content={
+            'validations': validation_results,
+            'summary': {
+                'total': len(symbols),
+                'valid': sum(1 for v in validation_results.values() if v['isValid']),
+                'invalid': sum(1 for v in validation_results.values() if not v['isValid'])
+            }
+        })
+        
+    except Exception as e:
+        print(f"Error validating symbols: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Internal server error"}
         )
 
 @app.post("/api/snaptrade/accounts")

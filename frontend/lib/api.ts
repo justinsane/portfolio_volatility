@@ -128,6 +128,43 @@ export function getSampleDownloadUrl(): string {
   return `${API_BASE_URL}/sample`;
 }
 
+export interface SymbolValidationResult {
+  isValid: boolean;
+  source: string;
+  name: string | null;
+  assetType: string;
+  sector: string;
+  industry: string;
+}
+
+export interface SymbolValidationResponse {
+  validations: Record<string, SymbolValidationResult>;
+  summary: {
+    total: number;
+    valid: number;
+    invalid: number;
+  };
+}
+
+export async function validateSymbols(
+  symbols: string[]
+): Promise<SymbolValidationResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/validate-symbols`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ symbols }),
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+
+  return response.json();
+}
+
 // Batch resolve tickers to metadata (name, assetClass, category, etc.)
 export interface ResolvedTickerMeta {
   ticker: string;

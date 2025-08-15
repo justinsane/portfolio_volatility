@@ -20,13 +20,18 @@ import {
   ValidationWarning,
   getValidationSummary,
 } from '@/lib/csvValidator';
+import {
+  ManualPortfolioValidationResult,
+  getPortfolioValidationSummary,
+} from '@/lib/portfolioValidator';
 import { getSampleDownloadUrl } from '@/lib/api';
 
 interface ValidationResultsProps {
-  result: CSVValidationResult;
+  result: CSVValidationResult | ManualPortfolioValidationResult;
   onClose?: () => void;
   onProceed?: () => void;
   onManualEntry?: (data: any) => void;
+  isManualPortfolio?: boolean;
 }
 
 export default function ValidationResults({
@@ -34,8 +39,11 @@ export default function ValidationResults({
   onClose,
   onProceed,
   onManualEntry,
+  isManualPortfolio = false,
 }: ValidationResultsProps) {
-  const summary = getValidationSummary(result);
+  const summary = isManualPortfolio
+    ? getPortfolioValidationSummary(result)
+    : getValidationSummary(result);
 
   const getIcon = (type: 'success' | 'warning' | 'error') => {
     switch (type) {
@@ -58,6 +66,22 @@ export default function ValidationResults({
   const handleManualEntry = () => {
     if (result.parsedData && onManualEntry) {
       // Convert parsed data to format expected by manual entry
+      const manualData = {
+        assets: result.parsedData.assets.map(asset => ({
+          ticker: asset.ticker,
+          weight: asset.weight,
+          originalWeight: asset.originalWeight,
+        })),
+        totalWeight: result.parsedData.totalWeight,
+        unknownSymbols: result.parsedData.unknownSymbols,
+      };
+      onManualEntry(manualData);
+    }
+  };
+
+  const handleEditPortfolio = () => {
+    if (result.parsedData && onManualEntry) {
+      // For manual portfolio validation, this allows editing the current portfolio
       const manualData = {
         assets: result.parsedData.assets.map(asset => ({
           ticker: asset.ticker,
@@ -242,7 +266,8 @@ export default function ValidationResults({
           {/* Manual Entry Button - Show if weights don't add to 100% */}
           {result.parsedData &&
             Math.abs(result.parsedData.totalWeight - 100) > 0.01 &&
-            onManualEntry && (
+            onManualEntry &&
+            !isManualPortfolio && (
               <Button
                 variant='outline'
                 onClick={handleManualEntry}
@@ -252,6 +277,18 @@ export default function ValidationResults({
                 Continue with Manual Entry
               </Button>
             )}
+
+          {/* Edit Portfolio Button - For manual portfolio validation */}
+          {isManualPortfolio && onManualEntry && (
+            <Button
+              variant='outline'
+              onClick={handleEditPortfolio}
+              className='flex items-center gap-2'
+            >
+              <HelpCircle className='h-4 w-4' />
+              Edit Portfolio
+            </Button>
+          )}
 
           {/* Proceed Button - Only show if validation passed */}
           {result.isValid && onProceed && (
@@ -283,14 +320,32 @@ export default function ValidationResults({
             <div className='space-y-2'>
               <h4 className='font-semibold text-blue-800'>Need Help?</h4>
               <div className='text-sm text-blue-700 space-y-1'>
-                <p>
-                  • Your CSV should have exactly two columns:{' '}
-                  <code className='bg-blue-100 px-1 rounded'>Ticker</code> and{' '}
-                  <code className='bg-blue-100 px-1 rounded'>Weight</code>
-                </p>
-                <p>• Weights should be numbers (e.g., 25.5 for 25.5%)</p>
-                <p>• Each ticker should appear only once</p>
-                <p>• Weights should ideally add up to 100%</p>
+                {isManualPortfolio ? (
+                  <>
+                    <p>
+                      • Enter stock symbols in uppercase (e.g., AAPL, SPY, VTI)
+                    </p>
+                    <p>• Weights should be numbers (e.g., 25.5 for 25.5%)</p>
+                    <p>• Each ticker should appear only once</p>
+                    <p>• Weights should ideally add up to 100%</p>
+                    <p>
+                      • Use the weight adjustment tools to normalize your
+                      portfolio
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      • Your CSV should have exactly two columns:{' '}
+                      <code className='bg-blue-100 px-1 rounded'>Ticker</code>{' '}
+                      and{' '}
+                      <code className='bg-blue-100 px-1 rounded'>Weight</code>
+                    </p>
+                    <p>• Weights should be numbers (e.g., 25.5 for 25.5%)</p>
+                    <p>• Each ticker should appear only once</p>
+                    <p>• Weights should ideally add up to 100%</p>
+                  </>
+                )}
               </div>
             </div>
           </div>
