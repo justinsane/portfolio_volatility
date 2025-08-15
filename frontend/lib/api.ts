@@ -94,9 +94,31 @@ export async function predictVolatility(file: File): Promise<PredictionResult> {
 
   if (!response.ok) {
     const errorData: ApiError = await response.json();
-    throw new Error(
-      errorData.error || `HTTP error! status: ${response.status}`
-    );
+
+    // Provide more helpful error messages based on common issues
+    let errorMessage =
+      errorData.error || `HTTP error! status: ${response.status}`;
+
+    if (response.status === 400) {
+      if (errorMessage.includes('CSV must contain columns')) {
+        errorMessage =
+          'Invalid CSV format. Please ensure your file has "Ticker" and "Weight" columns. Download our sample file for reference.';
+      } else if (errorMessage.includes('File must be a CSV file')) {
+        errorMessage =
+          'Please upload a CSV file. Other file types are not supported.';
+      } else if (errorMessage.includes('Error processing file')) {
+        errorMessage =
+          'Unable to process your CSV file. Please check the format and try again.';
+      }
+    } else if (response.status === 413) {
+      errorMessage =
+        'File too large. Please upload a smaller CSV file (max 10MB).';
+    } else if (response.status === 500) {
+      errorMessage =
+        'Server error. Please try again later or contact support if the problem persists.';
+    }
+
+    throw new Error(errorMessage);
   }
 
   return response.json();

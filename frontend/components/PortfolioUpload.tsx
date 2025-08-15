@@ -18,16 +18,19 @@ import {
   FileSpreadsheet,
   Edit3,
   Building2,
+  ChevronDown,
 } from 'lucide-react';
 import {
   predictVolatility,
   getSampleDownloadUrl,
   PredictionResult,
 } from '@/lib/api';
+import { validateCSVFile, CSVValidationResult } from '@/lib/csvValidator';
 import PortfolioResults from './PortfolioResults';
 import SnapTradeConnection from './SnapTradeConnection';
 import AccountSelector from './AccountSelector';
 import PositionExtractor from './PositionExtractor';
+import ValidationResults from './ValidationResults';
 
 interface PortfolioAsset {
   ticker: string;
@@ -50,6 +53,9 @@ export default function PortfolioUpload() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [validationResult, setValidationResult] =
+    useState<CSVValidationResult | null>(null);
+  const [showValidation, setShowValidation] = useState(false);
   const tickerRefs = useRef<Array<HTMLInputElement | null>>([]);
   const weightRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -64,14 +70,29 @@ export default function PortfolioUpload() {
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
 
   // CSV Upload Handlers
-  const handleFileSelect = useCallback((file: File) => {
-    if (!file.name.endsWith('.csv')) {
-      setError('Please select a CSV file');
-      return;
-    }
+  const handleFileSelect = useCallback(async (file: File) => {
     setSelectedFile(file);
     setError(null);
     setResult(null);
+    setValidationResult(null);
+    setShowValidation(false);
+
+    // Validate the file
+    try {
+      const validation = await validateCSVFile(file);
+      setValidationResult(validation);
+
+      if (validation.isValid) {
+        // If validation passes, we can proceed
+        setShowValidation(false);
+      } else {
+        // Show validation results for errors
+        setShowValidation(true);
+      }
+    } catch (err) {
+      setError('Error validating file. Please try again.');
+      console.error('Validation error:', err);
+    }
   }, []);
 
   const handleFileInput = useCallback(
@@ -339,11 +360,18 @@ export default function PortfolioUpload() {
   const handlePredict = async () => {
     setIsLoading(true);
     setError(null);
+    setShowValidation(false);
 
     try {
       let data: PredictionResult;
 
       if (activeTab === 'csv' && selectedFile) {
+        // Check if validation passed before making API call
+        if (validationResult && !validationResult.isValid) {
+          setError('Please fix validation issues before proceeding');
+          setIsLoading(false);
+          return;
+        }
         data = await predictVolatility(selectedFile);
       } else if (activeTab === 'manual') {
         const validation = validateManualPortfolio();
@@ -380,6 +408,44 @@ export default function PortfolioUpload() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleValidationProceed = () => {
+    setShowValidation(false);
+    handlePredict();
+  };
+
+  const handleValidationClose = () => {
+    setShowValidation(false);
+    setValidationResult(null);
+    setSelectedFile(null); // Clear the selected file when validation is closed
+  };
+
+  const handleShowValidation = () => {
+    setShowValidation(true);
+    // Smooth scroll to validation results after a short delay to ensure they're rendered
+    setTimeout(() => {
+      const validationElement = document.querySelector(
+        '[data-validation-results]'
+      );
+      if (validationElement) {
+        validationElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+    }, 100);
+  };
+
+  const handleManualEntry = (data: any) => {
+    // Convert validation data to manual assets format
+    const convertedAssets = data.assets.map((asset: any) => ({
+      ticker: asset.ticker,
+      weight: asset.weight,
+    }));
+    setManualAssets(convertedAssets);
+    setActiveTab('manual');
+    setShowValidation(false);
   };
 
   const downloadSample = () => {
@@ -542,6 +608,41 @@ export default function PortfolioUpload() {
                   </p>
                 </div>
               )}
+
+              {selectedFile && validationResult && validationResult.isValid && (
+                <div className='mt-4 flex gap-2'>
+                  <Button onClick={handlePredict} disabled={isLoading}>
+                    {isLoading ? 'Analyzing...' : 'Predict Volatility'}
+                  </Button>
+                  <Button
+                    variant='outline'
+                    onClick={handleShowValidation}
+                    disabled={isLoading}
+                    className='flex items-center gap-2'
+                  >
+                    <CheckCircle className='h-4 w-4' />
+                    View Validation Details
+                    <ChevronDown className='h-4 w-4' />
+                  </Button>
+                </div>
+              )}
+
+              {selectedFile &&
+                validationResult &&
+                !validationResult.isValid && (
+                  <div className='mt-4 flex gap-2'>
+                    <Button
+                      variant='outline'
+                      onClick={handleShowValidation}
+                      disabled={isLoading}
+                      className='flex items-center gap-2 bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                    >
+                      <AlertCircle className='h-4 w-4' />
+                      View Validation Issues
+                      <ChevronDown className='h-4 w-4' />
+                    </Button>
+                  </div>
+                )}
 
               <div className='text-center'>
                 <Button variant='outline' onClick={downloadSample} size='sm'>
@@ -722,7 +823,10 @@ export default function PortfolioUpload() {
           </Tabs>
 
           {/* Predict Button */}
-          {((activeTab === 'csv' && selectedFile) ||
+          {((activeTab === 'csv' &&
+            selectedFile &&
+            validationResult &&
+            validationResult.isValid) ||
             (activeTab === 'manual' && getTotalWeight() > 0)) && (
             <div className='mt-6 text-center'>
               <Button onClick={handlePredict} disabled={isLoading} size='lg'>
@@ -754,6 +858,18 @@ export default function PortfolioUpload() {
           <AlertCircle className='h-4 w-4' />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+
+      {/* Validation Results */}
+      {showValidation && validationResult && (
+        <div data-validation-results>
+          <ValidationResults
+            result={validationResult}
+            onClose={handleValidationClose}
+            onProceed={handleValidationProceed}
+            onManualEntry={handleManualEntry}
+          />
+        </div>
       )}
 
       {/* Results Display */}

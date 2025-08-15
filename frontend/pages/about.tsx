@@ -28,6 +28,8 @@ import {
   Database,
   EyeOff,
   HelpCircle,
+  Link as LinkIcon,
+  RefreshCw,
 } from 'lucide-react';
 
 export default function AboutPage() {
@@ -88,8 +90,8 @@ export default function AboutPage() {
                     </span>
                   </div>
                   <p className='text-sm text-gray-600'>
-                    Upload CSV or enter manually. Your data is processed for the
-                    session only—no persistent storage by default.
+                    Connect via SnapTrade or upload CSV. Your data is processed
+                    for the session only—no persistent storage by default.
                   </p>
                 </div>
               </div>
@@ -108,14 +110,15 @@ export default function AboutPage() {
               <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                 <div className='rounded-lg border p-4'>
                   <div className='mb-2 flex items-center gap-2'>
-                    <FileSpreadsheet className='h-4 w-4 text-gray-700' />
+                    <LinkIcon className='h-4 w-4 text-gray-700' />
                     <span className='text-sm font-semibold'>
-                      1) Provide Data
+                      1) Connect Portfolio
                     </span>
                   </div>
                   <p className='text-sm text-gray-600'>
-                    Upload a CSV with columns <strong>Ticker</strong> and
-                    <strong> Weight</strong>, or use Manual Entry.
+                    Connect your brokerage account via SnapTrade API for instant
+                    portfolio data, or upload a CSV with <strong>Ticker</strong>{' '}
+                    and <strong>Weight</strong> columns.
                   </p>
                 </div>
                 <div className='rounded-lg border p-4'>
@@ -208,7 +211,7 @@ export default function AboutPage() {
               <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                 <div className='rounded-lg border p-4'>
                   <p className='mb-1 text-sm font-semibold text-gray-900'>
-                    Minimal Retention
+                    Zero Data Retention
                   </p>
                   <p className='text-sm text-gray-600'>
                     Inputs are processed to generate results and are not
@@ -227,11 +230,11 @@ export default function AboutPage() {
                 </div>
                 <div className='rounded-lg border p-4'>
                   <p className='mb-1 text-sm font-semibold text-gray-900'>
-                    Sensitive Data
+                    Secure SnapTrade Integration
                   </p>
                   <p className='text-sm text-gray-600'>
-                    Avoid including personally identifiable information in CSVs.
-                    We only need tickers and weights.
+                    SnapTrade connections are read-only and temporary. We never
+                    store your brokerage credentials or account details.
                   </p>
                 </div>
                 <div className='rounded-lg border p-4'>
@@ -257,6 +260,43 @@ export default function AboutPage() {
             </CardHeader>
             <CardContent>
               <Accordion type='single' collapsible className='w-full'>
+                <AccordionItem value='snaptrade-privacy'>
+                  <AccordionTrigger>
+                    How does SnapTrade integration work and what data do you
+                    access?
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className='space-y-3 text-sm text-gray-600'>
+                      <p>
+                        <strong>Read-Only Access:</strong> SnapTrade provides
+                        read-only access to your portfolio positions and
+                        weights. We cannot make any trades or changes to your
+                        account.
+                      </p>
+                      <p>
+                        <strong>No Credential Storage:</strong> We never see or
+                        store your brokerage login credentials. SnapTrade
+                        handles all authentication securely.
+                      </p>
+                      <p>
+                        <strong>Temporary Connection:</strong> The connection is
+                        temporary and expires automatically. We only access your
+                        portfolio data during the analysis session.
+                      </p>
+                      <p>
+                        <strong>Zero Retention:</strong> We do not store any of
+                        your portfolio data, account information, or personal
+                        details. Everything is processed in memory and discarded
+                        after generating your volatility report.
+                      </p>
+                      <p>
+                        <strong>Supported Brokers:</strong> SnapTrade supports
+                        major brokers including Fidelity, Charles Schwab,
+                        Robinhood, E*TRADE, and many others.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value='what-is-vol'>
                   <AccordionTrigger>
                     What exactly is the volatility you report?
@@ -320,8 +360,8 @@ export default function AboutPage() {
                   Ready to estimate risk?
                 </p>
                 <p className='text-sm text-gray-600'>
-                  Head back to the home page to upload a CSV or enter your
-                  portfolio manually.
+                  Connect your brokerage account via SnapTrade or upload a CSV
+                  to get started.
                 </p>
               </div>
               <Button asChild>
