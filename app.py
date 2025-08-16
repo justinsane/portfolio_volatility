@@ -284,6 +284,69 @@ Sent from Portfolio Volatility Predictor API
             content={"error": f"Failed to send feedback: {str(e)}"}
         )
 
+# --- Email Signup endpoint ---
+
+class EmailSignupRequest(BaseModel):
+    name: Optional[str] = None
+    email: str
+
+@app.post("/api/email-signup")
+async def submit_email_signup(signup: EmailSignupRequest):
+    """Submit email signup for full analysis report"""
+    try:
+        # Email configuration - only create if environment variables are set
+        mail_username = os.getenv("MAIL_USERNAME")
+        mail_password = os.getenv("MAIL_PASSWORD")
+        mail_from = os.getenv("MAIL_FROM")
+        
+        if not all([mail_username, mail_password, mail_from]):
+            return JSONResponse(
+                status_code=500,
+                content={"error": "Email configuration not set up. Please configure MAIL_USERNAME, MAIL_PASSWORD, and MAIL_FROM environment variables."}
+            )
+        
+        email_config = ConnectionConfig(
+            MAIL_USERNAME=mail_username,
+            MAIL_PASSWORD=mail_password,
+            MAIL_FROM=mail_from,
+            MAIL_PORT=587,
+            MAIL_SERVER="smtp.gmail.com",
+            MAIL_STARTTLS=True,
+            MAIL_SSL_TLS=False,
+            USE_CREDENTIALS=True
+        )
+        
+        fastmail = FastMail(email_config)
+        
+        # Send notification to admin only
+        admin_message = MessageSchema(
+            subject=f"New Email Signup Request: {signup.email}",
+            recipients=[os.getenv("ADMIN_EMAIL", os.getenv("FEEDBACK_EMAIL", "test@gmail.com"))],
+            body=f"""
+New email signup request received:
+
+Name: {signup.name or 'Anonymous'}
+Email: {signup.email}
+
+User has requested a full portfolio analysis report.
+Please send them a comprehensive report manually.
+
+---
+Portfolio Volatility Predictor
+            """.strip(),
+            subtype="plain"
+        )
+        
+        await fastmail.send_message(admin_message)
+        
+        return JSONResponse(content={"message": "Email signup submitted successfully"})
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to submit email signup: {str(e)}"}
+        )
+
 # --- SnapTrade API endpoints ---
 
 class SnapTradeUserRequest(BaseModel):
@@ -596,9 +659,16 @@ async def get_snaptrade_positions(request: SnapTradePositionsRequest):
                 "message": f"Retrieved {result['count']} positions"
             })
         else:
+            # Pass through additional error details if available
+            error_response = {"error": result["error"]}
+            if "error_type" in result:
+                error_response["error_type"] = result["error_type"]
+            if "retry_after" in result:
+                error_response["retry_after"] = result["retry_after"]
+            
             return JSONResponse(
                 status_code=400,
-                content={"error": result["error"]}
+                content=error_response
             )
             
     except Exception as e:

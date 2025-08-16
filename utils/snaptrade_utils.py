@@ -177,6 +177,17 @@ class SnapTradeManager:
         except Exception as e:
             logger.error(f"Error getting positions for account {account_id}: {e}")
             logger.error(f"Exception type: {type(e)}")
+            
+            # Check if this is a SnapTrade sync error
+            error_str = str(e)
+            if "Initial holdings sync not yet completed" in error_str or "425" in error_str:
+                return {
+                    "success": False,
+                    "error": "Holdings sync in progress. Please wait a few minutes and try again.",
+                    "error_type": "sync_in_progress",
+                    "retry_after": 300  # 5 minutes
+                }
+            
             return {
                 "success": False,
                 "error": str(e)

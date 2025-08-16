@@ -47,6 +47,8 @@ export default function PositionExtractor({
   const [portfolioAssets, setPortfolioAssets] = useState<PortfolioAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [retryCount, setRetryCount] = useState(0);
+  const [isSyncError, setIsSyncError] = useState(false);
 
   // Fetch positions from SnapTrade
   const fetchPositions = async () => {
@@ -96,10 +98,6 @@ export default function PositionExtractor({
 
       console.log('Positions API response status:', response.status);
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch positions: ${response.statusText}`);
-      }
-
       const data = await response.json();
       console.log('Positions API response data:', data);
 
@@ -109,7 +107,18 @@ export default function PositionExtractor({
         setPositions(data.positions || []);
         setPortfolioAssets(data.portfolio_assets || []);
       } else {
-        throw new Error(data.error || 'Failed to fetch positions');
+        // Handle specific error types
+        if (data.error_type === 'sync_in_progress') {
+          setIsSyncError(true);
+          setRetryCount(prev => prev + 1);
+          throw new Error(
+            data.error ||
+              'Holdings sync in progress. Please wait a few minutes and try again.'
+          );
+        } else {
+          setIsSyncError(false);
+          throw new Error(data.error || 'Failed to fetch positions');
+        }
       }
     } catch (err) {
       const errorMessage =
@@ -173,17 +182,60 @@ export default function PositionExtractor({
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
             <AlertCircle className='h-5 w-5 text-red-500' />
-            Error Extracting Positions
+            {isSyncError
+              ? 'Holdings Sync in Progress'
+              : 'Error Extracting Positions'}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert variant='destructive'>
+          <Alert variant={isSyncError ? 'default' : 'destructive'}>
             <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>
+              {error}
+              {isSyncError && (
+                <div className='mt-2 text-sm text-gray-600'>
+                  <p>
+                    This is normal for newly connected accounts. SnapTrade is
+                    still syncing your holdings.
+                  </p>
+                  <p className='mt-1'>Retry attempts: {retryCount}</p>
+                </div>
+              )}
+            </AlertDescription>
           </Alert>
-          <Button onClick={fetchPositions} className='mt-4' variant='outline'>
-            Try Again
-          </Button>
+          <div className='mt-4 flex gap-2'>
+            <Button
+              onClick={fetchPositions}
+              variant='outline'
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                  Retrying...
+                </>
+              ) : (
+                'Try Again'
+              )}
+            </Button>
+            {isSyncError && (
+              <Button
+                onClick={() => {
+                  setRetryCount(0);
+                  setIsSyncError(false);
+                  setError('');
+                  // Wait 5 minutes before retrying
+                  setTimeout(() => {
+                    fetchPositions();
+                  }, 300000); // 5 minutes
+                }}
+                variant='outline'
+                className='bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+              >
+                Wait 5 Minutes & Retry
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     );

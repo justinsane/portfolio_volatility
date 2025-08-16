@@ -15,7 +15,7 @@ import {
   Building2,
   Zap,
 } from 'lucide-react';
-import { PredictionResult } from '@/lib/api';
+import { PredictionResult, submitEmailSignup } from '@/lib/api';
 import { getETFInfo } from '@/lib/etf-mapping';
 import { getDisplayName, getCategory } from '@/lib/tickerDirectory';
 import { useEffect } from 'react';
@@ -23,6 +23,7 @@ import {
   ensureTickersResolved,
   warmFromEnhancementDetails,
 } from '../lib/tickerResolver';
+import EmailSignup from './ui/EmailSignup';
 
 interface PortfolioResultsProps {
   result: PredictionResult;
@@ -46,6 +47,9 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
       {result.risk_analysis && result.risk_analysis.success && (
         <RiskAnalysisDisplay riskAnalysis={result.risk_analysis} />
       )}
+
+      {/* Email Signup CTA */}
+      <EmailSignup onSubmit={submitEmailSignup} />
     </div>
   );
 }

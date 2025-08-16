@@ -220,3 +220,32 @@ export async function submitFeedback(
 
   return response.json();
 }
+
+// Email Signup API
+export interface EmailSignupRequest {
+  name?: string;
+  email: string;
+}
+
+export interface EmailSignupResponse {
+  message: string;
+}
+
+export async function submitEmailSignup(
+  signup: EmailSignupRequest
+): Promise<EmailSignupResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/email-signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(signup),
+  });
+
+  if (!response.ok) {
+    const errorData: ApiError = await response.json();
+    throw new Error(
+      errorData.error || `HTTP error! status: ${response.status}`
+    );
+  }
+
+  return response.json();
+}
