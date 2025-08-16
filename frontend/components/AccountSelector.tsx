@@ -226,10 +226,15 @@ export default function AccountSelector({
         <Button
           onClick={handleContinue}
           disabled={!selectedAccount}
-          className='w-full'
-          size='lg'
+          className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
+          style={{ minHeight: '48px' }}
         >
-          Continue with Selected Account
+          <span className='whitespace-nowrap'>
+            <span className='hidden sm:inline'>
+              Continue with Selected Account
+            </span>
+            <span className='sm:hidden'>Connect</span>
+          </span>
         </Button>
       </CardContent>
     </Card>
