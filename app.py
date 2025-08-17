@@ -20,7 +20,7 @@ load_dotenv()
 # Import our custom modules
 from utils.model_predict import predict_volatility
 from utils.risk_analysis.risk_analyzer import RiskAnalyzer
-from utils.snaptrade_utils import SnapTradeManager, generate_user_id
+from utils.snaptrade_utils_production import ProductionSnapTradeManager, generate_user_id
 from utils.enhanced_volatility_estimator import EnhancedVolatilityEstimator
 
 # Initialize FastAPI app
@@ -49,8 +49,8 @@ risk_analyzer = RiskAnalyzer()
 
 # Initialize SnapTrade manager
 try:
-    snaptrade_manager = SnapTradeManager()
-    print("✅ SnapTrade manager initialized successfully")
+    snaptrade_manager = ProductionSnapTradeManager()
+    print("✅ Production SnapTrade manager initialized successfully")
 except Exception as e:
     print(f"❌ Failed to initialize SnapTrade manager: {e}")
     snaptrade_manager = None
@@ -777,4 +777,29 @@ async def delete_snaptrade_user(request: SnapTradeDeleteUserRequest):
         return JSONResponse(
             status_code=500,
             content={"error": f"Failed to delete user: {str(e)}"}
+        )
+
+@app.get("/api/snaptrade/status")
+async def get_snaptrade_status():
+    """Get SnapTrade connection status and limit information"""
+    try:
+        if not snaptrade_manager:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "SnapTrade manager not initialized"}
+            )
+        
+        # Get connection status
+        status = snaptrade_manager.get_connection_status()
+        
+        return JSONResponse(content={
+            "success": True,
+            "status": status,
+            "message": f"Current: {status['current_count']}/{status['max_connections']} connections"
+        })
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to get status: {str(e)}"}
         )
