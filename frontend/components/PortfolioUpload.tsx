@@ -302,7 +302,7 @@ export default function PortfolioUpload() {
                 className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'
               >
                 <Building2 className='h-4 w-4' />
-                SnapTrade
+                Easy Connection (API)
               </TabsTrigger>
               <TabsTrigger
                 value='csv'
@@ -320,7 +320,7 @@ export default function PortfolioUpload() {
               </TabsTrigger>
             </TabsList>
 
-            {/* SnapTrade Tab */}
+            {/* Easy Connection (API) */}
             <TabsContent value='snaptrade' className='space-y-4'>
               {snapTradeStep === 'connection' && (
                 <SnapTradeConnection
