@@ -45,13 +45,20 @@ export default function SnapTradeConnection({
       setStep('registering');
       setProgress(25);
 
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch('/api/snaptrade/register-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({}),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`Registration failed: ${response.statusText}`);
@@ -86,6 +93,10 @@ export default function SnapTradeConnection({
     try {
       setProgress(75);
 
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
       const response = await fetch('/api/snaptrade/login-url', {
         method: 'POST',
         headers: {
@@ -95,7 +106,10 @@ export default function SnapTradeConnection({
           user_id: userData.userId,
           user_secret: userData.userSecret,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`Login URL generation failed: ${response.statusText}`);

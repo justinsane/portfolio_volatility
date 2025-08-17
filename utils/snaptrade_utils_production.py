@@ -86,33 +86,69 @@ class ProductionSnapTradeManager:
             logger.info(f"Current user count: {current_count}/{self.max_connections}")
             
             if current_count >= self.max_connections:
-                logger.warning(f"Connection limit reached ({current_count}/{self.max_connections}). Deleting oldest user...")
+                logger.warning(f"Connection limit reached ({current_count}/{self.max_connections}). Cleaning up users...")
                 
-                # Get oldest user
-                oldest_user = self._get_oldest_user_from_snaptrade()
-                if not oldest_user:
-                    logger.error("No users found to delete")
-                    return False
+                # Try to delete users until we're under the limit
+                max_attempts = 3  # Don't try forever
+                attempts = 0
                 
-                # Delete the oldest user
-                if self._delete_user_from_snaptrade(oldest_user):
-                    logger.info(f"Successfully freed up connection by deleting: {oldest_user}")
-                    return True
-                else:
-                    logger.error(f"Failed to delete oldest user: {oldest_user}")
-                    return False
+                while current_count >= self.max_connections and attempts < max_attempts:
+                    attempts += 1
+                    logger.info(f"Cleanup attempt {attempts}/{max_attempts}")
+                    
+                    # Get all users
+                    all_users = self._get_all_users_from_snaptrade()
+                    logger.info(f"All users before cleanup attempt {attempts}: {all_users}")
+                    
+                    # Find a user to delete (skip any that end with '_deleted')
+                    users_to_delete = [user for user in all_users if not user.endswith('_deleted')]
+                    
+                    if not users_to_delete:
+                        logger.error("No valid users found to delete")
+                        return False
+                    
+                    # Delete the first valid user
+                    user_to_delete = users_to_delete[0]
+                    logger.info(f"Attempting to delete user: {user_to_delete}")
+                    
+                    if self._delete_user_from_snaptrade(user_to_delete):
+                        logger.info(f"Successfully deleted user: {user_to_delete}")
+                        
+                        # Wait a moment for the deletion to propagate
+                        import time
+                        time.sleep(1)
+                        
+                        # Check the new count
+                        current_count = self._get_user_count()
+                        logger.info(f"User count after deletion: {current_count}/{self.max_connections}")
+                        
+                        if current_count < self.max_connections:
+                            logger.info("✅ Successfully freed up connection")
+                            return True
+                    else:
+                        logger.error(f"Failed to delete user: {user_to_delete}")
+                
+                # If we get here, we couldn't get under the limit
+                logger.error(f"Could not get under connection limit after {max_attempts} attempts")
+                return False
             else:
                 logger.info(f"Connection available ({current_count}/{self.max_connections})")
                 return True
                 
         except Exception as e:
             logger.error(f"Error ensuring connection available: {e}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             return False
     
     def register_user_with_limit_management(self, user_id: str, auto_manage_limit: bool = True) -> Dict[str, Any]:
         """Register a new user with automatic connection limit management"""
         try:
             logger.info(f"Registering user with limit management: {user_id}")
+            
+            # Check current connection status first
+            status = self.get_connection_status()
+            logger.info(f"Current connection status: {status['current_count']}/{status['max_connections']} (at limit: {status['at_limit']})")
             
             # Ensure connection is available if auto-manage is enabled
             if auto_manage_limit:
@@ -121,11 +157,23 @@ class ProductionSnapTradeManager:
                     logger.error("Could not ensure connection availability")
                     return {
                         "success": False,
-                        "error": "Could not ensure connection availability"
+                        "error": "Could not ensure connection availability. Please try again."
+                    }
+                
+                # Double-check we have space after cleanup
+                final_status = self.get_connection_status()
+                logger.info(f"After cleanup status: {final_status['current_count']}/{final_status['max_connections']}")
+                
+                if final_status['at_limit']:
+                    logger.error("Still at connection limit after cleanup attempt")
+                    return {
+                        "success": False,
+                        "error": "Connection limit reached. Please try again in a few minutes."
                     }
             
             # Try to register the user
             try:
+                logger.info(f"Attempting to register user: {user_id}")
                 response = self.client.authentication.register_snap_trade_user(
                     user_id=user_id
                 )
@@ -145,9 +193,10 @@ class ProductionSnapTradeManager:
                 
             except Exception as e:
                 error_str = str(e)
+                logger.error(f"Error registering user {user_id}: {error_str}")
                 
                 # Check if this is a connection limit error
-                if "Connection Limit Reached" in error_str and auto_manage_limit:
+                if ("Connection Limit Reached" in error_str or "limit reached" in error_str.lower()) and auto_manage_limit:
                     logger.warning("Connection limit reached. Attempting to resolve...")
                     
                     # Try to ensure connection availability
@@ -183,7 +232,7 @@ class ProductionSnapTradeManager:
                         logger.error("Could not resolve connection limit")
                         return {
                             "success": False,
-                            "error": "Could not resolve connection limit"
+                            "error": "Could not resolve connection limit. Please try again."
                         }
                 
                 # If it's not a connection limit error or we couldn't resolve it
@@ -195,6 +244,8 @@ class ProductionSnapTradeManager:
                 
         except Exception as e:
             logger.error(f"Unexpected error in register_user_with_limit_management: {e}")
+            import traceback
+            logger.error(f"Full traceback: {traceback.format_exc()}")
             return {
                 "success": False,
                 "error": str(e)

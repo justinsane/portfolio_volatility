@@ -387,8 +387,8 @@ async def register_snaptrade_user(request: SnapTradeUserRequest):
         # Generate user ID if not provided
         user_id = request.user_id or generate_user_id()
         
-        # Register user with SnapTrade
-        result = snaptrade_manager.register_user(user_id)
+        # Register user with SnapTrade (with automatic connection limit management)
+        result = snaptrade_manager.register_user_with_limit_management(user_id)
         
         if result["success"]:
             return JSONResponse(content={
