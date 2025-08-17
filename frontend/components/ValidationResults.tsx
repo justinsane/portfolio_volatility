@@ -252,65 +252,70 @@ export default function ValidationResults({
         )}
 
         {/* Action Buttons */}
-        <div className='flex flex-col sm:flex-row gap-3 pt-4 border-t'>
-          {/* Download Sample Button */}
-          <Button
-            variant='outline'
-            onClick={downloadSample}
-            className='flex items-center gap-2'
-          >
-            <Download className='h-4 w-4' />
-            Download Sample CSV
-          </Button>
+        <div className='pt-4 border-t'>
+          {/* Primary Action Row - Proceed Button */}
+          {result.isValid && onProceed && (
+            <div className='flex justify-center mb-4'>
+              <Button
+                onClick={onProceed}
+                className='flex items-center gap-2 w-full sm:w-auto px-8'
+              >
+                <ExternalLink className='h-4 w-4' />
+                Proceed with Analysis
+              </Button>
+            </div>
+          )}
 
-          {/* Manual Entry Button - Show if weights don't add to 100% */}
-          {result.parsedData &&
-            Math.abs(result.parsedData.totalWeight - 100) > 0.01 &&
-            onManualEntry &&
-            !isManualPortfolio && (
+          {/* Secondary Actions Row */}
+          <div className='flex flex-col sm:flex-row gap-3 justify-center sm:justify-start'>
+            {/* Download Sample Button */}
+            <Button
+              variant='outline'
+              onClick={downloadSample}
+              className='flex items-center gap-2'
+            >
+              <Download className='h-4 w-4' />
+              Download Sample CSV
+            </Button>
+
+            {/* Manual Entry Button - Show if weights don't add to 100% */}
+            {result.parsedData &&
+              Math.abs(result.parsedData.totalWeight - 100) > 0.01 &&
+              onManualEntry &&
+              !isManualPortfolio && (
+                <Button
+                  variant='outline'
+                  onClick={handleManualEntry}
+                  className='flex items-center gap-2'
+                >
+                  <HelpCircle className='h-4 w-4' />
+                  Continue with Manual Entry
+                </Button>
+              )}
+
+            {/* Edit Portfolio Button - For manual portfolio validation */}
+            {isManualPortfolio && onManualEntry && (
               <Button
                 variant='outline'
-                onClick={handleManualEntry}
+                onClick={handleEditPortfolio}
                 className='flex items-center gap-2'
               >
                 <HelpCircle className='h-4 w-4' />
-                Continue with Manual Entry
+                Edit Portfolio
               </Button>
             )}
 
-          {/* Edit Portfolio Button - For manual portfolio validation */}
-          {isManualPortfolio && onManualEntry && (
-            <Button
-              variant='outline'
-              onClick={handleEditPortfolio}
-              className='flex items-center gap-2'
-            >
-              <HelpCircle className='h-4 w-4' />
-              Edit Portfolio
-            </Button>
-          )}
-
-          {/* Proceed Button - Only show if validation passed */}
-          {result.isValid && onProceed && (
-            <Button
-              onClick={onProceed}
-              className='flex items-center gap-2 ml-auto'
-            >
-              <ExternalLink className='h-4 w-4' />
-              Proceed with Analysis
-            </Button>
-          )}
-
-          {/* Close Button */}
-          {onClose && (
-            <Button
-              variant='ghost'
-              onClick={onClose}
-              className='flex items-center gap-2'
-            >
-              Close
-            </Button>
-          )}
+            {/* Close Button */}
+            {onClose && (
+              <Button
+                variant='ghost'
+                onClick={onClose}
+                className='flex items-center gap-2'
+              >
+                Close
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Help Section */}
