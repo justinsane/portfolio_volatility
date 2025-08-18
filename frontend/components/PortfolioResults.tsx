@@ -1,4 +1,4 @@
-import React from 'react';
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
@@ -14,15 +14,19 @@ import {
   Globe,
   Building2,
   Zap,
+  PieChart,
+  CheckCircle,
+  Info,
+  ArrowUpRight,
 } from 'lucide-react';
-import { PredictionResult, submitEmailSignup } from '@/lib/api';
+import { type PredictionResult, submitEmailSignup } from '@/lib/api';
 import { getETFInfo } from '@/lib/etf-mapping';
 import { getDisplayName, getCategory } from '@/lib/tickerDirectory';
 import { useEffect } from 'react';
 import {
   ensureTickersResolved,
   warmFromEnhancementDetails,
-} from '../lib/tickerResolver';
+} from '@/lib/tickerResolver';
 import EmailSignup from './ui/EmailSignup';
 
 interface PortfolioResultsProps {
@@ -35,12 +39,30 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
     warmFromEnhancementDetails(result.enhancement_data?.asset_details || []);
     ensureTickersResolved(tickers);
   }, [result]);
-  return (
-    <div className='space-y-6'>
-      {/* Summary Metrics */}
-      <SummaryMetrics result={result} />
 
-      {/* Portfolio Composition */}
+  return (
+    <div className='space-y-8 max-w-7xl mx-auto'>
+      <div className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5 border border-border/50'>
+        <div className='absolute inset-0 bg-grid-pattern opacity-5'></div>
+        <div className='relative p-8'>
+          <div className='flex items-center gap-3 mb-6'>
+            <div className='p-3 rounded-xl bg-primary/10 border border-primary/20'>
+              <TrendingUp className='h-6 w-6 text-primary' />
+            </div>
+            <div>
+              <h1 className='text-3xl font-bold text-foreground'>
+                Volatility Forecast Results
+              </h1>
+              <p className='text-muted-foreground mt-1'>
+                Comprehensive portfolio risk analysis and predictions
+              </p>
+            </div>
+          </div>
+
+          <SummaryMetrics result={result} />
+        </div>
+      </div>
+
       <PortfolioComposition result={result} />
 
       {/* Risk Analysis */}
@@ -48,8 +70,9 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
         <RiskAnalysisDisplay riskAnalysis={result.risk_analysis} />
       )}
 
-      {/* Email Signup CTA */}
-      <EmailSignup onSubmit={submitEmailSignup} />
+      <div className='rounded-2xl bg-gradient-to-r from-primary/5 to-accent/5 border border-border/50 p-8'>
+        <EmailSignup onSubmit={submitEmailSignup} />
+      </div>
     </div>
   );
 }
@@ -58,17 +81,17 @@ function SummaryMetrics({ result }: { result: PredictionResult }) {
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel.toLowerCase()) {
       case 'very high':
-        return 'text-red-600 bg-red-50 border-red-200';
+        return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-800/30';
       case 'high':
-        return 'text-orange-600 bg-orange-50 border-orange-200';
+        return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-800/30';
       case 'moderate':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+        return 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/20 dark:text-yellow-400 dark:border-yellow-800/30';
       case 'low':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400 dark:border-green-800/30';
       case 'very low':
-        return 'text-emerald-600 bg-emerald-50 border-emerald-200';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800/30';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -88,141 +111,145 @@ function SummaryMetrics({ result }: { result: PredictionResult }) {
   const getModelTypeLabel = (modelType: string) => {
     switch (modelType) {
       case 'enhanced_multi_source':
-        return '🚀 Enhanced Multi-Source';
+        return 'Enhanced Multi-Source';
       case 'historical_random_forest':
-        return '🤖 Historical Random Forest';
+        return 'Historical Random Forest';
       case 'asset_based_estimation':
-        return '📊 Asset-Based Estimation';
+        return 'Asset-Based Estimation';
       default:
         return modelType;
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
-          <TrendingUp className='h-5 w-5' />
-          Volatility Forecast Results
-        </CardTitle>
-      </CardHeader>
-      <CardContent className='space-y-6'>
-        {/* Key Metrics Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-          <div
-            className={`p-4 rounded-lg border ${getRiskColor(
-              result.risk_level
-            )}`}
-          >
-            <div className='flex items-center gap-2 mb-2'>
-              <Shield className='h-4 w-4' />
-              <p className='text-sm font-medium'>Risk Level</p>
-            </div>
-            <p className='text-2xl font-bold'>{result.risk_level}</p>
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+      <div
+        className={`group relative overflow-hidden rounded-xl border-2 p-6 transition-all duration-200 hover:shadow-lg ${getRiskColor(
+          result.risk_level
+        )}`}
+      >
+        <div className='flex items-center justify-between mb-4'>
+          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
+            <Shield className='h-5 w-5' />
           </div>
-
-          <div className='p-4 bg-blue-50 rounded-lg border border-blue-200'>
-            <div className='flex items-center gap-2 mb-2'>
-              <Activity className='h-4 w-4 text-blue-600' />
-              <p className='text-sm font-medium text-blue-800'>
-                Annual Volatility
-              </p>
-            </div>
-            <div className='flex items-baseline gap-3'>
-              <p className='text-2xl font-bold text-blue-900'>
-                {result.final_volatility !== undefined
-                  ? `${(result.final_volatility * 100).toFixed(1)}%`
-                  : result.annual_volatility}
-              </p>
-              {result.labels?.window && (
-                <Badge variant='outline' className='text-xs'>
-                  {result.labels.window}
-                </Badge>
-              )}
-              {result.labels?.ml_adjustment && (
-                <Badge variant='outline' className='text-xs'>
-                  ML: {result.labels.ml_adjustment}
-                </Badge>
-              )}
-            </div>
+          <div className='text-right'>
+            <p className='text-xs font-medium opacity-75'>Risk Assessment</p>
           </div>
+        </div>
+        <div>
+          <p className='text-2xl font-bold mb-1'>{result.risk_level}</p>
+          <p className='text-sm opacity-75'>Portfolio Risk Level</p>
+        </div>
+      </div>
 
-          <div className='p-4 bg-purple-50 rounded-lg border border-purple-200'>
-            <div className='flex items-center gap-2 mb-2'>
-              <Target className='h-4 w-4 text-purple-600' />
-              <p className='text-sm font-medium text-purple-800'>
-                Forecast Period
-              </p>
-            </div>
-            <p className='text-2xl font-bold text-purple-900'>
-              {result.forecast_days} days
+      <div className='group relative overflow-hidden rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+        <div className='flex items-center justify-between mb-4'>
+          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
+            <Activity className='h-5 w-5' />
+          </div>
+          <div className='flex items-center gap-1 text-xs font-medium opacity-75'>
+            <ArrowUpRight className='h-3 w-3' />
+            Annual
+          </div>
+        </div>
+        <div>
+          <div className='flex items-baseline gap-2 mb-1'>
+            <p className='text-2xl font-bold'>
+              {result.final_volatility !== undefined
+                ? `${(result.final_volatility * 100).toFixed(1)}%`
+                : result.annual_volatility}
             </p>
+            {result.labels?.ml_adjustment && (
+              <Badge variant='outline' className='text-xs bg-white/50'>
+                ML: {result.labels.ml_adjustment}
+              </Badge>
+            )}
           </div>
+          <p className='text-sm opacity-75'>Expected Volatility</p>
+        </div>
+      </div>
 
-          <div className='p-4 bg-gray-50 rounded-lg border border-gray-200'>
-            <div className='flex items-center gap-2 mb-2'>
-              {getModelTypeIcon(result.model_type)}
-              <p className='text-sm font-medium'>Model Type</p>
+      <div className='group relative overflow-hidden rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+        <div className='flex items-center justify-between mb-4'>
+          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
+            <Target className='h-5 w-5' />
+          </div>
+          <div className='text-right'>
+            <p className='text-xs font-medium opacity-75'>Time Horizon</p>
+          </div>
+        </div>
+        <div>
+          <p className='text-2xl font-bold mb-1'>{result.forecast_days}</p>
+          <p className='text-sm opacity-75'>Days Forecast</p>
+        </div>
+      </div>
+
+      <div className='group relative overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 dark:bg-gray-950/20 dark:text-gray-400 dark:border-gray-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+        <div className='flex items-center justify-between mb-4'>
+          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
+            {getModelTypeIcon(result.model_type)}
+          </div>
+          <div className='text-right'>
+            <p className='text-xs font-medium opacity-75'>AI Model</p>
+          </div>
+        </div>
+        <div>
+          <p className='text-lg font-semibold mb-1 leading-tight'>
+            {getModelTypeLabel(result.model_type)}
+          </p>
+          <p className='text-sm opacity-75'>Prediction Method</p>
+        </div>
+      </div>
+
+      {result.enhancement_data && (
+        <>
+          <div className='group relative overflow-hidden rounded-xl border-2 border-green-200 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 dark:border-green-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+            <div className='flex items-center justify-between mb-4'>
+              <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
+                <Globe className='h-5 w-5' />
+              </div>
+              <div className='text-right'>
+                <p className='text-xs font-medium opacity-75'>Data Quality</p>
+              </div>
             </div>
-            <p className='text-lg font-semibold'>
-              {getModelTypeLabel(result.model_type)}
-            </p>
+            <div>
+              <p className='text-2xl font-bold mb-1'>
+                {(
+                  result.enhancement_data.coverage_analysis.coverage_by_count *
+                  100
+                ).toFixed(0)}
+                %
+              </p>
+              <p className='text-sm opacity-75'>Asset Coverage</p>
+            </div>
           </div>
 
-          {result.enhancement_data && (
-            <>
-              <div className='p-4 bg-green-50 rounded-lg border border-green-200'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <Globe className='h-4 w-4 text-green-600' />
-                  <p className='text-sm font-medium text-green-800'>
-                    Asset Coverage
-                  </p>
-                </div>
-                <p className='text-2xl font-bold text-green-900'>
-                  {(
-                    result.enhancement_data.coverage_analysis
-                      .coverage_by_count * 100
-                  ).toFixed(0)}
-                  %
+          <div className='group relative overflow-hidden rounded-xl border-2 border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+            <div className='flex items-center justify-between mb-4'>
+              <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
+                <Building2 className='h-5 w-5' />
+              </div>
+              <div className='text-right'>
+                <p className='text-xs font-medium opacity-75'>Reliability</p>
+              </div>
+            </div>
+            <div>
+              <div className='flex items-center gap-2 mb-1'>
+                {result.enhancement_data.overall_confidence === 'high' ? (
+                  <CheckCircle className='h-5 w-5 text-green-600' />
+                ) : (
+                  <Info className='h-5 w-5 text-yellow-600' />
+                )}
+                <p className='text-lg font-semibold capitalize'>
+                  {result.enhancement_data.overall_confidence}
                 </p>
               </div>
-
-              <div className='p-4 bg-amber-50 rounded-lg border border-amber-200'>
-                <div className='flex items-center gap-2 mb-2'>
-                  <Building2 className='h-4 w-4 text-amber-600' />
-                  <p className='text-sm font-medium text-amber-800'>
-                    Confidence
-                  </p>
-                </div>
-                <Badge
-                  variant={
-                    result.enhancement_data.overall_confidence === 'high'
-                      ? 'default'
-                      : 'secondary'
-                  }
-                  className={
-                    result.enhancement_data.overall_confidence === 'high'
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                      : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                  }
-                >
-                  {result.enhancement_data.overall_confidence}
-                </Badge>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Description */}
-        {result.description && (
-          <div className='p-4 bg-blue-50 rounded-lg border border-blue-200'>
-            <p className='text-sm text-blue-800 leading-relaxed'>
-              {result.description}
-            </p>
+              <p className='text-sm opacity-75'>Confidence Level</p>
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -230,40 +257,40 @@ function PortfolioComposition({ result }: { result: PredictionResult }) {
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
       case 'large cap':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/50';
       case 'mid cap':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800/50';
       case 'small cap':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800/50';
       case 'international':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800/50';
       case 'emerging markets':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800/50';
       case 'bond':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-950/30 dark:text-gray-300 dark:border-gray-800/50';
       case 'real estate':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-950/30 dark:text-yellow-300 dark:border-yellow-800/50';
       case 'technology':
-        return 'bg-indigo-100 text-indigo-800';
+        return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800/50';
       case 'sector':
-        return 'bg-pink-100 text-pink-800';
+        return 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-950/30 dark:text-pink-300 dark:border-pink-800/50';
       case 'commodity':
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800/50';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
   const getConfidenceColor = (confidence: string) => {
     switch (confidence.toLowerCase()) {
       case 'high':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800/50';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-950/30 dark:text-yellow-300 dark:border-yellow-800/50';
       case 'low':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800/50';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -277,36 +304,41 @@ function PortfolioComposition({ result }: { result: PredictionResult }) {
   const weightsAreFractional = maxWeight <= 1.0000001; // tolerate float drift
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
-          <BarChart3 className='h-5 w-5' />
+    <Card className='border-2 border-border/50 shadow-lg'>
+      <CardHeader className='pb-6'>
+        <CardTitle className='flex items-center gap-3 text-xl'>
+          <div className='p-2 rounded-lg bg-primary/10 border border-primary/20'>
+            <PieChart className='h-5 w-5 text-primary' />
+          </div>
           Portfolio Composition
+          <Badge variant='outline' className='ml-auto'>
+            {result.portfolio_assets.length} Assets
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className='overflow-x-auto'>
           <table className='w-full'>
             <thead>
-              <tr className='border-b border-gray-200'>
-                <th className='text-left p-3 font-semibold text-gray-700'>
+              <tr className='border-b-2 border-border'>
+                <th className='text-left p-4 font-semibold text-foreground'>
                   Asset
                 </th>
-                <th className='text-left p-3 font-semibold text-gray-700'>
+                <th className='text-left p-4 font-semibold text-foreground'>
                   Weight
                 </th>
-                <th className='text-left p-3 font-semibold text-gray-700'>
+                <th className='text-left p-4 font-semibold text-foreground'>
                   Volatility
                 </th>
-                <th className='text-left p-3 font-semibold text-gray-700'>
+                <th className='text-left p-4 font-semibold text-foreground'>
                   Confidence
                 </th>
-                <th className='text-left p-3 font-semibold text-gray-700'>
+                <th className='text-left p-4 font-semibold text-foreground'>
                   Category
                 </th>
               </tr>
             </thead>
-            <tbody className='divide-y divide-gray-100'>
+            <tbody className='divide-y divide-border/50'>
               {result.portfolio_assets.map((asset, index) => {
                 const etfInfo = getETFInfo(asset.Ticker);
                 const enhancedDetails =
@@ -336,48 +368,67 @@ function PortfolioComposition({ result }: { result: PredictionResult }) {
                   ? asset.Weight * 100
                   : asset.Weight;
                 const percentInt = Math.round(percent);
+
                 return (
                   <tr
                     key={index}
-                    className='hover:bg-gray-50 transition-colors'
+                    className='hover:bg-muted/30 transition-colors duration-150 group'
                   >
-                    <td className='p-3'>
-                      <div>
-                        <div className='font-semibold text-gray-900'>
-                          {asset.Ticker}
+                    <td className='p-4'>
+                      <div className='flex items-center gap-3'>
+                        <div className='w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center'>
+                          <span className='text-xs font-bold text-primary'>
+                            {asset.Ticker.slice(0, 2)}
+                          </span>
                         </div>
-                        {displayName && (
-                          <div className='text-sm text-gray-600 mt-1'>
-                            {displayName}
+                        <div>
+                          <div className='font-semibold text-foreground group-hover:text-primary transition-colors'>
+                            {asset.Ticker}
                           </div>
+                          {displayName && (
+                            <div className='text-sm text-muted-foreground mt-1 line-clamp-1'>
+                              {displayName}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className='p-4'>
+                      <div className='flex items-center gap-3'>
+                        <span className='font-semibold text-lg min-w-[3rem]'>
+                          {percentInt}%
+                        </span>
+                        <div className='flex-1 max-w-24'>
+                          <Progress value={percent} className='h-3 bg-muted' />
+                        </div>
+                      </div>
+                    </td>
+                    <td className='p-4'>
+                      <div className='flex items-center gap-2'>
+                        <span className='font-medium text-foreground'>
+                          {volatility}
+                        </span>
+                        {volatility !== 'N/A' && (
+                          <div className='w-2 h-2 rounded-full bg-primary/60'></div>
                         )}
                       </div>
                     </td>
-                    <td className='p-3'>
-                      <div className='flex items-center gap-2'>
-                        <span className='font-medium'>{percentInt}%</span>
-                        <div className='flex-1 max-w-24'>
-                          <Progress value={percent} className='h-2' />
-                        </div>
-                      </div>
-                    </td>
-                    <td className='p-3'>
-                      <span className='font-medium text-gray-900'>
-                        {volatility}
-                      </span>
-                    </td>
-                    <td className='p-3'>
+                    <td className='p-4'>
                       <Badge
                         variant='outline'
-                        className={`${getConfidenceColor(confidence)}`}
+                        className={`font-medium border ${getConfidenceColor(
+                          confidence
+                        )}`}
                       >
                         {confidence}
                       </Badge>
                     </td>
-                    <td className='p-3'>
+                    <td className='p-4'>
                       <Badge
                         variant='outline'
-                        className={`${getCategoryColor(assetType)}`}
+                        className={`font-medium border ${getCategoryColor(
+                          assetType
+                        )}`}
                       >
                         {assetType}
                       </Badge>
@@ -402,191 +453,275 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel) {
       case 'Very High':
-        return '#dc3545';
+        return '#dc2626';
       case 'High':
-        return '#fd7e14';
+        return '#ea580c';
       case 'Moderate':
-        return '#ffc107';
+        return '#d97706';
       case 'Low':
-        return '#20c997';
+        return '#16a34a';
       case 'Very Low':
-        return '#28a745';
+        return '#059669';
       default:
-        return '#6c757d';
+        return '#6b7280';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority?.toLowerCase()) {
       case 'high':
-        return '#dc3545';
+        return '#dc2626';
       case 'medium':
-        return '#fd7e14';
+        return '#ea580c';
       case 'low':
-        return '#28a745';
+        return '#16a34a';
       default:
-        return '#6c757d';
+        return '#6b7280';
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
-          <Shield className='h-5 w-5' />
+    <Card className='border-2 border-border/50 shadow-lg'>
+      <CardHeader className='pb-6'>
+        <CardTitle className='flex items-center gap-3 text-xl'>
+          <div className='p-2 rounded-lg bg-primary/10 border border-primary/20'>
+            <Shield className='h-5 w-5 text-primary' />
+          </div>
           Risk Analysis
         </CardTitle>
       </CardHeader>
-      <CardContent className='space-y-6'>
-        {/* Risk Summary */}
+      <CardContent className='space-y-8'>
         <div>
-          <h4 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-            <Shield className='h-4 w-4' />
+          <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
+            <Shield className='h-5 w-5 text-primary' />
             Risk Summary
           </h4>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
             <div
-              className='p-4 bg-gray-50 rounded-lg border-l-4'
-              style={{ borderLeftColor: riskSummary.risk_color }}
+              className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
+              style={{ borderColor: riskSummary.risk_color }}
             >
-              <p className='text-sm text-gray-600 mb-1'>Portfolio Risk Level</p>
-              <p
-                className='text-xl font-bold'
-                style={{ color: riskSummary.risk_color }}
-              >
-                {riskSummary.overall_risk_level}
-              </p>
-              <p className='text-xs text-gray-500 mt-1'>
-                Based on correlation & concentration
-              </p>
+              <div className='flex items-center justify-between mb-4'>
+                <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                  <Shield
+                    className='h-5 w-5'
+                    style={{ color: riskSummary.risk_color }}
+                  />
+                </div>
+                <div className='text-right'>
+                  <p className='text-xs font-medium text-muted-foreground'>
+                    Overall Assessment
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p
+                  className='text-2xl font-bold mb-2'
+                  style={{ color: riskSummary.risk_color }}
+                >
+                  {riskSummary.overall_risk_level}
+                </p>
+                <p className='text-sm text-muted-foreground'>
+                  Based on correlation & concentration
+                </p>
+              </div>
             </div>
+
             <div
-              className='p-4 bg-gray-50 rounded-lg border-l-4'
-              style={{
-                borderLeftColor: riskSummary.diversification_score.color,
-              }}
+              className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
+              style={{ borderColor: riskSummary.diversification_score.color }}
             >
-              <p className='text-sm text-gray-600 mb-1'>
-                Diversification Score
-              </p>
-              <p
-                className='text-xl font-bold'
-                style={{ color: riskSummary.diversification_score.color }}
-              >
-                {riskSummary.diversification_score.score}/100
-              </p>
-              <p className='text-xs text-gray-500 mt-1 line-clamp-2'>
-                {riskSummary.diversification_score.explanation ||
-                  'Diversification analysis completed'}
-              </p>
+              <div className='flex items-center justify-between mb-4'>
+                <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                  <PieChart
+                    className='h-5 w-5'
+                    style={{ color: riskSummary.diversification_score.color }}
+                  />
+                </div>
+                <div className='text-right'>
+                  <p className='text-xs font-medium text-muted-foreground'>
+                    Portfolio Balance
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p
+                  className='text-2xl font-bold mb-2'
+                  style={{ color: riskSummary.diversification_score.color }}
+                >
+                  {riskSummary.diversification_score.score}/100
+                </p>
+                <p className='text-sm text-muted-foreground line-clamp-2'>
+                  {riskSummary.diversification_score.explanation ||
+                    'Diversification analysis completed'}
+                </p>
+              </div>
             </div>
-            <div className='p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500'>
-              <p className='text-sm text-gray-600 mb-1'>Risk Score</p>
-              <p className='text-xl font-bold text-gray-900'>
-                {riskSummary.risk_score}/100
-              </p>
+
+            <div className='relative overflow-hidden rounded-xl border-2 border-primary/30 p-6 bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm hover:shadow-md transition-shadow'>
+              <div className='flex items-center justify-between mb-4'>
+                <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                  <BarChart3 className='h-5 w-5 text-primary' />
+                </div>
+                <div className='text-right'>
+                  <p className='text-xs font-medium text-muted-foreground'>
+                    Risk Score
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className='text-2xl font-bold text-primary mb-2'>
+                  {riskSummary.risk_score}/100
+                </p>
+                <p className='text-sm text-muted-foreground'>
+                  Comprehensive risk metric
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Correlation Analysis */}
         {correlationAnalysis.success ? (
           <div>
-            <h4 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-              <TrendingUp className='h-4 w-4' />
+            <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
+              <TrendingUp className='h-5 w-5 text-primary' />
               Correlation Analysis
             </h4>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
               <div
-                className='p-4 bg-gray-50 rounded-lg border-l-4'
+                className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
                 style={{
-                  borderLeftColor:
+                  borderColor:
                     correlationAnalysis.most_correlated_pair.risk_color,
                 }}
               >
-                <p className='text-sm text-gray-600 mb-1'>
-                  Most Correlated Pair
-                </p>
-                <p className='text-lg font-semibold text-gray-900'>
-                  {correlationAnalysis.most_correlated_pair.asset1} &{' '}
-                  {correlationAnalysis.most_correlated_pair.asset2}
-                </p>
-                <p
-                  className='text-sm font-semibold'
-                  style={{
-                    color: correlationAnalysis.most_correlated_pair.risk_color,
-                  }}
-                >
-                  {(
-                    correlationAnalysis.most_correlated_pair.correlation * 100
-                  ).toFixed(1)}
-                  % correlation
-                </p>
-                <p className='text-xs text-gray-500 mt-1'>
-                  {correlationAnalysis.most_correlated_pair.risk_description}
-                </p>
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                    <TrendingUp
+                      className='h-5 w-5'
+                      style={{
+                        color:
+                          correlationAnalysis.most_correlated_pair.risk_color,
+                      }}
+                    />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-xs font-medium text-muted-foreground'>
+                      Highest Correlation
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-lg font-semibold text-foreground mb-1'>
+                    {correlationAnalysis.most_correlated_pair.asset1} &{' '}
+                    {correlationAnalysis.most_correlated_pair.asset2}
+                  </p>
+                  <p
+                    className='text-xl font-bold mb-2'
+                    style={{
+                      color:
+                        correlationAnalysis.most_correlated_pair.risk_color,
+                    }}
+                  >
+                    {(
+                      correlationAnalysis.most_correlated_pair.correlation * 100
+                    ).toFixed(1)}
+                    %
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    {correlationAnalysis.most_correlated_pair.risk_description}
+                  </p>
+                </div>
               </div>
+
               <div
-                className='p-4 bg-gray-50 rounded-lg border-l-4'
+                className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
                 style={{
-                  borderLeftColor:
+                  borderColor:
                     correlationAnalysis.concentration_metrics.risk_color,
                 }}
               >
-                <p className='text-sm text-gray-600 mb-1'>
-                  Portfolio Concentration
-                </p>
-                <p className='text-lg font-semibold text-gray-900'>
-                  HHI: {correlationAnalysis.concentration_metrics.hhi}
-                </p>
-                <p
-                  className='text-sm font-semibold'
-                  style={{
-                    color: correlationAnalysis.concentration_metrics.risk_color,
-                  }}
-                >
-                  {
-                    correlationAnalysis.concentration_metrics
-                      .concentration_level
-                  }
-                </p>
-                <p className='text-xs text-gray-500 mt-1'>
-                  Largest:{' '}
-                  {
-                    correlationAnalysis.concentration_metrics.largest_holding
-                      .ticker
-                  }{' '}
-                  (
-                  {
-                    correlationAnalysis.concentration_metrics.largest_holding
-                      .percentage
-                  }
-                  %)
-                </p>
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                    <Target
+                      className='h-5 w-5'
+                      style={{
+                        color:
+                          correlationAnalysis.concentration_metrics.risk_color,
+                      }}
+                    />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-xs font-medium text-muted-foreground'>
+                      Concentration Risk
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-lg font-semibold text-foreground mb-1'>
+                    HHI: {correlationAnalysis.concentration_metrics.hhi}
+                  </p>
+                  <p
+                    className='text-xl font-bold mb-2'
+                    style={{
+                      color:
+                        correlationAnalysis.concentration_metrics.risk_color,
+                    }}
+                  >
+                    {
+                      correlationAnalysis.concentration_metrics
+                        .concentration_level
+                    }
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    Largest:{' '}
+                    {
+                      correlationAnalysis.concentration_metrics.largest_holding
+                        .ticker
+                    }{' '}
+                    (
+                    {
+                      correlationAnalysis.concentration_metrics.largest_holding
+                        .percentage
+                    }
+                    %)
+                  </p>
+                </div>
               </div>
-              <div className='p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500'>
-                <p className='text-sm text-gray-600 mb-1'>
-                  Average Correlation
-                </p>
-                <p className='text-lg font-semibold text-gray-900'>
-                  {(correlationAnalysis.average_correlation * 100).toFixed(1)}%
-                </p>
-                <p className='text-xs text-gray-500 mt-1'>
-                  Lower is better for diversification
-                </p>
+
+              <div className='relative overflow-hidden rounded-xl border-2 border-primary/30 p-6 bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm hover:shadow-md transition-shadow'>
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                    <Activity className='h-5 w-5 text-primary' />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-xs font-medium text-muted-foreground'>
+                      Portfolio Correlation
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-2xl font-bold text-primary mb-2'>
+                    {(correlationAnalysis.average_correlation * 100).toFixed(1)}
+                    %
+                  </p>
+                  <p className='text-sm text-muted-foreground'>
+                    Lower is better for diversification
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         ) : (
           <div>
-            <h4 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-              <TrendingUp className='h-4 w-4' />
+            <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
+              <TrendingUp className='h-5 w-5 text-primary' />
               Correlation Analysis
             </h4>
             {correlationAnalysis.single_asset_portfolio ? (
-              <Alert>
-                <AlertTriangle className='h-4 w-4' />
-                <AlertDescription>
+              <Alert className='border-amber-200 bg-amber-50 dark:bg-amber-950/20'>
+                <AlertTriangle className='h-4 w-4 text-amber-600' />
+                <AlertDescription className='text-amber-800 dark:text-amber-200'>
                   <strong>Single Asset Portfolio Detected</strong>
                   <br />
                   Correlation analysis is not applicable for single asset
@@ -605,58 +740,26 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
                 </AlertDescription>
               </Alert>
             )}
-
-            {/* Show concentration metrics even if correlation fails */}
-            <div className='mt-4'>
-              <div
-                className='p-4 bg-gray-50 rounded-lg border-l-4'
-                style={{
-                  borderLeftColor:
-                    correlationAnalysis.concentration_metrics.risk_color,
-                }}
-              >
-                <p className='text-sm text-gray-600 mb-1'>
-                  Portfolio Concentration
-                </p>
-                <p className='text-lg font-semibold text-gray-900'>
-                  HHI: {correlationAnalysis.concentration_metrics.hhi}
-                </p>
-                <p
-                  className='text-sm font-semibold'
-                  style={{
-                    color: correlationAnalysis.concentration_metrics.risk_color,
-                  }}
-                >
-                  {
-                    correlationAnalysis.concentration_metrics
-                      .concentration_level
-                  }
-                </p>
-                <p className='text-xs text-gray-500 mt-1'>
-                  {correlationAnalysis.single_asset_portfolio
-                    ? `Single Asset: ${correlationAnalysis.concentration_metrics.largest_holding.ticker} (100.0%)`
-                    : `Largest: ${correlationAnalysis.concentration_metrics.largest_holding.ticker} (${correlationAnalysis.concentration_metrics.largest_holding.percentage}%)`}
-                </p>
-              </div>
-            </div>
           </div>
         )}
 
-        {/* Key Concerns */}
         {riskSummary.key_concerns && riskSummary.key_concerns.length > 0 && (
           <div>
-            <h4 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-              <AlertTriangle className='h-4 w-4' />
+            <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
+              <AlertTriangle className='h-5 w-5 text-amber-600' />
               Key Concerns
             </h4>
-            <div className='space-y-2'>
+            <div className='grid gap-4'>
               {riskSummary.key_concerns.map(
                 (concern: string, index: number) => (
                   <div
                     key={index}
-                    className='p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded'
+                    className='flex items-start gap-4 p-4 bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-400 rounded-lg'
                   >
-                    <p className='text-sm text-yellow-800'>{concern}</p>
+                    <AlertTriangle className='h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0' />
+                    <p className='text-sm text-amber-800 dark:text-amber-200 leading-relaxed'>
+                      {concern}
+                    </p>
                   </div>
                 )
               )}
@@ -664,24 +767,33 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
           </div>
         )}
 
-        {/* Recommendations */}
         {recommendations && recommendations.length > 0 && (
           <div>
-            <h4 className='text-lg font-semibold mb-4 flex items-center gap-2'>
-              <Lightbulb className='h-4 w-4' />
+            <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
+              <Lightbulb className='h-5 w-5 text-primary' />
               Recommendations
             </h4>
-            <div className='space-y-3'>
+            <div className='grid gap-6'>
               {recommendations.map((rec: any, index: number) => (
                 <div
                   key={index}
-                  className='p-4 bg-gray-50 rounded-lg border-l-4'
-                  style={{ borderLeftColor: getPriorityColor(rec.priority) }}
+                  className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
+                  style={{ borderColor: getPriorityColor(rec.priority) }}
                 >
-                  <div className='flex justify-between items-center mb-2'>
-                    <h5 className='font-semibold text-gray-900'>{rec.title}</h5>
+                  <div className='flex justify-between items-start mb-4'>
+                    <div className='flex items-center gap-3'>
+                      <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                        <Lightbulb
+                          className='h-5 w-5'
+                          style={{ color: getPriorityColor(rec.priority) }}
+                        />
+                      </div>
+                      <h5 className='font-semibold text-foreground text-lg'>
+                        {rec.title}
+                      </h5>
+                    </div>
                     <Badge
-                      className='text-xs font-semibold'
+                      className='text-xs font-semibold px-3 py-1'
                       style={{
                         backgroundColor: getPriorityColor(rec.priority),
                         color: 'white',
@@ -690,12 +802,15 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
                       {rec.priority.toUpperCase()}
                     </Badge>
                   </div>
-                  <p className='text-sm text-gray-600 mb-2'>
+                  <p className='text-muted-foreground mb-4 leading-relaxed'>
                     {rec.description}
                   </p>
-                  <p className='text-xs font-semibold text-gray-900'>
-                    Action: {rec.action}
-                  </p>
+                  <div className='flex items-start gap-2 p-3 bg-muted/30 rounded-lg'>
+                    <ArrowUpRight className='h-4 w-4 text-primary mt-0.5 flex-shrink-0' />
+                    <p className='text-sm font-medium text-foreground'>
+                      <span className='text-primary'>Action:</span> {rec.action}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
