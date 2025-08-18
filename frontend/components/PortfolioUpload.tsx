@@ -321,163 +321,182 @@ export default function PortfolioUpload() {
             </TabsList>
 
             {/* Easy Connection (API) */}
-            <TabsContent value='snaptrade' className='space-y-4'>
-              {snapTradeStep === 'connection' && (
-                <SnapTradeConnection
-                  onConnectionSuccess={handleSnapTradeConnectionSuccess}
-                  onError={handleSnapTradeError}
-                />
-              )}
-
-              {snapTradeStep === 'account' && snapTradeUserData && (
-                <AccountSelector
-                  userData={snapTradeUserData}
-                  onAccountSelect={handleAccountSelect}
-                  onError={handleSnapTradeError}
-                />
-              )}
-
-              {snapTradeStep === 'positions' &&
-                snapTradeUserData &&
-                selectedAccountId && (
-                  <PositionExtractor
-                    userData={snapTradeUserData}
-                    accountId={selectedAccountId}
-                    onPositionsExtracted={handlePositionsExtracted}
+            <TabsContent
+              value='snaptrade'
+              className='min-h-[500px] sm:min-h-[550px] md:min-h-[600px]'
+            >
+              <div className='space-y-4 h-full overflow-y-auto'>
+                {snapTradeStep === 'connection' && (
+                  <SnapTradeConnection
+                    onConnectionSuccess={handleSnapTradeConnectionSuccess}
                     onError={handleSnapTradeError}
                   />
                 )}
 
-              {snapTradeStep === 'manual' && (
-                <div className='space-y-4'>
-                  <Alert>
-                    <CheckCircle className='h-4 w-4' />
-                    <AlertDescription>
-                      Your portfolio positions have been extracted and loaded
-                      into the manual adjustment form. You can now review and
-                      modify the data before running the volatility analysis.
-                    </AlertDescription>
-                  </Alert>
-                  <Button
-                    onClick={() => setActiveTab('manual')}
-                    className='w-full'
-                    size='lg'
-                  >
-                    <Edit3 className='mr-2 h-4 w-4' />
-                    Go to Manual Adjustment
-                  </Button>
-                </div>
-              )}
-            </TabsContent>
+                {snapTradeStep === 'account' && snapTradeUserData && (
+                  <AccountSelector
+                    userData={snapTradeUserData}
+                    onAccountSelect={handleAccountSelect}
+                    onError={handleSnapTradeError}
+                  />
+                )}
 
-            {/* CSV Upload Tab */}
-            <TabsContent value='csv' className='space-y-4'>
-              <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-                  isDragOver
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <Upload className='h-12 w-12 mx-auto mb-4 text-gray-400' />
-                <p className='text-lg font-medium mb-2'>
-                  Drag and drop your CSV file here
-                </p>
-                <p className='text-sm text-gray-600 mb-4'>or click to browse</p>
-                <p className='text-xs text-gray-500 mb-4'>
-                  Required columns: Ticker, Weight
-                </p>
+                {snapTradeStep === 'positions' &&
+                  snapTradeUserData &&
+                  selectedAccountId && (
+                    <PositionExtractor
+                      userData={snapTradeUserData}
+                      accountId={selectedAccountId}
+                      onPositionsExtracted={handlePositionsExtracted}
+                      onError={handleSnapTradeError}
+                    />
+                  )}
 
-                <input
-                  type='file'
-                  accept='.csv'
-                  onChange={handleFileInput}
-                  className='hidden'
-                  id='file-input'
-                />
-                <label htmlFor='file-input'>
-                  <Button asChild>
-                    <span>
-                      <FileText className='h-4 w-4 mr-2' />
-                      Choose File
-                    </span>
-                  </Button>
-                </label>
-              </div>
-
-              {selectedFile && (
-                <div className='p-3 bg-green-50 border border-green-200 rounded-lg'>
-                  <div className='flex items-center gap-2'>
-                    <CheckCircle className='h-4 w-4 text-green-600' />
-                    <span className='text-sm font-medium text-green-800'>
-                      Selected: {selectedFile.name}
-                    </span>
-                  </div>
-                  <p className='text-xs text-green-600 mt-1'>
-                    Size: {(selectedFile.size / 1024).toFixed(2)} KB
-                  </p>
-                </div>
-              )}
-
-              {selectedFile && validationResult && validationResult.isValid && (
-                <div className='mt-4 flex gap-2'>
-                  <Button onClick={handlePredict} disabled={isLoading}>
-                    {isLoading ? 'Analyzing...' : 'Predict Volatility'}
-                  </Button>
-                  <Button
-                    variant='outline'
-                    onClick={handleShowValidation}
-                    disabled={isLoading}
-                    className='flex items-center gap-2'
-                  >
-                    <CheckCircle className='h-4 w-4' />
-                    View Validation Details
-                    <ChevronDown className='h-4 w-4' />
-                  </Button>
-                </div>
-              )}
-
-              {selectedFile &&
-                validationResult &&
-                !validationResult.isValid && (
-                  <div className='mt-4 flex gap-2'>
+                {snapTradeStep === 'manual' && (
+                  <div className='space-y-4'>
+                    <Alert>
+                      <CheckCircle className='h-4 w-4' />
+                      <AlertDescription>
+                        Your portfolio positions have been extracted and loaded
+                        into the manual adjustment form. You can now review and
+                        modify the data before running the volatility analysis.
+                      </AlertDescription>
+                    </Alert>
                     <Button
-                      variant='outline'
-                      onClick={handleShowValidation}
-                      disabled={isLoading}
-                      className='flex items-center gap-2 bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                      onClick={() => setActiveTab('manual')}
+                      className='w-full'
+                      size='lg'
                     >
-                      <AlertCircle className='h-4 w-4' />
-                      View Validation Issues
-                      <ChevronDown className='h-4 w-4' />
+                      <Edit3 className='mr-2 h-4 w-4' />
+                      Go to Manual Adjustment
                     </Button>
                   </div>
                 )}
+              </div>
+            </TabsContent>
 
-              <div className='text-center'>
-                <Button variant='outline' onClick={downloadSample} size='sm'>
-                  <Download className='h-4 w-4 mr-2' />
-                  Download Sample Portfolio CSV
-                </Button>
+            {/* CSV Upload Tab */}
+            <TabsContent
+              value='csv'
+              className='min-h-[500px] sm:min-h-[550px] md:min-h-[600px]'
+            >
+              <div className='space-y-4 h-full overflow-y-auto'>
+                <div
+                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+                    isDragOver
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <Upload className='h-12 w-12 mx-auto mb-4 text-gray-400' />
+                  <p className='text-lg font-medium mb-2'>
+                    Drag and drop your CSV file here
+                  </p>
+                  <p className='text-sm text-gray-600 mb-4'>
+                    or click to browse
+                  </p>
+                  <p className='text-xs text-gray-500 mb-4'>
+                    Required columns: Ticker, Weight
+                  </p>
+
+                  <input
+                    type='file'
+                    accept='.csv'
+                    onChange={handleFileInput}
+                    className='hidden'
+                    id='file-input'
+                  />
+                  <label htmlFor='file-input'>
+                    <Button asChild>
+                      <span>
+                        <FileText className='h-4 w-4 mr-2' />
+                        Choose File
+                      </span>
+                    </Button>
+                  </label>
+                </div>
+
+                {selectedFile && (
+                  <div className='p-3 bg-green-50 border border-green-200 rounded-lg'>
+                    <div className='flex items-center gap-2'>
+                      <CheckCircle className='h-4 w-4 text-green-600' />
+                      <span className='text-sm font-medium text-green-800'>
+                        Selected: {selectedFile.name}
+                      </span>
+                    </div>
+                    <p className='text-xs text-green-600 mt-1'>
+                      Size: {(selectedFile.size / 1024).toFixed(2)} KB
+                    </p>
+                  </div>
+                )}
+
+                {selectedFile &&
+                  validationResult &&
+                  validationResult.isValid && (
+                    <div className='mt-4 flex gap-2'>
+                      <Button onClick={handlePredict} disabled={isLoading}>
+                        {isLoading ? 'Analyzing...' : 'Predict Volatility'}
+                      </Button>
+                      <Button
+                        variant='outline'
+                        onClick={handleShowValidation}
+                        disabled={isLoading}
+                        className='flex items-center gap-2'
+                      >
+                        <CheckCircle className='h-4 w-4' />
+                        View Validation Details
+                        <ChevronDown className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  )}
+
+                {selectedFile &&
+                  validationResult &&
+                  !validationResult.isValid && (
+                    <div className='mt-4 flex gap-2'>
+                      <Button
+                        variant='outline'
+                        onClick={handleShowValidation}
+                        disabled={isLoading}
+                        className='flex items-center gap-2 bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
+                      >
+                        <AlertCircle className='h-4 w-4' />
+                        View Validation Issues
+                        <ChevronDown className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  )}
+
+                <div className='text-center'>
+                  <Button variant='outline' onClick={downloadSample} size='sm'>
+                    <Download className='h-4 w-4 mr-2' />
+                    Download Sample Portfolio CSV
+                  </Button>
+                </div>
               </div>
             </TabsContent>
 
             {/* Manual Entry Tab */}
-            <TabsContent value='manual' className='space-y-4'>
-              <ManualPortfolioSection
-                manualAssets={manualAssets}
-                onUpdateAssets={setManualAssets}
-                onValidate={async () => {
-                  const validation = await validateManualPortfolioLocal();
-                  setValidationResult(validation);
-                  setShowValidation(true);
-                }}
-                getTotalWeight={getTotalWeight}
-                getWeightColor={getWeightColor}
-              />
+            <TabsContent
+              value='manual'
+              className='min-h-[500px] sm:min-h-[550px] md:min-h-[600px]'
+            >
+              <div className='space-y-4 h-full overflow-y-auto'>
+                <ManualPortfolioSection
+                  manualAssets={manualAssets}
+                  onUpdateAssets={setManualAssets}
+                  onValidate={async () => {
+                    const validation = await validateManualPortfolioLocal();
+                    setValidationResult(validation);
+                    setShowValidation(true);
+                  }}
+                  getTotalWeight={getTotalWeight}
+                  getWeightColor={getWeightColor}
+                />
+              </div>
             </TabsContent>
           </Tabs>
 
