@@ -1,0 +1,37 @@
+---
+description: Next.js 15.4 with React 19
+globs: /.ts, **/.tsx, app//page.tsx, app//layout.tsx, app//template.tsx, app//route.ts, app//loading.tsx, app//error.tsx, app//not-found.tsx, app//unauthorized.tsx, app//forbidden.tsx, middleware.ts, instrumentation.{ts,tsx}, next.config.ts
+alwaysApply: true
+---
+
+You are an expert in Next.js App Router, TypeScript, React 19, Turbopack, and Vercel tooling. You are focusing on producing clear and readable code.
+
+You always use the latest stable versions of Next.js 15.4 and React 19 and you are familiar with the latest features and best practices.  ￼
+
+## Project Structure
+	•	Prefer the App Router and organize routes under app with a root layout and page files. Use src/app to keep config files at the repository root and keep public at the root. Add middleware in src if you use the src pattern.  ￼
+	•	Group routes by feature using Route Groups and colocate server logic with UI in route handlers within the same segment where practical. Prefer route.js files under app for HTTP handlers.  ￼
+	•	Adopt special files to standardize UX. Use error.tsx for recoverable errors and not-found.tsx for 404 states. Use unauthorized.tsx and forbidden.tsx for auth boundaries. Call notFound or unauthorized or forbidden from server code to jump to the matching UI.  ￼
+
+## Code Style
+	•	Default to Server Components. Mark the smallest necessary leaves as Client Components. Keep client code lean and avoid importing server-only modules across the boundary. This reduces bundle size and improves performance.  ￼
+	•	Co-locate data fetching with the component that renders it on the server. Use fetch with appropriate cache directives and revalidation rather than ad hoc client fetches.  ￼
+	•	Prefer next.config.ts. Type the config with NextConfig and keep experimental flags isolated behind clear comments and ownership.  ￼
+	•	Use Turbopack in development. Use next dev with the turbo flag to speed up local feedback loops. Evaluate next build with Turbopack only when it meets your app needs.  ￼
+
+## Usage
+	•	Handle the Next.js 15 caching shift. GET route handlers are uncached by default in 15. Opt in to static behavior with segment config such as dynamic set to force-static or apply explicit fetch caching. Page segments in the client router cache now default to a zero stale time which favors freshness when navigating.  ￼
+	•	Use revalidateTag and revalidatePath for precise cache invalidation. Tag important fetches and invalidate on successful mutations. Prefer tags for broad fan-out.  ￼
+	•	Adopt Server Actions for mutations. Keep actions in server files or mark inline action functions with the use server directive. Post forms with the Form Component where possible and use useFormStatus in clients for pending feedback. Avoid exporting server actions from client files.  ￼
+	•	Prefer Edge when you need low latency and Web APIs only. Prefer the Node.js runtime when you need Node APIs or large native deps. Set runtime per route segment. Manage behavior with the Route Segment Config rather than global switches.  ￼
+	•	Use after for post-response work in streaming flows. Log metrics and fire-and-forget tasks after the response completes to keep interactions snappy.  ￼
+	•	Keep navigation fast without breaking data freshness. Rely on built-in prefetch and streaming. Tune the experimental staleTimes only if you fully understand the tradeoffs and document why it is enabled. The feature remains experimental.  ￼
+	•	Treat Partial Prerendering as experimental. Do not turn it on globally. Adopt incrementally on safe routes and wrap dynamic islands in Suspense. Track canary changes before enabling in production.
+	•	Enable optimizePackageImports for heavy libraries to improve cold starts and dev responsiveness. Favor libraries known to benefit such as large icon sets. Verify the bundles and keep the list narrow.  ￼ ￼
+	•	Use typed routes carefully. The typedRoutes flag is still experimental. Keep it disabled in production unless your team accepts canary constraints and has tests that guard route generation.  ￼
+	•	Keep React Compiler behind an explicit flag and scope it. Start with a small subtree and measure regressions in build times and correctness before expanding use.  ￼
+	•	Prefer route handlers over the legacy API Routes for new code in the App Router. Use file colocated handlers for fine control over caching and streaming. Remember the 15 default for GET is uncached.  ￼
+	•	Build resilient forms. Use the Form Component to post directly to server actions. Use progressive enhancement by handling both script-enabled and script-disabled clients. Show optimistic UI only where you can safely roll back.  ￼
+	•	Structure auth flows with middleware and the new auth interrupt files. Short-circuit unauthorized access at the edge with middleware and render contextual unauthorized or forbidden UIs in app segments.  ￼
+	•	Favor the src layout. Place app under src/app. Keep tsconfig and next.config.ts at the root and update Tailwind content globs and path aliases to include src.  ￼
+	•	Document every experimental toggle with owner, scope, and rollback steps. Audit flags like ppr, staleTimes, viewTransition, typedRoutes, and reactCompiler during upgrades since they are not recommended for production by default.

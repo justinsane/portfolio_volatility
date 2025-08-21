@@ -84,7 +84,8 @@ def predict_volatility(portfolio_df: pd.DataFrame, forecast_days: int = 20):
                     "overall_confidence": result['overall_confidence'],
                     "asset_details": result['asset_details'],
                     "data_sources_used": result['data_sources_used']
-                }
+                },
+                "correlation_analysis": result.get('correlation_analysis', {})
             }
         else:
             logger.warning("Enhanced model not available. Falling back to original model.")

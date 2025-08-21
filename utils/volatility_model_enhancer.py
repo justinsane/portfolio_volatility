@@ -224,8 +224,10 @@ class VolatilityModelEnhancer:
         print(f"  • Weight coverage: {coverage['coverage_by_weight']:.1%}")
         print(f"  • Unknown assets: {', '.join(coverage['unknown_asset_list'][:5])}")
         
-        # Calculate portfolio volatility using enhanced estimates (1y realized base)
-        base_portfolio_vol = self._calculate_portfolio_volatility(weights, asset_volatilities)
+        # Get enhanced portfolio volatility with real correlations
+        enhanced_result = self.enhanced_estimator.estimate_portfolio_volatility_enhanced(portfolio_df, use_apis=use_apis)
+        base_portfolio_vol = enhanced_result['portfolio_volatility']
+        correlation_analysis = enhanced_result.get('correlation_analysis', {})
 
         # Try original model for a bounded ML adjustment (forward-looking tilt)
         original_result = None
@@ -280,7 +282,8 @@ class VolatilityModelEnhancer:
             'enhancement_stats': self.enhancement_stats.copy(),
             'interpretation': self._interpret_enhanced_prediction(final_portfolio_vol),
             'model_type': 'enhanced_multi_source',
-            'data_sources_used': self._get_data_sources_used(enhanced_asset_details)
+            'data_sources_used': self._get_data_sources_used(enhanced_asset_details),
+            'correlation_analysis': correlation_analysis
         }
     
     def _calculate_portfolio_volatility(self, weights: np.ndarray, 

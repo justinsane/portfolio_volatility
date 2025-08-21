@@ -8,6 +8,7 @@ import warnings
 import time
 from typing import Dict, Optional, Tuple
 from dotenv import load_dotenv
+from .risk_analysis.correlation_analyzer import CorrelationAnalyzer
 
 warnings.filterwarnings('ignore')
 
@@ -26,6 +27,9 @@ class EnhancedVolatilityEstimator:
         # Load API keys from environment variables if not provided
         self.alpha_vantage_key = alpha_vantage_key or os.getenv('ALPHA_VANTAGE_KEY') or os.getenv('ALPHA_VANTAGE_API_KEY')
         self.fmp_key = fmp_key or os.getenv('FMP_KEY') or os.getenv('FMP_API_KEY')
+        
+        # Initialize correlation analyzer for real correlation data
+        self.correlation_analyzer = CorrelationAnalyzer()
         
         # Enhanced volatility database with more comprehensive coverage
         self.enhanced_volatility_map = self._build_enhanced_volatility_map()
@@ -510,24 +514,62 @@ class EnhancedVolatilityEstimator:
             
             print(f"  {ticker}: {asset_vol:.1%} ({vol_result['confidence']} confidence, {vol_result['data_source']})")
         
-        # Calculate portfolio volatility (simplified - assumes correlation of 0.6)
-        # In practice, you'd want to calculate the full covariance matrix
+        # Calculate portfolio volatility using real correlations from CorrelationAnalyzer
         asset_volatilities = np.array(asset_volatilities)
         
         # Weighted average approach (conservative)
         weighted_avg_vol = np.sum(weights * asset_volatilities)
         
-        # Diversification-adjusted approach
-        # Assumes average correlation of 0.6 between assets
-        avg_correlation = 0.6
-        variance_sum = np.sum((weights * asset_volatilities) ** 2)
-        covariance_sum = avg_correlation * np.sum([
-            weights[i] * weights[j] * asset_volatilities[i] * asset_volatilities[j]
-            for i in range(len(weights))
-            for j in range(len(weights))
-            if i != j
-        ])
-        portfolio_volatility = np.sqrt(variance_sum + covariance_sum)
+        # Get real correlation data from CorrelationAnalyzer
+        correlation_result = self.correlation_analyzer.analyze_portfolio_correlations(portfolio_df)
+        
+        if correlation_result['success'] and len(portfolio_df) > 1:
+            # Use actual correlation matrix if available
+            try:
+                correlation_matrix = pd.DataFrame(correlation_result['correlation_matrix'])
+                
+                # Calculate portfolio volatility using real correlations
+                variance_sum = np.sum((weights * asset_volatilities) ** 2)
+                covariance_sum = 0
+                
+                for i in range(len(weights)):
+                    for j in range(len(weights)):
+                        if i != j:
+                            # Get correlation from matrix (handle potential missing values)
+                            corr_value = correlation_matrix.iloc[i, j]
+                            if pd.isna(corr_value):
+                                corr_value = 0.6  # Fallback to assumption if correlation is missing
+                            covariance_sum += weights[i] * weights[j] * asset_volatilities[i] * asset_volatilities[j] * corr_value
+                
+                portfolio_volatility = np.sqrt(variance_sum + covariance_sum)
+                correlation_method = "Real Correlation Matrix"
+                avg_correlation = correlation_result.get('average_correlation', 0.6)
+                
+            except Exception as e:
+                print(f"Error using real correlation matrix: {e}")
+                # Fall back to average correlation approach
+                avg_correlation = correlation_result.get('average_correlation', 0.6)
+                variance_sum = np.sum((weights * asset_volatilities) ** 2)
+                covariance_sum = avg_correlation * np.sum([
+                    weights[i] * weights[j] * asset_volatilities[i] * asset_volatilities[j]
+                    for i in range(len(weights))
+                    for j in range(len(weights))
+                    if i != j
+                ])
+                portfolio_volatility = np.sqrt(variance_sum + covariance_sum)
+                correlation_method = "Average Correlation from Analysis"
+        else:
+            # Fall back to assumption-based approach
+            avg_correlation = 0.6
+            variance_sum = np.sum((weights * asset_volatilities) ** 2)
+            covariance_sum = avg_correlation * np.sum([
+                weights[i] * weights[j] * asset_volatilities[i] * asset_volatilities[j]
+                for i in range(len(weights))
+                for j in range(len(weights))
+                if i != j
+            ])
+            portfolio_volatility = np.sqrt(variance_sum + covariance_sum)
+            correlation_method = "Assumption (0.6 correlation)"
         
         return {
             'portfolio_volatility': portfolio_volatility,
@@ -538,6 +580,12 @@ class EnhancedVolatilityEstimator:
                 'high': sum(1 for detail in asset_details if detail['confidence'] == 'High'),
                 'medium': sum(1 for detail in asset_details if detail['confidence'] == 'Medium'),
                 'low': sum(1 for detail in asset_details if detail['confidence'] == 'Low')
+            },
+            'correlation_analysis': {
+                'method_used': correlation_method,
+                'average_correlation': avg_correlation,
+                'correlation_success': correlation_result.get('success', False),
+                'correlation_data': correlation_result
             }
         }
 
