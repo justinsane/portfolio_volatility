@@ -28,6 +28,7 @@ import {
   warmFromEnhancementDetails,
 } from '@/lib/tickerResolver';
 import EmailSignup from './ui/EmailSignup';
+import CrashTestPanel from './CrashTestPanel';
 
 interface PortfolioResultsProps {
   result: PredictionResult;
@@ -69,6 +70,9 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
       {result.risk_analysis && result.risk_analysis.success && (
         <RiskAnalysisDisplay riskAnalysis={result.risk_analysis} />
       )}
+
+      {/* Crash Test Analysis */}
+      <CrashTestPanel portfolio={result.portfolio_assets} />
 
       <div className='rounded-2xl bg-gradient-to-r from-primary/5 to-accent/5 border border-border/50 p-8'>
         <EmailSignup onSubmit={submitEmailSignup} />

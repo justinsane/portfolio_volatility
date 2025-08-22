@@ -22,6 +22,7 @@ from utils.model_predict import predict_volatility
 from utils.risk_analysis.risk_analyzer import RiskAnalyzer
 from utils.snaptrade_utils_production import ProductionSnapTradeManager, generate_user_id
 from utils.enhanced_volatility_estimator import EnhancedVolatilityEstimator
+from utils.crash_test_services import CrashTestService, CRASH_SCENARIOS
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -62,6 +63,14 @@ try:
 except Exception as e:
     print(f"❌ Failed to initialize volatility estimator: {e}")
     volatility_estimator = None
+
+# Initialize crash test service
+try:
+    crash_test_service = CrashTestService()
+    print("✅ Crash test service initialized successfully")
+except Exception as e:
+    print(f"❌ Failed to initialize crash test service: {e}")
+    crash_test_service = None
 
 @app.on_event("startup")
 async def startup_event():
@@ -802,4 +811,89 @@ async def get_snaptrade_status():
         return JSONResponse(
             status_code=500,
             content={"error": f"Failed to get status: {str(e)}"}
+        )
+
+# --- Crash Test API endpoints ---
+
+class CrashTestRequest(BaseModel):
+    portfolio: List[Dict[str, Any]]
+    scenarios: List[Dict[str, Any]]
+    options: Dict[str, Any]
+
+@app.post("/api/crash_test")
+async def run_crash_test(request: CrashTestRequest):
+    """Run crash test analysis for portfolio stress testing"""
+    try:
+        if not crash_test_service:
+            return JSONResponse(
+                status_code=500,
+                content={"error": "Crash test service not initialized"}
+            )
+        
+        # Validate portfolio
+        if not request.portfolio:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "Portfolio cannot be empty"}
+            )
+        
+        # Validate weights sum to 1 (with some tolerance)
+        total_weight = sum(asset.get('weight', 0) for asset in request.portfolio)
+        if abs(total_weight - 1.0) > 0.01:
+            return JSONResponse(
+                status_code=400,
+                content={"error": f"Portfolio weights must sum to 1.0 (current sum: {total_weight:.3f})"}
+            )
+        
+        # Validate scenarios
+        if not request.scenarios:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "At least one scenario must be specified"}
+            )
+        
+        for scenario in request.scenarios:
+            required_fields = ['id', 'start', 'end']
+            missing_fields = [field for field in required_fields if field not in scenario]
+            if missing_fields:
+                return JSONResponse(
+                    status_code=400,
+                    content={"error": f"Scenario missing required fields: {missing_fields}"}
+                )
+        
+        # Set default options
+        options = {
+            "rebalance": "none",
+            "driftHandling": "renormDaily",
+            "currency": "USD",
+            "benchmarks": ["SPY", "AGG", "60_40"]
+        }
+        options.update(request.options)
+        
+        # Run crash test analysis
+        result = crash_test_service.run_crash_test(
+            portfolio=request.portfolio,
+            scenarios=request.scenarios,
+            options=options
+        )
+        
+        return JSONResponse(content=result)
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to run crash test: {str(e)}"}
+        )
+
+@app.get("/api/crash_test/scenarios")
+async def get_crash_scenarios():
+    """Get available crash test scenarios"""
+    try:
+        return JSONResponse(content={
+            "scenarios": list(CRASH_SCENARIOS.values())
+        })
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to get scenarios: {str(e)}"}
         )
