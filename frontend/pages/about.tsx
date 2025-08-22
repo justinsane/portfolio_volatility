@@ -308,6 +308,111 @@ export default function AboutPage() {
                     otherwise we fall back to category-level priors.
                   </AccordionContent>
                 </AccordionItem>
+                <AccordionItem value='how-volatility-calculated'>
+                  <AccordionTrigger>
+                    How do you calculate portfolio volatility?
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className='space-y-3 text-sm text-gray-600'>
+                      <p>
+                        <strong>Multi-Source Approach:</strong> We use a tiered
+                        system to estimate individual asset volatility:
+                      </p>
+                      <ol className='ml-4 space-y-2 list-decimal'>
+                        <li>
+                          <strong>Historical Data (Yahoo Finance):</strong>{' '}
+                          Calculate realized volatility from 1-year price data
+                          when available
+                        </li>
+                        <li>
+                          <strong>External APIs:</strong> Use Financial Modeling
+                          Prep and Alpha Vantage for additional data
+                        </li>
+                        <li>
+                          <strong>Enhanced Database:</strong> Fall back to our
+                          comprehensive database of 500+ known assets
+                        </li>
+                        <li>
+                          <strong>Pattern Classification:</strong> Use asset
+                          type patterns (stocks, bonds, ETFs, crypto) as final
+                          fallback
+                        </li>
+                      </ol>
+                      <p>
+                        <strong>Portfolio Calculation:</strong> We combine
+                        individual asset volatilities using real correlation
+                        data from historical price analysis, applying the
+                        standard portfolio variance formula with actual
+                        correlation coefficients rather than assumptions.
+                      </p>
+                      <p>
+                        <strong>Confidence Scoring:</strong> Each estimate
+                        includes confidence levels (High/Medium/Low) based on
+                        data quality and methodology used.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value='how-correlation-calculated'>
+                  <AccordionTrigger>
+                    How do you calculate correlations between assets?
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className='space-y-3 text-sm text-gray-600'>
+                      <p>
+                        <strong>Real Historical Correlations:</strong> We
+                        calculate actual correlation coefficients using 252
+                        trading days of historical price data from Yahoo
+                        Finance.
+                      </p>
+                      <p>
+                        <strong>Correlation Matrix:</strong> For each portfolio,
+                        we compute the full correlation matrix showing
+                        relationships between all asset pairs, identifying the
+                        most correlated pair and calculating the average
+                        correlation.
+                      </p>
+                      <p>
+                        <strong>Risk Assessment:</strong> Correlations are
+                        categorized by risk level:
+                      </p>
+                      <ul className='ml-4 space-y-1 list-disc'>
+                        <li>
+                          <strong>Very High (≥0.8):</strong> Red - High
+                          concentration risk
+                        </li>
+                        <li>
+                          <strong>High (0.6-0.8):</strong> Orange - Moderate
+                          concentration risk
+                        </li>
+                        <li>
+                          <strong>Moderate (0.4-0.6):</strong> Yellow - Some
+                          concentration risk
+                        </li>
+                        <li>
+                          <strong>Low (0.2-0.4):</strong> Teal - Good
+                          diversification
+                        </li>
+                        <li>
+                          <strong>Very Low (&lt;0.2):</strong> Green - Excellent
+                          diversification
+                        </li>
+                      </ul>
+                      <p>
+                        <strong>Fallback Strategy:</strong> When historical data
+                        is insufficient, we use conservative correlation
+                        assumptions (0.6 average) and clearly indicate this in
+                        the methodology.
+                      </p>
+                      <p>
+                        <strong>Portfolio Impact:</strong> Real correlations
+                        significantly affect portfolio volatility calculations -
+                        lower correlations provide better diversification
+                        benefits and reduce overall portfolio risk.
+                      </p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
                 <AccordionItem value='why-three-models'>
                   <AccordionTrigger>
                     Why multiple models instead of a single approach?
