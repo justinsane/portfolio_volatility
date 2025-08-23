@@ -15,25 +15,25 @@ CRASH_SCENARIOS = {
         "id": "dot_com",
         "label": "Dot-Com Bust",
         "start": "2000-03-24",
-        "end": "2002-10-09"
+        "end": "2007-10-09"
     },
     "gfc": {
         "id": "gfc", 
         "label": "Global Financial Crisis",
         "start": "2007-10-09",
-        "end": "2009-03-09"
+        "end": "2013-03-28"
     },
     "pandemic": {
         "id": "pandemic",
         "label": "Pandemic Crash",
         "start": "2020-02-19", 
-        "end": "2020-03-23"
+        "end": "2021-08-20"
     },
     "rate_shock_2022": {
         "id": "rate_shock_2022",
         "label": "2022 Rate Shock",
         "start": "2022-01-01",
-        "end": "2022-10-14"
+        "end": "2024-01-01"
     }
 }
 
@@ -62,6 +62,10 @@ class PriceService:
             # Fetch from Yahoo Finance
             ticker_obj = yf.Ticker(ticker)
             df = ticker_obj.history(start=start_date, end=end_date)
+            
+            # Ensure timezone-naive dates
+            if not df.empty and df.index.tz is not None:
+                df.index = df.index.tz_localize(None)
             
             if df.empty:
                 return pd.Series(dtype=float)
@@ -117,10 +121,12 @@ class PortfolioService:
                 coverage_data[ticker] = 0
         
         if not ticker_data:
+            # Identify which tickers have no data
+            missing_tickers = [asset['ticker'] for asset in portfolio if coverage_data.get(asset['ticker'], 0) == 0]
             return {
                 "returns": pd.Series(dtype=float),
                 "coverage": coverage_data,
-                "error": "No valid price data found"
+                "error": f"No valid price data found for tickers: {', '.join(missing_tickers)}. These assets may not have been trading during the specified period."
             }
         
         # Align all return series to common dates
@@ -305,7 +311,7 @@ class MetricsService:
     
     @staticmethod
     def _calculate_max_drawdown(equity_curve: pd.Series) -> Tuple[float, Optional[int], pd.Series]:
-        """Calculate maximum drawdown and time to recovery"""
+        """Calculate maximum drawdown and time to recovery from peak to recovery"""
         peaks = equity_curve.cummax()
         drawdown = equity_curve / peaks - 1.0
         
@@ -313,18 +319,44 @@ class MetricsService:
         max_dd = drawdown.min()
         trough_date = drawdown.idxmin()
         
-        # Find peak before trough
+        # Find peak before trough (this is the peak we need to recover to)
         peak_before = peaks.loc[:trough_date].idxmax()
         peak_value = peaks.loc[peak_before]
         
-        # Calculate time to recovery
+        # Calculate time to recovery FROM PEAK (not from trough)
         recovery_days = None
-        if trough_date < equity_curve.index[-1]:
-            # Look for recovery after trough
-            recovery_mask = equity_curve.loc[trough_date:] >= peak_value
-            if recovery_mask.any():
-                recovery_date = recovery_mask.idxmax()
-                recovery_days = (recovery_date - trough_date).days
+        if peak_before < equity_curve.index[-1]:
+            # Look for the first time equity recovers to peak value AFTER falling below it
+            # We need to find where equity first goes below peak, then recovers
+            equity_after_peak = equity_curve.loc[peak_before:]
+            
+            # Find the first time equity goes below peak value
+            below_peak_mask = equity_after_peak < peak_value
+            if below_peak_mask.any():
+                first_below_peak = below_peak_mask[below_peak_mask].index[0]
+                
+                # Now look for recovery after that point
+                recovery_mask = equity_curve.loc[first_below_peak:] >= peak_value
+                if recovery_mask.any():
+                    # Find the first True value (actual recovery point)
+                    recovery_indices = recovery_mask[recovery_mask].index
+                    if len(recovery_indices) > 0:
+                        recovery_date = recovery_indices[0]
+                        # Calculate business days from peak to recovery (exclusive of peak date)
+                        # Ensure we're working with pandas Timestamps and timezone-naive
+                        start_date = pd.Timestamp(peak_before)
+                        if start_date.tz is not None:
+                            start_date = start_date.tz_localize(None)
+                        start_date = start_date + pd.Timedelta(days=1)
+                        
+                        end_date = pd.Timestamp(recovery_date)
+                        if end_date.tz is not None:
+                            end_date = end_date.tz_localize(None)
+                            
+                        business_days = len(pd.date_range(start_date, end_date, freq='B'))
+                        recovery_days = business_days
+        
+        return float(max_dd), recovery_days, drawdown
         
         return float(max_dd), recovery_days, drawdown
     
@@ -359,6 +391,8 @@ class MetricsService:
             "equity": [float(round(v, 4)) for v in equity_curve.values],
             "drawdown": [float(round(v, 2)) for v in drawdown_series.values]
         }
+
+
 
 class CrashTestService:
     """Main service for orchestrating crash tests"""
@@ -411,7 +445,10 @@ class CrashTestService:
                 )
                 if not prices.empty:
                     # Calculate coverage as percentage of expected trading days
-                    expected_days = len(pd.date_range(scenario['start'], scenario['end'], freq='B'))
+                    # Ensure timezone-naive dates for date_range
+                    start_date = pd.to_datetime(scenario['start']).tz_localize(None) if pd.to_datetime(scenario['start']).tz is not None else pd.to_datetime(scenario['start'])
+                    end_date = pd.to_datetime(scenario['end']).tz_localize(None) if pd.to_datetime(scenario['end']).tz is not None else pd.to_datetime(scenario['end'])
+                    expected_days = len(pd.date_range(start_date, end_date, freq='B'))
                     actual_days = len(prices)
                     coverage = min(actual_days / expected_days, 1.0) if expected_days > 0 else 0.0
                     ticker_coverage.append(coverage)
@@ -438,37 +475,53 @@ class CrashTestService:
     ) -> Dict[str, Any]:
         """Analyze a single crash scenario"""
         
-        # Calculate portfolio returns
-        portfolio_result = self.portfolio_service.calculate_portfolio_returns(
-            portfolio=portfolio,
-            start_date=scenario['start'],
-            end_date=scenario['end'],
-            rebalance=options.get('rebalance', 'none'),
-            drift_handling=options.get('driftHandling', 'renormDaily')
-        )
-        
-        if "error" in portfolio_result:
+        try:
+            # Calculate portfolio returns
+            portfolio_result = self.portfolio_service.calculate_portfolio_returns(
+                portfolio=portfolio,
+                start_date=scenario['start'],
+                end_date=scenario['end'],
+                rebalance=options.get('rebalance', 'none'),
+                drift_handling=options.get('driftHandling', 'renormDaily')
+            )
+            
+            if "error" in portfolio_result:
+                return {
+                    "id": scenario['id'],
+                    "error": portfolio_result["error"],
+                    "coveragePct": 0.0
+                }
+            
+            # Check if we have sufficient data
+            if portfolio_result["returns"].empty or len(portfolio_result["returns"]) < 10:
+                return {
+                    "id": scenario['id'],
+                    "error": f"Insufficient price data for {scenario['id']} scenario. Need at least 10 trading days.",
+                    "coveragePct": 0.0
+                }
+            
+            # Calculate metrics
+            metrics = self.metrics_service.calculate_metrics(portfolio_result["returns"])
+            
+            # Generate series data
+            series_data = self.metrics_service.generate_series_data(portfolio_result["returns"])
+            
+            # Calculate scenario coverage
+            scenario_coverage = self._calculate_scenario_coverage(portfolio_result["coverage"])
+            
             return {
                 "id": scenario['id'],
-                "error": portfolio_result["error"],
+                "metrics": metrics,
+                "series": series_data,
+                "coveragePct": scenario_coverage
+            }
+            
+        except Exception as e:
+            return {
+                "id": scenario['id'],
+                "error": f"Error analyzing {scenario['id']} scenario: {str(e)}",
                 "coveragePct": 0.0
             }
-        
-        # Calculate metrics
-        metrics = self.metrics_service.calculate_metrics(portfolio_result["returns"])
-        
-        # Generate series data
-        series_data = self.metrics_service.generate_series_data(portfolio_result["returns"])
-        
-        # Calculate scenario coverage
-        scenario_coverage = self._calculate_scenario_coverage(portfolio_result["coverage"])
-        
-        return {
-            "id": scenario['id'],
-            "metrics": metrics,
-            "series": series_data,
-            "coveragePct": scenario_coverage
-        }
     
     def _calculate_scenario_coverage(self, coverage_data: Dict[str, float]) -> float:
         """Calculate overall coverage for a scenario"""

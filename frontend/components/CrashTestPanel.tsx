@@ -33,9 +33,10 @@ export type CrashMetrics = {
 
 export type CrashScenarioResult = {
   id: string;
-  metrics: CrashMetrics;
-  series: { dates: string[]; equity: number[]; drawdown: number[] };
+  metrics?: CrashMetrics;
+  series?: { dates: string[]; equity: number[]; drawdown: number[] };
   coveragePct: number;
+  error?: string;
 };
 
 export type CrashTestResult = {
@@ -57,29 +58,29 @@ const CRASH_SCENARIOS = [
     id: 'gfc',
     label: 'Global Financial Crisis',
     start: '2007-10-09',
-    end: '2009-03-09',
-    description: 'The 2008 financial crisis and its aftermath',
+    end: '2013-03-28',
+    description: 'The 2008 financial crisis and recovery period',
   },
   {
     id: 'pandemic',
     label: 'Pandemic Crash',
     start: '2020-02-19',
-    end: '2020-03-23',
+    end: '2021-08-20',
     description: 'COVID-19 market crash and recovery',
   },
   {
     id: 'dot_com',
     label: 'Dot-Com Bust',
     start: '2000-03-24',
-    end: '2002-10-09',
-    description: 'The dot-com bubble burst',
+    end: '2007-10-09',
+    description: 'The dot-com bubble burst and recovery',
   },
   {
     id: 'rate_shock_2022',
     label: '2022 Rate Shock',
     start: '2022-01-01',
-    end: '2022-10-14',
-    description: 'Rising interest rates and market volatility',
+    end: '2024-01-01',
+    description: 'Rising interest rates and market adjustment',
   },
 ];
 
@@ -167,7 +168,7 @@ export default function CrashTestPanel({
   };
 
   const formatRecoveryTime = (days: number | null) => {
-    if (days === null) return 'No recovery';
+    if (days === null) return 'No recovery within period';
     if (days < 30) return `${days} days`;
     if (days < 365) return `${Math.round(days / 30)} months`;
     return `${Math.round(days / 365)} years`;
@@ -274,104 +275,176 @@ export default function CrashTestPanel({
 
         {/* Results Display */}
         {results && results.scenarios.length > 0 && (
-          <div className='space-y-6'>
-            <h3 className='text-lg font-semibold'>Crash Test Results</h3>
+          <>
+            {/* Show scenarios with valid data first */}
+            {results.scenarios.filter(
+              scenario => !scenario.error && scenario.metrics
+            ).length > 0 && (
+              <div className='space-y-6'>
+                <h3 className='text-lg font-semibold'>Crash Test Results</h3>
+                <div className='grid gap-6'>
+                  {results.scenarios
+                    .filter(scenario => !scenario.error && scenario.metrics)
+                    .map(scenario => {
+                      const scenarioInfo = CRASH_SCENARIOS.find(
+                        s => s.id === scenario.id
+                      );
+                      return (
+                        <Card key={scenario.id} className='border-2'>
+                          <CardHeader className='pb-4'>
+                            <div className='flex items-center justify-between'>
+                              <div>
+                                <CardTitle className='text-lg'>
+                                  {scenarioInfo?.label}
+                                </CardTitle>
+                                <p className='text-sm text-muted-foreground'>
+                                  {scenarioInfo?.start} to {scenarioInfo?.end}
+                                </p>
+                              </div>
+                              <Badge variant='outline' className='text-xs'>
+                                {Math.round(scenario.coveragePct * 100)}%
+                                coverage
+                              </Badge>
+                            </div>
+                          </CardHeader>
 
-            <div className='grid gap-6'>
-              {results.scenarios.map(scenario => {
-                const scenarioInfo = CRASH_SCENARIOS.find(
-                  s => s.id === scenario.id
-                );
-                return (
-                  <Card key={scenario.id} className='border-2'>
-                    <CardHeader className='pb-4'>
-                      <div className='flex items-center justify-between'>
-                        <div>
-                          <CardTitle className='text-lg'>
-                            {scenarioInfo?.label}
-                          </CardTitle>
-                          <p className='text-sm text-muted-foreground'>
-                            {scenarioInfo?.start} to {scenarioInfo?.end}
-                          </p>
-                        </div>
-                        <Badge variant='outline' className='text-xs'>
-                          {Math.round(scenario.coveragePct * 100)}% coverage
-                        </Badge>
-                      </div>
-                    </CardHeader>
+                          <CardContent>
+                            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                              <MetricCard
+                                label='Cumulative Return'
+                                value={`${scenario.metrics!.cumReturnPct.toFixed(
+                                  1
+                                )}%`}
+                                color={
+                                  scenario.metrics!.cumReturnPct >= 0
+                                    ? 'text-green-600'
+                                    : 'text-red-600'
+                                }
+                                icon={<TrendingDown className='h-4 w-4' />}
+                              />
 
-                    <CardContent>
-                      <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                        <MetricCard
-                          label='Cumulative Return'
-                          value={`${scenario.metrics.cumReturnPct.toFixed(1)}%`}
-                          color={
-                            scenario.metrics.cumReturnPct >= 0
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                          }
-                          icon={<TrendingDown className='h-4 w-4' />}
-                        />
+                              <MetricCard
+                                label='Max Drawdown'
+                                value={`${scenario.metrics!.maxDrawdownPct.toFixed(
+                                  1
+                                )}%`}
+                                color={getRiskColor(
+                                  scenario.metrics!.maxDrawdownPct
+                                )}
+                                icon={<Activity className='h-4 w-4' />}
+                              />
 
-                        <MetricCard
-                          label='Max Drawdown'
-                          value={`${scenario.metrics.maxDrawdownPct.toFixed(
-                            1
-                          )}%`}
-                          color={getRiskColor(scenario.metrics.maxDrawdownPct)}
-                          icon={<Activity className='h-4 w-4' />}
-                        />
+                              <div title='Time from the peak value to recovery of that same peak value (measures how long the portfolio spent underwater)'>
+                                <MetricCard
+                                  label='Time to Recovery'
+                                  value={formatRecoveryTime(
+                                    scenario.metrics!.timeToRecoveryDays
+                                  )}
+                                  color='text-muted-foreground'
+                                  icon={<Clock className='h-4 w-4' />}
+                                />
+                              </div>
 
-                        <MetricCard
-                          label='Time to Recovery'
-                          value={formatRecoveryTime(
-                            scenario.metrics.timeToRecoveryDays
-                          )}
-                          color='text-muted-foreground'
-                          icon={<Clock className='h-4 w-4' />}
-                        />
+                              <MetricCard
+                                label='Worst Day'
+                                value={`${scenario.metrics!.worstDayPct.toFixed(
+                                  1
+                                )}%`}
+                                color='text-red-600'
+                                icon={<AlertTriangle className='h-4 w-4' />}
+                              />
+                            </div>
 
-                        <MetricCard
-                          label='Worst Day'
-                          value={`${scenario.metrics.worstDayPct.toFixed(1)}%`}
-                          color='text-red-600'
-                          icon={<AlertTriangle className='h-4 w-4' />}
-                        />
-                      </div>
+                            <div className='grid grid-cols-2 md:grid-cols-3 gap-4 mt-4'>
+                              <div className='text-center p-3 bg-muted/30 rounded-lg'>
+                                <div className='text-2xl font-bold text-foreground'>
+                                  {scenario.metrics!.annVolPct.toFixed(1)}%
+                                </div>
+                                <div className='text-xs text-muted-foreground'>
+                                  Annual Volatility
+                                </div>
+                              </div>
 
-                      <div className='grid grid-cols-2 md:grid-cols-3 gap-4 mt-4'>
-                        <div className='text-center p-3 bg-muted/30 rounded-lg'>
-                          <div className='text-2xl font-bold text-foreground'>
-                            {scenario.metrics.annVolPct.toFixed(1)}%
-                          </div>
-                          <div className='text-xs text-muted-foreground'>
-                            Annual Volatility
-                          </div>
-                        </div>
+                              <div className='text-center p-3 bg-muted/30 rounded-lg'>
+                                <div className='text-2xl font-bold text-foreground'>
+                                  {scenario.metrics!.sharpeLite.toFixed(2)}
+                                </div>
+                                <div className='text-xs text-muted-foreground'>
+                                  Sharpe Ratio
+                                </div>
+                              </div>
 
-                        <div className='text-center p-3 bg-muted/30 rounded-lg'>
-                          <div className='text-2xl font-bold text-foreground'>
-                            {scenario.metrics.sharpeLite.toFixed(2)}
-                          </div>
-                          <div className='text-xs text-muted-foreground'>
-                            Sharpe Ratio
-                          </div>
-                        </div>
+                              <div className='text-center p-3 bg-muted/30 rounded-lg'>
+                                <div className='text-2xl font-bold text-foreground'>
+                                  {scenario.metrics!.worstMonthPct.toFixed(1)}%
+                                </div>
+                                <div className='text-xs text-muted-foreground'>
+                                  Worst Month
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
 
-                        <div className='text-center p-3 bg-muted/30 rounded-lg'>
-                          <div className='text-2xl font-bold text-foreground'>
-                            {scenario.metrics.worstMonthPct.toFixed(1)}%
-                          </div>
-                          <div className='text-xs text-muted-foreground'>
-                            Worst Month
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            {/* Show scenarios with errors */}
+            {results.scenarios.filter(
+              scenario => scenario.error || !scenario.metrics
+            ).length > 0 && (
+              <div className='space-y-6 mt-6'>
+                <h3 className='text-lg font-semibold text-orange-700 dark:text-orange-400'>
+                  Scenarios with Limited Data
+                </h3>
+                <div className='grid gap-6'>
+                  {results.scenarios
+                    .filter(scenario => scenario.error || !scenario.metrics)
+                    .map(scenario => {
+                      const scenarioInfo = CRASH_SCENARIOS.find(
+                        s => s.id === scenario.id
+                      );
+                      return (
+                        <Card
+                          key={scenario.id}
+                          className='border-2 border-orange-200 dark:border-orange-800'
+                        >
+                          <CardHeader className='pb-4'>
+                            <div className='flex items-center justify-between'>
+                              <div>
+                                <CardTitle className='text-lg'>
+                                  {scenarioInfo?.label}
+                                </CardTitle>
+                                <p className='text-sm text-muted-foreground'>
+                                  {scenarioInfo?.start} to {scenarioInfo?.end}
+                                </p>
+                              </div>
+                              <Badge
+                                variant='outline'
+                                className='text-xs bg-orange-50 text-orange-700 dark:bg-orange-950/20 dark:text-orange-400'
+                              >
+                                Limited data
+                              </Badge>
+                            </div>
+                          </CardHeader>
+
+                          <CardContent>
+                            <Alert>
+                              <AlertTriangle className='h-4 w-4' />
+                              <AlertDescription>
+                                {scenario.error ||
+                                  'Insufficient historical data available for this scenario. Some assets may not have been trading during this period.'}
+                              </AlertDescription>
+                            </Alert>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
 
             {/* Benchmark Comparison */}
             {results.benchmarks &&
@@ -392,60 +465,74 @@ export default function CrashTestPanel({
                         </tr>
                       </thead>
                       <tbody>
-                        {results.scenarios.map(scenario => (
-                          <tr key={scenario.id} className='border-b'>
-                            <td className='p-2 font-medium'>
-                              {
-                                CRASH_SCENARIOS.find(s => s.id === scenario.id)
-                                  ?.label
-                              }
-                            </td>
-                            <td className='p-2'>
-                              <span
-                                className={
-                                  scenario.metrics.cumReturnPct >= 0
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
+                        {results.scenarios
+                          .filter(
+                            scenario => !scenario.error && scenario.metrics
+                          )
+                          .map(scenario => (
+                            <tr key={scenario.id} className='border-b'>
+                              <td className='p-2 font-medium'>
+                                {
+                                  CRASH_SCENARIOS.find(
+                                    s => s.id === scenario.id
+                                  )?.label
                                 }
-                              >
-                                {scenario.metrics.cumReturnPct.toFixed(1)}%
-                              </span>
-                            </td>
-                            {['SPY', 'AGG', '60_40'].map(benchmark => {
-                              const benchmarkData = results.benchmarks?.[
-                                benchmark
-                              ]?.find(b => b.id === scenario.id);
-                              return (
-                                <td key={benchmark} className='p-2'>
-                                  {benchmarkData ? (
-                                    <span
-                                      className={
-                                        benchmarkData.metrics.cumReturnPct >= 0
-                                          ? 'text-green-600'
-                                          : 'text-red-600'
-                                      }
-                                    >
-                                      {benchmarkData.metrics.cumReturnPct.toFixed(
-                                        1
-                                      )}
-                                      %
-                                    </span>
-                                  ) : (
-                                    <span className='text-muted-foreground'>
-                                      -
-                                    </span>
-                                  )}
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        ))}
+                              </td>
+                              <td className='p-2'>
+                                {scenario.metrics ? (
+                                  <span
+                                    className={
+                                      scenario.metrics.cumReturnPct >= 0
+                                        ? 'text-green-600'
+                                        : 'text-red-600'
+                                    }
+                                  >
+                                    {scenario.metrics.cumReturnPct.toFixed(1)}%
+                                  </span>
+                                ) : (
+                                  <span className='text-muted-foreground'>
+                                    -
+                                  </span>
+                                )}
+                              </td>
+                              {['SPY', 'AGG', '60_40'].map(benchmark => {
+                                const benchmarkData = results.benchmarks?.[
+                                  benchmark
+                                ]?.find(b => b.id === scenario.id);
+                                return (
+                                  <td key={benchmark} className='p-2'>
+                                    {benchmarkData &&
+                                    benchmarkData.metrics &&
+                                    !benchmarkData.error ? (
+                                      <span
+                                        className={
+                                          benchmarkData.metrics.cumReturnPct >=
+                                          0
+                                            ? 'text-green-600'
+                                            : 'text-red-600'
+                                        }
+                                      >
+                                        {benchmarkData.metrics.cumReturnPct.toFixed(
+                                          1
+                                        )}
+                                        %
+                                      </span>
+                                    ) : (
+                                      <span className='text-muted-foreground'>
+                                        {benchmarkData?.error ? 'No data' : '-'}
+                                      </span>
+                                    )}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
               )}
-          </div>
+          </>
         )}
       </CardContent>
     </Card>
