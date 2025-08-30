@@ -46,15 +46,15 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
       <div className='relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-background to-accent/5 border border-border/50'>
         <div className='absolute inset-0 bg-grid-pattern opacity-5'></div>
         <div className='relative p-8'>
-          <div className='flex items-center gap-3 mb-6'>
+          <div className='flex items-center gap-3 mb-8'>
             <div className='p-3 rounded-xl bg-primary/10 border border-primary/20'>
               <TrendingUp className='h-6 w-6 text-primary' />
             </div>
             <div>
-              <h1 className='text-3xl font-bold text-foreground'>
+              <h1 className='text-4xl font-black text-foreground leading-tight'>
                 Volatility Forecast Results
               </h1>
-              <p className='text-muted-foreground mt-1'>
+              <p className='text-muted-foreground/80 mt-3 text-lg font-medium'>
                 Comprehensive portfolio risk analysis and predictions
               </p>
             </div>
@@ -127,128 +127,140 @@ function SummaryMetrics({ result }: { result: PredictionResult }) {
 
   return (
     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+      {/* Risk Assessment - Most Prominent Card */}
       <div
-        className={`group relative overflow-hidden rounded-xl border-2 p-6 transition-all duration-200 hover:shadow-lg ${getRiskColor(
+        className={`group relative overflow-hidden rounded-xl border-2 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform ${getRiskColor(
           result.risk_level
-        )}`}
+        )} shadow-lg`}
       >
         <div className='flex items-center justify-between mb-4'>
-          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
-            <Shield className='h-5 w-5' />
+          <div className='p-2.5 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
+            <Shield className='h-6 w-6' />
           </div>
           <div className='text-right'>
-            <p className='text-xs font-medium opacity-75'>Risk Assessment</p>
+            <p className='text-xs font-semibold opacity-80'>Risk Assessment</p>
           </div>
         </div>
         <div>
-          <p className='text-2xl font-bold mb-1'>{result.risk_level}</p>
-          <p className='text-sm opacity-75'>Portfolio Risk Level</p>
+          <p className='text-3xl font-black mb-2 leading-none'>
+            {result.risk_level}
+          </p>
+          <p className='text-sm font-medium opacity-80'>Portfolio Risk Level</p>
         </div>
       </div>
 
-      <div className='group relative overflow-hidden rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+      {/* Expected Volatility */}
+      <div className='group relative overflow-hidden rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
         <div className='flex items-center justify-between mb-4'>
-          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
-            <Activity className='h-5 w-5' />
+          <div className='p-2.5 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
+            <Activity className='h-6 w-6' />
           </div>
-          <div className='flex items-center gap-1 text-xs font-medium opacity-75'>
-            <ArrowUpRight className='h-3 w-3' />
-            Annual
+          <div className='text-right'>
+            <p className='text-xs font-semibold opacity-80'>Annual</p>
           </div>
         </div>
         <div>
-          <div className='flex items-baseline gap-2 mb-1'>
-            <p className='text-2xl font-bold'>
+          <div className='flex items-baseline gap-2 mb-2'>
+            <p className='text-3xl font-black leading-none'>
               {result.final_volatility !== undefined
                 ? `${(result.final_volatility * 100).toFixed(1)}%`
                 : result.annual_volatility}
             </p>
             {result.labels?.ml_adjustment && (
-              <Badge variant='outline' className='text-xs bg-white/50'>
+              <Badge
+                variant='outline'
+                className='text-xs bg-white/60 dark:bg-black/30 font-medium'
+              >
                 ML: {result.labels.ml_adjustment}
               </Badge>
             )}
           </div>
-          <p className='text-sm opacity-75'>Expected Volatility</p>
+          <p className='text-sm font-medium opacity-80'>Expected Volatility</p>
         </div>
       </div>
 
-      <div className='group relative overflow-hidden rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+      {/* Time Horizon */}
+      <div className='group relative overflow-hidden rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-800/30 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
         <div className='flex items-center justify-between mb-4'>
-          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
-            <Target className='h-5 w-5' />
+          <div className='p-2.5 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
+            <Target className='h-6 w-6' />
           </div>
           <div className='text-right'>
-            <p className='text-xs font-medium opacity-75'>Time Horizon</p>
+            <p className='text-xs font-semibold opacity-80'>Time Horizon</p>
           </div>
         </div>
         <div>
-          <p className='text-2xl font-bold mb-1'>{result.forecast_days}</p>
-          <p className='text-sm opacity-75'>Days Forecast</p>
+          <p className='text-3xl font-black mb-2 leading-none'>
+            {result.forecast_days}
+          </p>
+          <p className='text-sm font-medium opacity-80'>Days Forecast</p>
         </div>
       </div>
 
-      <div className='group relative overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 dark:bg-gray-950/20 dark:text-gray-400 dark:border-gray-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+      {/* AI Model */}
+      <div className='group relative overflow-hidden rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-700 dark:bg-gray-950/20 dark:text-gray-400 dark:border-gray-800/30 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
         <div className='flex items-center justify-between mb-4'>
-          <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
+          <div className='p-2.5 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
             {getModelTypeIcon(result.model_type)}
           </div>
           <div className='text-right'>
-            <p className='text-xs font-medium opacity-75'>AI Model</p>
+            <p className='text-xs font-semibold opacity-80'>AI Model</p>
           </div>
         </div>
         <div>
-          <p className='text-lg font-semibold mb-1 leading-tight'>
+          <p className='text-xl font-bold mb-2 leading-tight'>
             {getModelTypeLabel(result.model_type)}
           </p>
-          <p className='text-sm opacity-75'>Prediction Method</p>
+          <p className='text-sm font-medium opacity-80'>Prediction Method</p>
         </div>
       </div>
 
+      {/* Enhanced Data Cards - Only show if enhancement data exists */}
       {result.enhancement_data && (
         <>
-          <div className='group relative overflow-hidden rounded-xl border-2 border-green-200 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 dark:border-green-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+          {/* Data Quality */}
+          <div className='group relative overflow-hidden rounded-xl border-2 border-green-200 bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 dark:border-green-800/30 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
             <div className='flex items-center justify-between mb-4'>
-              <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
-                <Globe className='h-5 w-5' />
+              <div className='p-2.5 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
+                <Globe className='h-6 w-6' />
               </div>
               <div className='text-right'>
-                <p className='text-xs font-medium opacity-75'>Data Quality</p>
+                <p className='text-xs font-semibold opacity-80'>Data Quality</p>
               </div>
             </div>
             <div>
-              <p className='text-2xl font-bold mb-1'>
+              <p className='text-3xl font-black mb-2 leading-none'>
                 {(
                   result.enhancement_data.coverage_analysis.coverage_by_count *
                   100
                 ).toFixed(0)}
                 %
               </p>
-              <p className='text-sm opacity-75'>Asset Coverage</p>
+              <p className='text-sm font-medium opacity-80'>Asset Coverage</p>
             </div>
           </div>
 
-          <div className='group relative overflow-hidden rounded-xl border-2 border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30 p-6 transition-all duration-200 hover:shadow-lg'>
+          {/* Reliability */}
+          <div className='group relative overflow-hidden rounded-xl border-2 border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
             <div className='flex items-center justify-between mb-4'>
-              <div className='p-2 rounded-lg bg-white/50 dark:bg-black/20'>
-                <Building2 className='h-5 w-5' />
+              <div className='p-2.5 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
+                {result.enhancement_data.overall_confidence === 'high' ? (
+                  <CheckCircle className='h-6 w-6 text-green-600' />
+                ) : (
+                  <Info className='h-6 w-6 text-yellow-600' />
+                )}
               </div>
               <div className='text-right'>
-                <p className='text-xs font-medium opacity-75'>Reliability</p>
+                <p className='text-xs font-semibold opacity-80'>Reliability</p>
               </div>
             </div>
             <div>
-              <div className='flex items-center gap-2 mb-1'>
-                {result.enhancement_data.overall_confidence === 'high' ? (
-                  <CheckCircle className='h-5 w-5 text-green-600' />
-                ) : (
-                  <Info className='h-5 w-5 text-yellow-600' />
-                )}
-                <p className='text-lg font-semibold capitalize'>
+              <div className='flex items-center gap-2 mb-2'>
+                <p className='text-2xl font-black capitalize leading-none'>
                   {result.enhancement_data.overall_confidence}
                 </p>
               </div>
-              <p className='text-sm opacity-75'>Confidence Level</p>
+              <p className='text-sm font-medium opacity-80'>Confidence Level</p>
             </div>
           </div>
         </>
