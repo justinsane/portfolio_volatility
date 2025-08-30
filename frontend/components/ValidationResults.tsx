@@ -32,6 +32,7 @@ interface ValidationResultsProps {
   onProceed?: () => void;
   onManualEntry?: (data: any) => void;
   isManualPortfolio?: boolean;
+  isLoading?: boolean;
 }
 
 export default function ValidationResults({
@@ -40,6 +41,7 @@ export default function ValidationResults({
   onProceed,
   onManualEntry,
   isManualPortfolio = false,
+  isLoading = false,
 }: ValidationResultsProps) {
   const summary = isManualPortfolio
     ? getPortfolioValidationSummary(result)
@@ -258,10 +260,11 @@ export default function ValidationResults({
             <div className='flex justify-center mb-4'>
               <Button
                 onClick={onProceed}
+                disabled={isLoading}
                 className='flex items-center gap-2 w-full sm:w-auto px-8'
               >
                 <ExternalLink className='h-4 w-4' />
-                Proceed with Analysis
+                {isLoading ? 'Analyzing...' : 'Proceed with Analysis'}
               </Button>
             </div>
           )}

@@ -6,6 +6,13 @@ import { Button } from './ui/button';
 import { Alert, AlertDescription } from './ui/alert';
 import { Progress } from './ui/progress';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog';
+import {
   TrendingDown,
   Clock,
   AlertTriangle,
@@ -17,8 +24,11 @@ import {
   Info,
   Download,
   RefreshCw,
+  Maximize2,
 } from 'lucide-react';
 import { type PredictionResult } from '@/lib/api';
+import UnderwaterSparkline from './charts/UnderwaterSparkline';
+import UnderwaterChart from './charts/UnderwaterChart';
 
 // Types for crash test data
 export type CrashMetrics = {
@@ -34,7 +44,11 @@ export type CrashMetrics = {
 export type CrashScenarioResult = {
   id: string;
   metrics?: CrashMetrics;
-  series?: { dates: string[]; equity: number[]; drawdown: number[] };
+  series?: {
+    dates: string[];
+    equity: number[];
+    drawdown: number[];
+  };
   coveragePct: number;
   error?: string;
 };
@@ -45,7 +59,16 @@ export type CrashTestResult = {
     byTicker: Record<string, number>;
   };
   scenarios: CrashScenarioResult[];
-  benchmarks?: Record<string, CrashScenarioResult[]>;
+  benchmarks?: Record<
+    string,
+    {
+      [scenarioId: string]: {
+        dates: string[];
+        equity: number[];
+        drawdown: number[];
+      };
+    }
+  >;
 };
 
 interface CrashTestPanelProps {
@@ -95,6 +118,9 @@ export default function CrashTestPanel({
     'gfc',
     'pandemic',
   ]);
+  const [selectedChartScenario, setSelectedChartScenario] = useState<
+    string | null
+  >(null);
 
   const runCrashTest = async () => {
     if (!portfolio || portfolio.length === 0) {
@@ -383,6 +409,51 @@ export default function CrashTestPanel({
                                 </div>
                               </div>
                             </div>
+
+                            {/* Underwater Sparkline */}
+                            {scenario.series && (
+                              <div className='mt-6'>
+                                <div className='flex items-center justify-between mb-3'>
+                                  <h4 className='text-sm font-medium text-muted-foreground'>
+                                    Drawdown Over Time
+                                  </h4>
+                                  <div className='text-xs text-muted-foreground'>
+                                    Click chart to expand
+                                  </div>
+                                </div>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <div
+                                      className='w-full cursor-pointer hover:opacity-90 transition-opacity'
+                                      aria-label={`Underwater chart showing drawdown during the ${scenarioInfo?.label}`}
+                                    >
+                                      <UnderwaterSparkline
+                                        dates={scenario.series!.dates}
+                                        values={scenario.series!.drawdown}
+                                        coveragePct={scenario.coveragePct}
+                                      />
+                                    </div>
+                                  </DialogTrigger>
+                                  <DialogContent className='sm:max-w-4xl max-h-[90vh] overflow-y-auto'>
+                                    <DialogHeader>
+                                      <DialogTitle>
+                                        {scenarioInfo?.label} - Portfolio
+                                        Performance
+                                      </DialogTitle>
+                                    </DialogHeader>
+                                    <UnderwaterChart
+                                      dates={scenario.series!.dates}
+                                      drawdown={scenario.series!.drawdown}
+                                      equity={scenario.series!.equity}
+                                      benchmarks={results.benchmarks}
+                                      scenarioName={scenarioInfo?.label || ''}
+                                      coveragePct={scenario.coveragePct}
+                                      scenarioId={scenario.id}
+                                    />
+                                  </DialogContent>
+                                </Dialog>
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       );
@@ -496,30 +567,19 @@ export default function CrashTestPanel({
                                 )}
                               </td>
                               {['SPY', 'AGG', '60_40'].map(benchmark => {
-                                const benchmarkData = results.benchmarks?.[
-                                  benchmark
-                                ]?.find(b => b.id === scenario.id);
+                                const benchmarkData =
+                                  results.benchmarks?.[benchmark]?.[
+                                    scenario.id
+                                  ];
                                 return (
                                   <td key={benchmark} className='p-2'>
-                                    {benchmarkData &&
-                                    benchmarkData.metrics &&
-                                    !benchmarkData.error ? (
-                                      <span
-                                        className={
-                                          benchmarkData.metrics.cumReturnPct >=
-                                          0
-                                            ? 'text-green-600'
-                                            : 'text-red-600'
-                                        }
-                                      >
-                                        {benchmarkData.metrics.cumReturnPct.toFixed(
-                                          1
-                                        )}
-                                        %
+                                    {benchmarkData ? (
+                                      <span className='text-muted-foreground'>
+                                        Available
                                       </span>
                                     ) : (
                                       <span className='text-muted-foreground'>
-                                        {benchmarkData?.error ? 'No data' : '-'}
+                                        -
                                       </span>
                                     )}
                                   </td>

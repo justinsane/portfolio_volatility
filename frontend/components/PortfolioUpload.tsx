@@ -51,6 +51,8 @@ export default function PortfolioUpload() {
     CSVValidationResult | ManualPortfolioValidationResult | null
   >(null);
   const [showValidation, setShowValidation] = useState(false);
+  const isPredictingRef = useRef(false);
+  const lastPredictTimeRef = useRef(0);
 
   // SnapTrade state
   const [snapTradeStep, setSnapTradeStep] = useState<
@@ -168,8 +170,27 @@ export default function PortfolioUpload() {
     }
   }, [manualAssets]);
 
+  const handleManualValidate = useCallback(async () => {
+    const validation = await validateManualPortfolioLocal();
+    setValidationResult(validation);
+    setShowValidation(true);
+  }, [validateManualPortfolioLocal]);
+
   // Prediction Handler
-  const handlePredict = async () => {
+  const handlePredict = useCallback(async () => {
+    const now = Date.now();
+
+    // Prevent multiple calls within 2 seconds
+    if (now - lastPredictTimeRef.current < 2000) {
+      return;
+    }
+
+    if (isLoading || isPredictingRef.current) {
+      return; // Prevent multiple simultaneous calls
+    }
+
+    lastPredictTimeRef.current = now;
+    isPredictingRef.current = true;
     setIsLoading(true);
     setError(null);
     setShowValidation(false);
@@ -219,21 +240,32 @@ export default function PortfolioUpload() {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
+      isPredictingRef.current = false;
     }
-  };
+  }, [
+    isLoading,
+    activeTab,
+    selectedFile,
+    validationResult,
+    validateManualPortfolioLocal,
+  ]);
 
-  const handleValidationProceed = () => {
+  const handleValidationProceed = useCallback(() => {
+    if (isLoading || isPredictingRef.current) return; // Prevent multiple calls while loading
     setShowValidation(false);
-    handlePredict();
-  };
+    // Add a small delay to prevent rapid successive clicks
+    setTimeout(() => {
+      handlePredict();
+    }, 100);
+  }, [isLoading, handlePredict]);
 
-  const handleValidationClose = () => {
+  const handleValidationClose = useCallback(() => {
     setShowValidation(false);
     setValidationResult(null);
     setSelectedFile(null); // Clear the selected file when validation is closed
-  };
+  }, []);
 
-  const handleShowValidation = () => {
+  const handleShowValidation = useCallback(() => {
     setShowValidation(true);
     // Smooth scroll to validation results after a short delay to ensure they're rendered
     setTimeout(() => {
@@ -247,9 +279,9 @@ export default function PortfolioUpload() {
         });
       }
     }, 100);
-  };
+  }, []);
 
-  const handleManualEntry = (data: any) => {
+  const handleManualEntry = useCallback((data: any) => {
     // Convert validation data to manual assets format
     const convertedAssets = data.assets.map((asset: any) => ({
       ticker: asset.ticker,
@@ -259,26 +291,26 @@ export default function PortfolioUpload() {
     setActiveTab('manual');
     setShowValidation(false);
     setValidationResult(null);
-  };
+  }, []);
 
-  const downloadSample = () => {
+  const downloadSample = useCallback(() => {
     const link = document.createElement('a');
     link.href = getSampleDownloadUrl();
     link.download = 'sample_portfolio.csv';
     link.click();
-  };
+  }, []);
 
-  const getTotalWeight = () => {
+  const getTotalWeight = useCallback(() => {
     return manualAssets
       .filter(asset => asset.ticker.trim() && asset.weight > 0)
       .reduce((sum, asset) => sum + asset.weight, 0);
-  };
+  }, [manualAssets]);
 
-  const getWeightColor = (total: number) => {
+  const getWeightColor = useCallback((total: number) => {
     if (Math.abs(total - 100) <= 1) return 'text-green-600';
     if (total > 100) return 'text-red-600';
     return 'text-yellow-600';
-  };
+  }, []);
 
   return (
     <div className='space-y-6'>
@@ -437,9 +469,6 @@ export default function PortfolioUpload() {
                   validationResult &&
                   validationResult.isValid && (
                     <div className='mt-4 flex gap-2'>
-                      <Button onClick={handlePredict} disabled={isLoading}>
-                        {isLoading ? 'Analyzing...' : 'Predict Volatility'}
-                      </Button>
                       <Button
                         variant='outline'
                         onClick={handleShowValidation}
@@ -488,11 +517,7 @@ export default function PortfolioUpload() {
                 <ManualPortfolioSection
                   manualAssets={manualAssets}
                   onUpdateAssets={setManualAssets}
-                  onValidate={async () => {
-                    const validation = await validateManualPortfolioLocal();
-                    setValidationResult(validation);
-                    setShowValidation(true);
-                  }}
+                  onValidate={handleManualValidate}
                   getTotalWeight={getTotalWeight}
                   getWeightColor={getWeightColor}
                 />
@@ -506,8 +531,20 @@ export default function PortfolioUpload() {
             validationResult &&
             validationResult.isValid) ||
             (activeTab === 'manual' && getTotalWeight() > 0)) && (
-            <div className='mt-6 text-center'>
-              <Button onClick={handlePredict} disabled={isLoading} size='lg'>
+            <div
+              className='mt-6 text-center'
+              key={`predict-button-${activeTab}-${isLoading}`}
+            >
+              <Button
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handlePredict();
+                }}
+                disabled={isLoading}
+                size='lg'
+                type='button'
+              >
                 {isLoading ? 'Analyzing...' : 'Predict Volatility'}
               </Button>
             </div>
@@ -547,6 +584,7 @@ export default function PortfolioUpload() {
             onProceed={handleValidationProceed}
             onManualEntry={handleManualEntry}
             isManualPortfolio={activeTab === 'manual'}
+            isLoading={isLoading}
           />
         </div>
       )}
