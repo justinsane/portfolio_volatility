@@ -10,6 +10,14 @@ import {
   Loader2,
   Building2,
   Link,
+  Shield,
+  Lock,
+  Eye,
+  Zap,
+  Users,
+  Database,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { SnapTradeReact } from 'snaptrade-react';
 
@@ -192,17 +200,17 @@ export default function SnapTradeConnection({
 
   if (step === 'error') {
     return (
-      <Card className='w-full'>
+      <Card className='w-full border-red-200 bg-red-50'>
         <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <AlertCircle className='h-5 w-5 text-red-500' />
+          <CardTitle className='flex items-center gap-2 text-red-800'>
+            <AlertCircle className='h-5 w-5 text-red-600' />
             Connection Error
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert variant='destructive'>
+          <Alert variant='destructive' className='border-red-300 bg-red-100'>
             <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription className='font-medium'>{error}</AlertDescription>
           </Alert>
           <Button onClick={startConnection} className='mt-4' variant='outline'>
             Try Again
@@ -214,56 +222,64 @@ export default function SnapTradeConnection({
 
   if (step === 'success') {
     return (
-      <Card className='w-full border-2 border-green-100 bg-gradient-to-br from-green-50 to-emerald-50'>
+      <Card className='w-full border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg'>
         <CardHeader className='pb-4'>
           <CardTitle className='flex items-center gap-3 text-xl font-bold text-green-800'>
-            <div className='flex items-center justify-center w-10 h-10 bg-green-600 rounded-lg'>
-              <CheckCircle className='h-6 w-6 text-white' />
+            <div className='flex items-center justify-center w-12 h-12 bg-green-600 rounded-xl shadow-lg'>
+              <CheckCircle className='h-7 w-7 text-white' />
             </div>
             Connection Successful!
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='bg-white rounded-lg p-6 border border-green-200'>
-            <div className='flex items-center justify-center mb-4'>
-              <div className='flex items-center justify-center w-16 h-16 bg-green-100 rounded-full'>
-                <CheckCircle className='h-8 w-8 text-green-600' />
+          <div className='bg-white rounded-xl p-6 border border-green-200 shadow-sm'>
+            <div className='flex items-center justify-center mb-6'>
+              <div className='flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full'>
+                <CheckCircle className='h-10 w-10 text-green-600' />
               </div>
             </div>
 
-            <div className='text-center space-y-3'>
-              <h3 className='font-semibold text-green-800 text-lg'>
+            <div className='text-center space-y-4'>
+              <h3 className='font-bold text-green-800 text-xl'>
                 Brokerage Account Connected!
               </h3>
               <p className='text-sm text-green-700 leading-relaxed'>
-                Your brokerage account has been connected successfully. You can
-                now proceed to select an account and extract your portfolio
+                Your brokerage account has been securely connected. You can now
+                proceed to select an account and extract your portfolio
                 positions for volatility analysis.
               </p>
             </div>
 
-            <div className='mt-6 p-4 bg-green-50 rounded-lg border border-green-200'>
-              <h4 className='font-semibold text-green-800 mb-2 flex items-center gap-2'>
-                <CheckCircle className='h-4 w-4 text-green-600' />
+            <div className='mt-6 p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200'>
+              <h4 className='font-semibold text-green-800 mb-3 flex items-center gap-2'>
+                <Sparkles className='h-4 w-4 text-green-600' />
                 Next Steps
               </h4>
-              <div className='space-y-2 text-sm text-green-700'>
-                <p className='flex items-start gap-2'>
-                  <span className='text-green-600 mt-0.5'>1.</span>
+              <div className='space-y-3 text-sm text-green-700'>
+                <div className='flex items-start gap-3'>
+                  <div className='flex items-center justify-center w-6 h-6 bg-green-600 text-white text-xs font-bold rounded-full flex-shrink-0 mt-0.5'>
+                    1
+                  </div>
                   <span>Select your brokerage account from the list</span>
-                </p>
-                <p className='flex items-start gap-2'>
-                  <span className='text-green-600 mt-0.5'>2.</span>
+                </div>
+                <div className='flex items-start gap-3'>
+                  <div className='flex items-center justify-center w-6 h-6 bg-green-600 text-white text-xs font-bold rounded-full flex-shrink-0 mt-0.5'>
+                    2
+                  </div>
                   <span>Extract your current portfolio positions</span>
-                </p>
-                <p className='flex items-start gap-2'>
-                  <span className='text-green-600 mt-0.5'>3.</span>
+                </div>
+                <div className='flex items-start gap-3'>
+                  <div className='flex items-center justify-center w-6 h-6 bg-green-600 text-white text-xs font-bold rounded-full flex-shrink-0 mt-0.5'>
+                    3
+                  </div>
                   <span>Review and adjust your portfolio data</span>
-                </p>
-                <p className='flex items-start gap-2'>
-                  <span className='text-green-600 mt-0.5'>4.</span>
+                </div>
+                <div className='flex items-start gap-3'>
+                  <div className='flex items-center justify-center w-6 h-6 bg-green-600 text-white text-xs font-bold rounded-full flex-shrink-0 mt-0.5'>
+                    4
+                  </div>
                   <span>Run volatility analysis on your portfolio</span>
-                </p>
+                </div>
               </div>
             </div>
           </div>
@@ -274,97 +290,188 @@ export default function SnapTradeConnection({
 
   return (
     <>
-      <Card className='w-full border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 touch-manipulation'>
+      <Card className='w-full border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg'>
         <CardHeader className='pb-4'>
-          <CardTitle className='flex items-center gap-3 text-xl font-bold text-gray-800'>
-            <div className='flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg'>
-              <Building2 className='h-6 w-6 text-white' />
+          <CardTitle className='flex items-center gap-3 text-xl font-bold text-slate-800'>
+            <div className='flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg'>
+              <Building2 className='h-7 w-7 text-white' />
             </div>
-            Connect Your Brokerage Account
+            Securely Connect Your Brokerage
           </CardTitle>
         </CardHeader>
         <CardContent className='space-y-6'>
           {step === 'initial' && (
             <>
-              <div className='space-y-4'>
-                <div className='bg-white rounded-lg p-4 border border-blue-200'>
-                  <h3 className='font-semibold text-gray-800 mb-2 flex items-center gap-2'>
-                    <Link className='h-4 w-4 text-blue-600' />
-                    Secure Connection Portal
+              <div className='space-y-6'>
+                {/* Enhanced Security Section */}
+                <div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200'>
+                  <h3 className='font-bold text-green-800 mb-4 flex items-center gap-2 text-lg'>
+                    <Shield className='h-5 w-5 text-green-600' />
+                    Privacy & Security First
                   </h3>
-                  <p className='text-sm text-gray-600 leading-relaxed'>
-                    Connect your brokerage account to automatically extract your
-                    portfolio positions. Our secure connection portal uses
-                    industry-standard encryption to protect your data.
-                  </p>
-                </div>
-
-                <div className='bg-green-50 rounded-lg p-4 border border-green-200'>
-                  <h3 className='font-semibold text-green-800 mb-2 flex items-center gap-2'>
-                    <CheckCircle className='h-4 w-4 text-green-600' />
-                    Privacy & Security
-                  </h3>
-                  <div className='space-y-2 text-sm text-green-700'>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-green-600 mt-0.5'>•</span>
-                      <span>
-                        <strong>Read-only access:</strong> We can only view your
-                        positions, never trade or modify your account
-                      </span>
-                    </p>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-green-600 mt-0.5'>•</span>
-                      <span>
-                        <strong>No data storage:</strong> Your portfolio data is
-                        never saved to our database
-                      </span>
-                    </p>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-green-600 mt-0.5'>•</span>
-                      <span>
-                        <strong>Secure connection:</strong> All data is
-                        transmitted over encrypted connections
-                      </span>
-                    </p>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-green-600 mt-0.5'>•</span>
-                      <span>
-                        <strong>Instant analysis:</strong> Your data is
-                        processed in real-time and immediately discarded
-                      </span>
-                    </p>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-3'>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Eye className='h-4 w-4 text-green-600' />
+                        </div>
+                        <div>
+                          <p className='font-semibold text-green-800 text-sm'>
+                            Read-only Access
+                          </p>
+                          <p className='text-xs text-green-700'>
+                            We can only view your positions, never trade or
+                            modify your account
+                          </p>
+                        </div>
+                      </div>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Database className='h-4 w-4 text-green-600' />
+                        </div>
+                        <div>
+                          <p className='font-semibold text-green-800 text-sm'>
+                            No Data Storage
+                          </p>
+                          <p className='text-xs text-green-700'>
+                            Your portfolio data is never saved to our database
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='space-y-3'>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Lock className='h-4 w-4 text-green-600' />
+                        </div>
+                        <div>
+                          <p className='font-semibold text-green-800 text-sm'>
+                            Secure Connection
+                          </p>
+                          <p className='text-xs text-green-700'>
+                            All data is transmitted over encrypted connections
+                          </p>
+                        </div>
+                      </div>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Zap className='h-4 w-4 text-green-600' />
+                        </div>
+                        <div>
+                          <p className='font-semibold text-green-800 text-sm'>
+                            Instant Analysis
+                          </p>
+                          <p className='text-xs text-green-700'>
+                            Your data is processed in real-time and immediately
+                            discarded
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className='bg-blue-50 rounded-lg p-4 border border-blue-200'>
-                  <h3 className='font-semibold text-blue-800 mb-2 flex items-center gap-2'>
-                    <ExternalLink className='h-4 w-4 text-blue-600' />
+                {/* How It Works Section */}
+                <div className='bg-white rounded-xl p-6 border border-blue-200 shadow-sm'>
+                  <h3 className='font-semibold text-blue-800 mb-4 flex items-center gap-2'>
+                    <Link className='h-5 w-5 text-blue-600' />
                     How It Works
                   </h3>
-                  <div className='space-y-2 text-sm text-blue-700'>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-blue-600 mt-0.5'>1.</span>
-                      <span>
-                        Click &ldquo;Connect Account&ldquo; to open the secure
-                        portal
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-3'>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <span className='text-sm font-bold text-blue-600'>
+                            1
+                          </span>
+                        </div>
+                        <div>
+                          <p className='font-semibold text-blue-800 text-sm'>
+                            Click "Connect Account"
+                          </p>
+                          <p className='text-xs text-blue-700'>
+                            Opens the secure connection portal
+                          </p>
+                        </div>
+                      </div>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <span className='text-sm font-bold text-blue-600'>
+                            2
+                          </span>
+                        </div>
+                        <div>
+                          <p className='font-semibold text-blue-800 text-sm'>
+                            Select & Login
+                          </p>
+                          <p className='text-xs text-blue-700'>
+                            Choose your brokerage and log in securely
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='space-y-3'>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <span className='text-sm font-bold text-blue-600'>
+                            3
+                          </span>
+                        </div>
+                        <div>
+                          <p className='font-semibold text-blue-800 text-sm'>
+                            Extract Positions
+                          </p>
+                          <p className='text-xs text-blue-700'>
+                            We'll extract your current portfolio positions
+                          </p>
+                        </div>
+                      </div>
+                      <div className='flex items-start gap-3'>
+                        <div className='flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <span className='text-sm font-bold text-blue-600'>
+                            4
+                          </span>
+                        </div>
+                        <div>
+                          <p className='font-semibold text-blue-800 text-sm'>
+                            Review & Analyze
+                          </p>
+                          <p className='text-xs text-blue-700'>
+                            Review and adjust your portfolio before analysis
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Supported Brokers */}
+                <div className='bg-slate-50 rounded-xl p-6 border border-slate-200'>
+                  <h3 className='font-semibold text-slate-800 mb-3 flex items-center gap-2'>
+                    <Users className='h-5 w-5 text-slate-600' />
+                    Supported Brokers
+                  </h3>
+                  <p className='text-sm text-slate-600 mb-3'>
+                    Connect with major brokerage platforms including:
+                  </p>
+                  <div className='flex flex-wrap gap-2'>
+                    {[
+                      'TD Ameritrade',
+                      'Charles Schwab',
+                      'Fidelity',
+                      'E*TRADE',
+                      'Robinhood',
+                      'Vanguard',
+                      'Interactive Brokers',
+                      'Ally Invest',
+                    ].map(broker => (
+                      <span
+                        key={broker}
+                        className='px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-medium text-slate-700'
+                      >
+                        {broker}
                       </span>
-                    </p>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-blue-600 mt-0.5'>2.</span>
-                      <span>Select your brokerage and log in securely</span>
-                    </p>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-blue-600 mt-0.5'>3.</span>
-                      <span>
-                        We&lsquo;ll extract your current portfolio positions
-                      </span>
-                    </p>
-                    <p className='flex items-start gap-2'>
-                      <span className='text-blue-600 mt-0.5'>4.</span>
-                      <span>
-                        Review and adjust your portfolio before analysis
-                      </span>
-                    </p>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -372,17 +479,18 @@ export default function SnapTradeConnection({
               <div className='p-2 -m-2'>
                 <Button
                   onClick={startConnection}
-                  className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
+                  className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:from-blue-800 active:to-indigo-800 text-white font-bold py-4 sm:py-4 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer rounded-xl'
                   size='lg'
-                  style={{ minHeight: '48px' }}
+                  style={{ minHeight: '56px' }}
                 >
-                  <Link className='mr-3 h-5 w-5 flex-shrink-0' />
+                  <Link className='mr-3 h-6 w-6 flex-shrink-0' />
                   <span className='whitespace-nowrap'>
                     <span className='hidden sm:inline'>
                       Connect Brokerage Account
                     </span>
-                    <span className='sm:hidden'>Connect</span>
+                    <span className='sm:hidden'>Connect Account</span>
                   </span>
+                  <ArrowRight className='ml-3 h-5 w-5 flex-shrink-0' />
                 </Button>
               </div>
             </>
@@ -390,34 +498,35 @@ export default function SnapTradeConnection({
 
           {(step === 'registering' || step === 'connecting') && (
             <>
-              <div className='bg-white rounded-lg p-6 border border-blue-200'>
-                <div className='flex items-center justify-center mb-4'>
-                  <div className='flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full'>
-                    <Loader2 className='h-6 w-6 animate-spin text-blue-600' />
+              <div className='bg-white rounded-xl p-8 border border-blue-200 shadow-sm'>
+                <div className='flex items-center justify-center mb-6'>
+                  <div className='relative'>
+                    <div className='flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full'>
+                      <Loader2 className='h-8 w-8 animate-spin text-blue-600' />
+                    </div>
+                    <div className='absolute inset-0 rounded-full border-4 border-transparent border-t-blue-400 animate-ping'></div>
                   </div>
                 </div>
 
-                <div className='text-center space-y-3'>
-                  <h3 className='font-semibold text-gray-800'>
+                <div className='text-center space-y-4'>
+                  <h3 className='font-bold text-slate-800 text-lg'>
                     {step === 'registering'
                       ? 'Setting up secure connection...'
                       : 'Generating connection portal...'}
                   </h3>
-                  <p className='text-sm text-gray-600'>
+                  <p className='text-sm text-slate-600'>
                     {step === 'registering'
                       ? 'Creating your secure user session with SnapTrade'
                       : 'Preparing the secure connection portal for your brokerage'}
                   </p>
                 </div>
 
-                <div className='mt-6 space-y-2'>
+                <div className='mt-8 space-y-3'>
                   <div className='flex items-center justify-between text-sm'>
-                    <span className='text-gray-600'>Progress</span>
-                    <span className='font-semibold text-blue-600'>
-                      {progress}%
-                    </span>
+                    <span className='text-slate-600 font-medium'>Progress</span>
+                    <span className='font-bold text-blue-600'>{progress}%</span>
                   </div>
-                  <Progress value={progress} className='w-full h-2' />
+                  <Progress value={progress} className='w-full h-3' />
                 </div>
               </div>
             </>
@@ -425,15 +534,15 @@ export default function SnapTradeConnection({
 
           {step === 'connecting' && loginUrl && (
             <>
-              <div className='bg-green-50 rounded-lg p-6 border border-green-200'>
-                <div className='flex items-center justify-center mb-4'>
-                  <div className='flex items-center justify-center w-12 h-12 bg-green-100 rounded-full'>
-                    <CheckCircle className='h-6 w-6 text-green-600' />
+              <div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-8 border border-green-200 shadow-sm'>
+                <div className='flex items-center justify-center mb-6'>
+                  <div className='flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full'>
+                    <CheckCircle className='h-8 w-8 text-green-600' />
                   </div>
                 </div>
 
-                <div className='text-center space-y-3'>
-                  <h3 className='font-semibold text-green-800'>
+                <div className='text-center space-y-4'>
+                  <h3 className='font-bold text-green-800 text-lg'>
                     Connection Portal Ready!
                   </h3>
                   <p className='text-sm text-green-700'>
@@ -443,24 +552,25 @@ export default function SnapTradeConnection({
                   </p>
                 </div>
 
-                <div className='p-2 -m-2 mt-4'>
+                <div className='p-2 -m-2 mt-6'>
                   <Button
                     onClick={openConnectionPortal}
-                    className='w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-semibold py-4 sm:py-3 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none'
+                    className='w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 active:from-green-800 active:to-emerald-800 text-white font-bold py-4 sm:py-4 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none rounded-xl'
                     size='lg'
-                    style={{ minHeight: '48px' }}
+                    style={{ minHeight: '56px' }}
                   >
-                    <ExternalLink className='mr-3 h-5 w-5 flex-shrink-0' />
+                    <ExternalLink className='mr-3 h-6 w-6 flex-shrink-0' />
                     <span className='whitespace-nowrap'>
                       <span className='hidden sm:inline'>
                         Open Connection Portal
                       </span>
                       <span className='sm:hidden'>Open Portal</span>
                     </span>
+                    <ArrowRight className='ml-3 h-5 w-5 flex-shrink-0' />
                   </Button>
                 </div>
 
-                <div className='mt-4 p-3 bg-white rounded-lg border border-green-200'>
+                <div className='mt-6 p-4 bg-white rounded-xl border border-green-200'>
                   <p className='text-xs text-green-700 text-center'>
                     <strong>Note:</strong> After connecting your account, the
                     modal will automatically close and you can continue with

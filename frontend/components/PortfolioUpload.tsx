@@ -17,6 +17,15 @@ import {
   Edit3,
   Building2,
   ChevronDown,
+  Shield,
+  Lock,
+  Link,
+  Zap,
+  Users,
+  Database,
+  Eye,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import {
   predictVolatility,
@@ -312,52 +321,77 @@ export default function PortfolioUpload() {
     return 'text-yellow-600';
   }, []);
 
+  // Check if portfolio is ready for prediction
+  const isPortfolioReady = () => {
+    if (activeTab === 'csv') {
+      return selectedFile && validationResult && validationResult.isValid;
+    } else if (activeTab === 'manual') {
+      const totalWeight = getTotalWeight();
+      return totalWeight > 0 && Math.abs(totalWeight - 100) <= 1;
+    }
+    return false;
+  };
+
   return (
-    <div className='space-y-6'>
-      {/* Portfolio Upload Tabs */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <Calculator className='h-5 w-5' />
-            Portfolio Input
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+    <div className='space-y-8'>
+      {/* Enhanced Portfolio Input Section */}
+      <div className='bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200 shadow-lg overflow-hidden'>
+        <div className='bg-gradient-to-r from-slate-800 to-blue-800 text-white p-6'>
+          <div className='flex items-center gap-3 mb-2'>
+            <div className='flex items-center justify-center w-10 h-10 bg-white/20 rounded-lg'>
+              <Calculator className='h-6 w-6' />
+            </div>
+            <h2 className='text-2xl font-bold'>Portfolio Input</h2>
+          </div>
+          <p className='text-slate-200 text-sm'>
+            Choose your preferred method to input your portfolio data for
+            volatility analysis
+          </p>
+        </div>
+
+        <div className='p-6'>
+          {/* Enhanced Tab Navigation */}
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className='w-full'
           >
-            <TabsList className='flex flex-col sm:flex-row w-full gap-1'>
+            <TabsList className='grid w-full grid-cols-3 bg-slate-100 p-1 rounded-xl h-auto'>
               <TabsTrigger
                 value='snaptrade'
-                className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'
+                className='flex flex-col items-center gap-2 py-4 px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200'
               >
-                <Building2 className='h-4 w-4' />
-                Easy Connection (API)
+                <div className='flex items-center gap-2'>
+                  <Building2 className='h-5 w-5' />
+                  <span className='font-semibold'>Easy Connection</span>
+                </div>
+                <span className='text-xs text-slate-600'>API Integration</span>
               </TabsTrigger>
               <TabsTrigger
                 value='csv'
-                className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'
+                className='flex flex-col items-center gap-2 py-4 px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200'
               >
-                <FileSpreadsheet className='h-4 w-4' />
-                CSV Upload
+                <div className='flex items-center gap-2'>
+                  <FileSpreadsheet className='h-5 w-5' />
+                  <span className='font-semibold'>CSV Upload</span>
+                </div>
+                <span className='text-xs text-slate-600'>File Import</span>
               </TabsTrigger>
               <TabsTrigger
                 value='manual'
-                className='flex items-center justify-center gap-2 py-3 sm:py-1.5 text-sm w-full sm:w-auto'
+                className='flex flex-col items-center gap-2 py-4 px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200'
               >
-                <Edit3 className='h-4 w-4' />
-                Manual Entry
+                <div className='flex items-center gap-2'>
+                  <Edit3 className='h-5 w-5' />
+                  <span className='font-semibold'>Manual Entry</span>
+                </div>
+                <span className='text-xs text-slate-600'>Direct Input</span>
               </TabsTrigger>
             </TabsList>
 
-            {/* Easy Connection (API) */}
-            <TabsContent
-              value='snaptrade'
-              className='min-h-[500px] sm:min-h-[550px] md:min-h-[600px]'
-            >
-              <div className='space-y-4 h-full overflow-y-auto'>
+            {/* Easy Connection (API) - Enhanced */}
+            <TabsContent value='snaptrade' className='mt-6 min-h-[600px]'>
+              <div className='space-y-6'>
                 {snapTradeStep === 'connection' && (
                   <SnapTradeConnection
                     onConnectionSuccess={handleSnapTradeConnectionSuccess}
@@ -386,8 +420,8 @@ export default function PortfolioUpload() {
 
                 {snapTradeStep === 'manual' && (
                   <div className='space-y-4'>
-                    <Alert>
-                      <CheckCircle className='h-4 w-4' />
+                    <Alert className='border-green-200 bg-green-50'>
+                      <CheckCircle className='h-4 w-4 text-green-600' />
                       <AlertDescription>
                         Your portfolio positions have been extracted and loaded
                         into the manual adjustment form. You can now review and
@@ -396,7 +430,7 @@ export default function PortfolioUpload() {
                     </Alert>
                     <Button
                       onClick={() => setActiveTab('manual')}
-                      className='w-full'
+                      className='w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
                       size='lg'
                     >
                       <Edit3 className='mr-2 h-4 w-4' />
@@ -407,100 +441,107 @@ export default function PortfolioUpload() {
               </div>
             </TabsContent>
 
-            {/* CSV Upload Tab */}
-            <TabsContent
-              value='csv'
-              className='min-h-[500px] sm:min-h-[550px] md:min-h-[600px]'
-            >
-              <div className='space-y-4 h-full overflow-y-auto'>
+            {/* CSV Upload Tab - Enhanced */}
+            <TabsContent value='csv' className='mt-6 min-h-[600px]'>
+              <div className='space-y-6'>
+                {/* Enhanced Drag & Drop Area */}
                 <div
-                  className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+                  className={`relative border-3 border-dashed rounded-2xl p-8 text-center transition-all duration-300 ${
                     isDragOver
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
+                      : 'border-slate-300 hover:border-slate-400 bg-white'
                   }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
-                  <Upload className='h-12 w-12 mx-auto mb-4 text-gray-400' />
-                  <p className='text-lg font-medium mb-2'>
-                    Drag and drop your CSV file here
-                  </p>
-                  <p className='text-sm text-gray-600 mb-4'>
-                    or click to browse
-                  </p>
-                  <p className='text-xs text-gray-500 mb-4'>
-                    Required columns: Ticker, Weight
-                  </p>
+                  <div className='absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl opacity-0 transition-opacity duration-300 pointer-events-none'></div>
 
-                  <input
-                    type='file'
-                    accept='.csv'
-                    onChange={handleFileInput}
-                    className='hidden'
-                    id='file-input'
-                  />
-                  <label htmlFor='file-input'>
-                    <Button asChild>
-                      <span>
-                        <FileText className='h-4 w-4 mr-2' />
-                        Choose File
-                      </span>
-                    </Button>
-                  </label>
+                  <div className='relative z-10'>
+                    <div className='flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full'>
+                      <Upload className='h-8 w-8 text-blue-600' />
+                    </div>
+
+                    <h3 className='text-xl font-semibold mb-2 text-slate-800'>
+                      Upload Your Portfolio CSV
+                    </h3>
+                    <p className='text-slate-600 mb-4'>
+                      Drag and drop your CSV file here or click to browse
+                    </p>
+
+                    <div className='bg-blue-50 rounded-lg p-3 mb-4 inline-block'>
+                      <p className='text-sm font-medium text-blue-800'>
+                        Required columns:{' '}
+                        <code className='bg-blue-100 px-2 py-1 rounded'>
+                          Ticker, Weight
+                        </code>
+                      </p>
+                    </div>
+
+                    <input
+                      type='file'
+                      accept='.csv'
+                      onChange={handleFileInput}
+                      className='hidden'
+                      id='file-input'
+                    />
+                    <label htmlFor='file-input'>
+                      <Button
+                        asChild
+                        className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                      >
+                        <span>
+                          <FileText className='h-4 w-4 mr-2' />
+                          Choose File
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
                 </div>
 
+                {/* File Status */}
                 {selectedFile && (
-                  <div className='p-3 bg-green-50 border border-green-200 rounded-lg'>
-                    <div className='flex items-center gap-2'>
-                      <CheckCircle className='h-4 w-4 text-green-600' />
-                      <span className='text-sm font-medium text-green-800'>
-                        Selected: {selectedFile.name}
-                      </span>
+                  <div className='p-4 bg-green-50 border border-green-200 rounded-xl'>
+                    <div className='flex items-center gap-3'>
+                      <div className='flex items-center justify-center w-10 h-10 bg-green-100 rounded-full'>
+                        <CheckCircle className='h-5 w-5 text-green-600' />
+                      </div>
+                      <div>
+                        <div className='font-semibold text-green-800'>
+                          {selectedFile.name}
+                        </div>
+                        <div className='text-sm text-green-600'>
+                          Size: {(selectedFile.size / 1024).toFixed(2)} KB
+                        </div>
+                      </div>
                     </div>
-                    <p className='text-xs text-green-600 mt-1'>
-                      Size: {(selectedFile.size / 1024).toFixed(2)} KB
-                    </p>
                   </div>
                 )}
 
-                {selectedFile &&
-                  validationResult &&
-                  validationResult.isValid && (
-                    <div className='mt-4 flex gap-2'>
-                      <Button
-                        variant='outline'
-                        onClick={handleShowValidation}
-                        disabled={isLoading}
-                        className='flex items-center gap-2'
-                      >
-                        <CheckCircle className='h-4 w-4' />
-                        View Validation Details
-                        <ChevronDown className='h-4 w-4' />
-                      </Button>
-                    </div>
-                  )}
+                {/* Validation Actions */}
+                {selectedFile && validationResult && (
+                  <div className='flex gap-3'>
+                    <Button
+                      variant='outline'
+                      onClick={handleShowValidation}
+                      disabled={isLoading}
+                      className='flex items-center gap-2'
+                    >
+                      <CheckCircle className='h-4 w-4' />
+                      View Validation Details
+                      <ChevronDown className='h-4 w-4' />
+                    </Button>
+                  </div>
+                )}
 
-                {selectedFile &&
-                  validationResult &&
-                  !validationResult.isValid && (
-                    <div className='mt-4 flex gap-2'>
-                      <Button
-                        variant='outline'
-                        onClick={handleShowValidation}
-                        disabled={isLoading}
-                        className='flex items-center gap-2 bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
-                      >
-                        <AlertCircle className='h-4 w-4' />
-                        View Validation Issues
-                        <ChevronDown className='h-4 w-4' />
-                      </Button>
-                    </div>
-                  )}
-
+                {/* Sample Download */}
                 <div className='text-center'>
-                  <Button variant='outline' onClick={downloadSample} size='sm'>
+                  <Button
+                    variant='outline'
+                    onClick={downloadSample}
+                    size='sm'
+                    className='border-slate-300 hover:border-slate-400'
+                  >
                     <Download className='h-4 w-4 mr-2' />
                     Download Sample Portfolio CSV
                   </Button>
@@ -508,12 +549,9 @@ export default function PortfolioUpload() {
               </div>
             </TabsContent>
 
-            {/* Manual Entry Tab */}
-            <TabsContent
-              value='manual'
-              className='min-h-[500px] sm:min-h-[550px] md:min-h-[600px]'
-            >
-              <div className='space-y-4 h-full overflow-y-auto'>
+            {/* Manual Entry Tab - Enhanced */}
+            <TabsContent value='manual' className='mt-6 min-h-[600px]'>
+              <div className='space-y-6'>
                 <ManualPortfolioSection
                   manualAssets={manualAssets}
                   onUpdateAssets={setManualAssets}
@@ -525,16 +563,9 @@ export default function PortfolioUpload() {
             </TabsContent>
           </Tabs>
 
-          {/* Predict Button */}
-          {((activeTab === 'csv' &&
-            selectedFile &&
-            validationResult &&
-            validationResult.isValid) ||
-            (activeTab === 'manual' && getTotalWeight() > 0)) && (
-            <div
-              className='mt-6 text-center'
-              key={`predict-button-${activeTab}-${isLoading}`}
-            >
+          {/* Enhanced Predict Button */}
+          {isPortfolioReady() && (
+            <div className='mt-8 text-center'>
               <Button
                 onClick={e => {
                   e.preventDefault();
@@ -544,34 +575,56 @@ export default function PortfolioUpload() {
                 disabled={isLoading}
                 size='lg'
                 type='button'
+                className='bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-200'
               >
-                {isLoading ? 'Analyzing...' : 'Predict Volatility'}
+                {isLoading ? (
+                  <>
+                    <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3'></div>
+                    Analyzing Portfolio...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className='mr-2 h-5 w-5' />
+                    Predict Volatility
+                    <ArrowRight className='ml-2 h-5 w-5' />
+                  </>
+                )}
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Loading State */}
+      {/* Loading State - Enhanced */}
       {isLoading && (
-        <Card>
-          <CardContent className='p-6'>
-            <div className='text-center'>
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4'></div>
-              <p className='text-gray-600'>
-                Analyzing portfolio and generating forecast...
-              </p>
-              <Progress value={undefined} className='mt-4' />
+        <Card className='border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50'>
+          <CardContent className='p-8'>
+            <div className='text-center space-y-4'>
+              <div className='flex items-center justify-center'>
+                <div className='relative'>
+                  <div className='animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600'></div>
+                  <div className='absolute inset-0 rounded-full border-4 border-transparent border-t-blue-400 animate-ping'></div>
+                </div>
+              </div>
+              <div>
+                <h3 className='text-lg font-semibold text-slate-800 mb-2'>
+                  Analyzing Your Portfolio
+                </h3>
+                <p className='text-slate-600'>
+                  Processing your data and generating volatility forecast...
+                </p>
+              </div>
+              <Progress value={undefined} className='w-full h-2' />
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Error Display */}
+      {/* Error Display - Enhanced */}
       {error && (
-        <Alert variant='destructive'>
+        <Alert variant='destructive' className='border-red-200 bg-red-50'>
           <AlertCircle className='h-4 w-4' />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className='font-medium'>{error}</AlertDescription>
         </Alert>
       )}
 
