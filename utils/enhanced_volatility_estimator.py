@@ -123,7 +123,7 @@ class EnhancedVolatilityEstimator:
             'GLD': 0.18, 'SLV': 0.25, 'IAU': 0.18, 'PDBC': 0.20, 'DJP': 0.22,
             'USO': 0.35, 'UNG': 0.45, 'DBA': 0.18, 'CORN': 0.25, 'WEAT': 0.28,
             
-            # Cryptocurrency (High Volatility)
+            # Cryptocurrency (High Volatility) - Spot prices
             'BTC': 0.65, 'ETH': 0.75, 'BTC-USD': 0.65, 'ETH-USD': 0.75,
             'ADA': 0.80, 'SOL': 0.85, 'DOGE': 0.90, 'BNB': 0.70, 'XRP': 0.75,
             'MATIC': 0.85, 'AVAX': 0.90, 'DOT': 0.80, 'LINK': 0.75,
@@ -356,6 +356,7 @@ class EnhancedVolatilityEstimator:
         """
         result = {
             'symbol': symbol,
+            'normalized_symbol': self._normalize_crypto_symbol(symbol),  # Add normalized symbol for transparency
             'estimated_volatility': 0.20,  # Default fallback
             'confidence': 'Low',
             'data_source': 'Pattern Matching',
@@ -367,14 +368,17 @@ class EnhancedVolatilityEstimator:
         
         # 1. Try to get historical volatility from yfinance FIRST (prioritize API data)
         try:
+            # Normalize crypto symbols to ensure we get spot prices instead of ETFs
+            normalized_symbol = self._normalize_crypto_symbol(symbol)
+            
             # Primary fetch via Ticker.history (fast)
-            ticker = yf.Ticker(symbol)
+            ticker = yf.Ticker(normalized_symbol)
             hist = ticker.history(period="1y")
             
             # Some instruments (especially mutual funds) return an empty DataFrame.
             # Fall back to the slower but more reliable `yf.download` helper in that case.
             if hist is None or len(hist) < 30:
-                hist = yf.download(symbol, period="1y", progress=False)
+                hist = yf.download(normalized_symbol, period="1y", progress=False)
 
             if len(hist) > 30:
                 price_col = 'Adj Close' if 'Adj Close' in hist.columns else 'Close'
@@ -395,6 +399,10 @@ class EnhancedVolatilityEstimator:
                     result['name'] = info.get('longName') or info.get('shortName') or result.get('name')
                     result['sector'] = info.get('sector', 'Unknown')
                     result['asset_type'] = info.get('quoteType', 'Unknown')
+                    
+                    # Log the symbol mapping for debugging
+                    if normalized_symbol != symbol.upper():
+                        print(f"Symbol mapping: {symbol} -> {normalized_symbol} (Name: {result['name']})")
                 except:
                     pass
                     
@@ -404,8 +412,11 @@ class EnhancedVolatilityEstimator:
         
         # 2. Try external APIs if enabled
         if use_api:
+            # Normalize symbol for API calls
+            normalized_symbol = self._normalize_crypto_symbol(symbol)
+            
             # Try Financial Modeling Prep for historical volatility
-            fmp_vol = self.get_historical_volatility_fmp(symbol)
+            fmp_vol = self.get_historical_volatility_fmp(normalized_symbol)
             if fmp_vol and 0.01 < fmp_vol < 2.0:  # Sanity check
                 result.update({
                     'estimated_volatility': fmp_vol,
@@ -416,7 +427,7 @@ class EnhancedVolatilityEstimator:
                 return result
             
             # Try Alpha Vantage for fundamentals
-            fundamentals = self.get_asset_fundamentals(symbol)
+            fundamentals = self.get_asset_fundamentals(normalized_symbol)
             if fundamentals:
                 # Capture name if provided by Alpha Vantage
                 if not result.get('name'):
@@ -443,11 +454,26 @@ class EnhancedVolatilityEstimator:
             time.sleep(0.1)  # Be respectful to free APIs
         
         # 3. Check enhanced volatility map as fallback (after API attempts)
-        if symbol.upper() in self.enhanced_volatility_map:
+        # Try both original and normalized symbols
+        normalized_symbol = self._normalize_crypto_symbol(symbol)
+        symbol_to_check = symbol.upper()
+        
+        if symbol_to_check in self.enhanced_volatility_map:
             # Get asset type from pattern matching since hardcoded map lacks it
             asset_type, _ = self.classify_asset_type(symbol)
             result.update({
-                'estimated_volatility': self.enhanced_volatility_map[symbol.upper()],
+                'estimated_volatility': self.enhanced_volatility_map[symbol_to_check],
+                'confidence': 'Medium',  # Lower confidence since no API enrichment
+                'data_source': 'Historical Database',
+                'asset_type': asset_type,  # Use pattern-matched asset type
+                'methodology': 'Known Asset + Pattern Classification'
+            })
+            return result
+        elif normalized_symbol in self.enhanced_volatility_map:
+            # Get asset type from pattern matching since hardcoded map lacks it
+            asset_type, _ = self.classify_asset_type(symbol)
+            result.update({
+                'estimated_volatility': self.enhanced_volatility_map[normalized_symbol],
                 'confidence': 'Medium',  # Lower confidence since no API enrichment
                 'data_source': 'Historical Database',
                 'asset_type': asset_type,  # Use pattern-matched asset type
@@ -466,6 +492,138 @@ class EnhancedVolatilityEstimator:
         })
         
         return result
+    
+    def _get_crypto_symbol_mapping(self) -> Dict[str, str]:
+        """Map common crypto symbols to their Yahoo Finance spot price symbols"""
+        return {
+            'BTC': 'BTC-USD',
+            'ETH': 'ETH-USD',
+            'ADA': 'ADA-USD',
+            'SOL': 'SOL-USD',
+            'DOGE': 'DOGE-USD',
+            'BNB': 'BNB-USD',
+            'XRP': 'XRP-USD',
+            'MATIC': 'MATIC-USD',
+            'AVAX': 'AVAX-USD',
+            'DOT': 'DOT-USD',
+            'LINK': 'LINK-USD',
+            'LTC': 'LTC-USD',
+            'BCH': 'BCH-USD',
+            'XLM': 'XLM-USD',
+            'VET': 'VET-USD',
+            'TRX': 'TRX-USD',
+            'ATOM': 'ATOM-USD',
+            'NEAR': 'NEAR-USD',
+            'FTM': 'FTM-USD',
+            'ALGO': 'ALGO-USD',
+            'ICP': 'ICP-USD',
+            'FIL': 'FIL-USD',
+            'THETA': 'THETA-USD',
+            'XTZ': 'XTZ-USD',
+            'EOS': 'EOS-USD',
+            'AAVE': 'AAVE-USD',
+            'UNI': 'UNI-USD',
+            'SUSHI': 'SUSHI-USD',
+            'COMP': 'COMP-USD',
+            'MKR': 'MKR-USD',
+            'YFI': 'YFI-USD',
+            'SNX': 'SNX-USD',
+            'CRV': 'CRV-USD',
+            'BAL': 'BAL-USD',
+            'REN': 'REN-USD',
+            'ZRX': 'ZRX-USD',
+            'BAT': 'BAT-USD',
+            'MANA': 'MANA-USD',
+            'SAND': 'SAND-USD',
+            'ENJ': 'ENJ-USD',
+            'CHZ': 'CHZ-USD',
+            'HOT': 'HOT-USD',
+            'ANKR': 'ANKR-USD',
+            'ONE': 'ONE-USD',
+            'HARMONY': 'ONE-USD',
+            'IOTA': 'IOTA-USD',
+            'NEO': 'NEO-USD',
+            'GAS': 'GAS-USD',
+            'ONT': 'ONT-USD',
+            'QTUM': 'QTUM-USD',
+            'ICX': 'ICX-USD',
+            'ZIL': 'ZIL-USD',
+            'ZEN': 'ZEN-USD',
+            'RVN': 'RVN-USD',
+            'XMR': 'XMR-USD',
+            'DASH': 'DASH-USD',
+            'ZEC': 'ZEC-USD',
+            'XEM': 'XEM-USD',
+            'WAVES': 'WAVES-USD',
+            'OMG': 'OMG-USD',
+            'KNC': 'KNC-USD',
+            'STORJ': 'STORJ-USD',
+            'SKL': 'SKL-USD',
+            'GRT': 'GRT-USD',
+            '1INCH': '1INCH-USD',
+            'CAKE': 'CAKE-USD',
+            'BAKE': 'BAKE-USD',
+            'DODO': 'DODO-USD',
+            'ALPHA': 'ALPHA-USD',
+            'PERP': 'PERP-USD',
+            'RLC': 'RLC-USD',
+            'OCEAN': 'OCEAN-USD',
+            'BAND': 'BAND-USD',
+            'NMR': 'NMR-USD',
+            'MLN': 'MLN-USD',
+            'REP': 'REP-USD',
+            'KEEP': 'KEEP-USD',
+            'NU': 'NU-USD',
+            'UMA': 'UMA-USD',
+            'BADGER': 'BADGER-USD',
+            'FARM': 'FARM-USD',
+            'PICKLE': 'PICKLE-USD',
+            'CREAM': 'CREAM-USD',
+            'COVER': 'COVER-USD',
+            'HEGIC': 'HEGIC-USD',
+            'API3': 'API3-USD',
+            'POND': 'POND-USD',
+            'ALPHA': 'ALPHA-USD',
+            'PERP': 'PERP-USD',
+            'RLC': 'RLC-USD',
+            'OCEAN': 'OCEAN-USD',
+            'BAND': 'BAND-USD',
+            'NMR': 'NMR-USD',
+            'MLN': 'MLN-USD',
+            'REP': 'REP-USD',
+            'KEEP': 'KEEP-USD',
+            'NU': 'NU-USD',
+            'UMA': 'UMA-USD',
+            'BADGER': 'BADGER-USD',
+            'FARM': 'FARM-USD',
+            'PICKLE': 'PICKLE-USD',
+            'CREAM': 'CREAM-USD',
+            'COVER': 'COVER-USD',
+            'HEGIC': 'HEGIC-USD',
+            'API3': 'API3-USD',
+            'POND': 'POND-USD',
+        }
+    
+    def _normalize_crypto_symbol(self, symbol: str) -> str:
+        """Normalize cryptocurrency symbols to ensure we get spot prices instead of ETFs"""
+        symbol_upper = symbol.upper()
+        crypto_mapping = self._get_crypto_symbol_mapping()
+        
+        # If it's a known crypto symbol, map to spot price
+        if symbol_upper in crypto_mapping:
+            return crypto_mapping[symbol_upper]
+        
+        # If it already has -USD suffix, return as is
+        if symbol_upper.endswith('-USD'):
+            return symbol_upper
+        
+        # If it's a 3-4 letter symbol that might be crypto, try adding -USD
+        if len(symbol_upper) <= 4 and symbol_upper.isalpha():
+            # Check if it's in our crypto patterns
+            if any(pattern in symbol_upper for pattern in self.asset_type_patterns['crypto_patterns']):
+                return f"{symbol_upper}-USD"
+        
+        return symbol_upper
     
     def estimate_portfolio_volatility_enhanced(self, portfolio_df: pd.DataFrame, 
                                              use_apis: bool = True) -> Dict:
