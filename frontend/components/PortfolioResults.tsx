@@ -833,7 +833,13 @@ function RiskAnalysisDisplay({
   }
   // Helper function to generate dynamic concerns based on portfolio data
   const generateDynamicConcerns = () => {
-    const dynamicConcerns = [];
+    const dynamicConcerns: Array<{
+      type: string;
+      title: string;
+      description: string;
+      severity: string;
+      action: string;
+    }> = [];
 
     // Safety check: if risk analysis data is missing, return empty array
     if (!riskAnalysis?.risk_metrics) {
@@ -1990,17 +1996,17 @@ function RiskAnalysisDisplay({
                 };
 
                 const content = getConcentrationContent();
-                const colorClasses = {
+                const colorClasses: Record<string, string> = {
                   orange:
                     'from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20 border-orange-200 dark:border-orange-800/30',
                   yellow:
                     'from-yellow-50 to-yellow-100 dark:from-yellow-950/20 dark:to-yellow-900/20 border-yellow-200 dark:border-yellow-800/30',
                 };
-                const badgeColors = {
+                const badgeColors: Record<string, string> = {
                   orange: 'bg-orange-600',
                   yellow: 'bg-yellow-600',
                 };
-                const buttonColors = {
+                const buttonColors: Record<string, string> = {
                   orange: 'bg-orange-600 hover:bg-orange-700',
                   yellow: 'bg-yellow-600 hover:bg-yellow-700',
                 };
