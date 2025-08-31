@@ -12,7 +12,7 @@ const buttonVariants = cva(
         destructive:
           'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+          'border border-input bg-background hover:bg-accent hover:text-accent-foreground hover:border-accent/50',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
@@ -20,6 +20,14 @@ const buttonVariants = cva(
         success: 'bg-emerald-600 text-white hover:bg-emerald-700',
         warning: 'bg-amber-600 text-white hover:bg-amber-700',
         danger: 'bg-red-600 text-white hover:bg-red-700',
+        'outline-blue':
+          'border border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-800 hover:border-blue-300',
+        'outline-red':
+          'border border-red-200 bg-white text-red-700 hover:bg-red-50 hover:text-red-800 hover:border-red-300',
+        'outline-slate':
+          'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-800 hover:border-slate-300',
+        'outline-green':
+          'border border-green-200 bg-white text-green-700 hover:bg-green-50 hover:text-green-800 hover:border-green-300',
       },
       size: {
         default: 'h-10 px-4 py-2',

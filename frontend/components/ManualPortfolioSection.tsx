@@ -317,7 +317,7 @@ export default function ManualPortfolioSection({
               </div>
               <div>
                 <p className='font-medium text-yellow-800'>
-                  Weights don't add up to 100%
+                  Weights don&apos;t add up to 100%
                 </p>
                 <p className='text-sm text-yellow-700 mt-1'>
                   Current total: {totalWeight.toFixed(1)}%. Please adjust
@@ -426,24 +426,24 @@ export default function ManualPortfolioSection({
             <div className='flex flex-wrap gap-2'>
               <Button
                 size='sm'
-                className='h-8 px-3 text-xs bg-white border-blue-200 text-blue-700 hover:bg-blue-50'
-                variant='outline'
+                variant='outline-blue'
+                className='h-8 px-3 text-xs'
                 onClick={normalizeWeights}
               >
                 Normalize to 100%
               </Button>
               <Button
                 size='sm'
-                className='h-8 px-3 text-xs bg-white border-blue-200 text-blue-700 hover:bg-blue-50'
-                variant='outline'
+                variant='outline-blue'
+                className='h-8 px-3 text-xs'
                 onClick={evenSplitWeights}
               >
                 Even Split
               </Button>
               <Button
                 size='sm'
-                className='h-8 px-3 text-xs bg-white border-red-200 text-red-700 hover:bg-red-50'
-                variant='outline'
+                variant='outline-red'
+                className='h-8 px-3 text-xs'
                 onClick={clearAllAssets}
               >
                 Clear All
@@ -458,16 +458,16 @@ export default function ManualPortfolioSection({
             <div className='flex flex-col gap-2'>
               <Button
                 size='sm'
-                className='h-8 px-3 text-xs bg-white border-blue-200 text-blue-700 hover:bg-blue-50'
-                variant='outline'
+                variant='outline-blue'
+                className='h-8 px-3 text-xs'
                 onClick={loadDemoETF}
               >
                 Load Diversified ETF Demo
               </Button>
               <Button
                 size='sm'
-                className='h-8 px-3 text-xs bg-white border-blue-200 text-blue-700 hover:bg-blue-50'
-                variant='outline'
+                variant='outline-blue'
+                className='h-8 px-3 text-xs'
                 onClick={loadDemoMutualFunds}
               >
                 Load Mutual Funds Demo
@@ -491,11 +491,11 @@ export default function ManualPortfolioSection({
             <Button
               key={index}
               size='sm'
-              variant='outline'
+              variant='outline-slate'
               onClick={() => {
                 onUpdateAssets([quickAsset]);
               }}
-              className='text-xs bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+              className='text-xs'
             >
               {quickAsset.ticker} ({quickAsset.weight}%)
             </Button>
@@ -507,9 +507,9 @@ export default function ManualPortfolioSection({
       {hasAssets && (
         <div className='flex gap-3'>
           <Button
-            variant='outline'
+            variant='outline-slate'
             onClick={onValidate}
-            className='flex items-center gap-2 bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+            className='flex items-center gap-2'
           >
             <CheckCircle className='h-4 w-4' />
             Validate Portfolio

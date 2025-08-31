@@ -32,6 +32,14 @@ import {
 } from '@/lib/tickerResolver';
 import EmailSignup from './ui/EmailSignup';
 import CrashTestPanel from './CrashTestPanel';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from './ui/accordion';
+import { Button } from './ui/button';
 
 interface PortfolioResultsProps {
   result: PredictionResult;
@@ -71,7 +79,10 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
 
       {/* Risk Analysis */}
       {result.risk_analysis && result.risk_analysis.success && (
-        <RiskAnalysisDisplay riskAnalysis={result.risk_analysis} />
+        <RiskAnalysisDisplay
+          riskAnalysis={result.risk_analysis}
+          portfolioAssets={result.portfolio_assets}
+        />
       )}
 
       {/* Crash Test Analysis */}
@@ -776,11 +787,27 @@ function PortfolioComposition({ result }: { result: PredictionResult }) {
   );
 }
 
-function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
+function RiskAnalysisDisplay({
+  riskAnalysis,
+  portfolioAssets,
+}: {
+  riskAnalysis: any;
+  portfolioAssets: any[];
+}) {
   const metrics = riskAnalysis.risk_metrics;
   const correlationAnalysis = metrics.correlation_analysis;
   const riskSummary = metrics.risk_summary;
   const recommendations = metrics.recommendations;
+  const [expandedConcerns, setExpandedConcerns] = useState(false);
+  const [learnMoreDialog, setLearnMoreDialog] = useState<{
+    isOpen: boolean;
+    topic: string;
+    recommendation: any;
+  }>({
+    isOpen: false,
+    topic: '',
+    recommendation: null,
+  });
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel) {
@@ -812,6 +839,223 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
     }
   };
 
+  const getRiskLevelBgColor = (riskLevel: string) => {
+    switch (riskLevel) {
+      case 'Very High':
+        return 'bg-gradient-to-br from-red-600 to-red-700 dark:from-red-700 dark:to-red-800';
+      case 'High':
+        return 'bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700';
+      case 'Moderate':
+        return 'bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-600 dark:to-yellow-700';
+      case 'Low':
+        return 'bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700';
+      case 'Very Low':
+        return 'bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700';
+      default:
+        return 'bg-gradient-to-br from-gray-500 to-gray-600 dark:from-gray-600 dark:to-gray-700';
+    }
+  };
+
+  const handleReviewRecommendations = () => {
+    // Scroll to recommendations section
+    const recommendationsSection = document.getElementById(
+      'recommendations-section'
+    );
+    if (recommendationsSection) {
+      recommendationsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleLearnMore = (topic: string, recommendation: any) => {
+    setLearnMoreDialog({
+      isOpen: true,
+      topic,
+      recommendation,
+    });
+  };
+
+  const getLearnMoreContent = (topic: string, recommendation: any) => {
+    const content = {
+      'high-correlation': {
+        title: 'Understanding High Correlation',
+        summary:
+          'High correlation between assets means they move together, reducing diversification benefits and increasing portfolio risk.',
+        sections: [
+          {
+            title: 'What is Correlation?',
+            content:
+              'Correlation measures how closely two assets move together. A correlation of 1.0 means they move in perfect sync, while 0.0 means they move independently. Your BND and TLT have a 93.8% correlation, which is very high.',
+          },
+          {
+            title: 'Why High Correlation is Risky',
+            content:
+              'When highly correlated assets decline together, your portfolio loses diversification benefits. This can lead to larger losses during market downturns and reduced risk-adjusted returns.',
+          },
+          {
+            title: 'Strategies to Reduce Correlation',
+            content:
+              'Consider adding assets with low correlation to bonds, such as: • International equities (VXUS, IEFA) • Real estate (VNQ, IYR) • Commodities (DJP, GSG) • Alternative investments (ARKK, QQQ)',
+          },
+          {
+            title: 'Target Goals',
+            content:
+              'Aim to reduce correlation between bond holdings to below 70%. Consider replacing one bond fund with a different asset class to improve diversification.',
+          },
+        ],
+        actions: [
+          { label: 'Explore Alternative Assets', action: 'explore-assets' },
+          { label: 'Rebalance Portfolio', action: 'rebalance' },
+          { label: 'View Correlation Matrix', action: 'correlation-matrix' },
+        ],
+      },
+      'portfolio-concentration': {
+        title: 'Addressing Portfolio Concentration',
+        summary:
+          'High concentration in a few assets increases risk. Your portfolio has significant exposure to individual holdings.',
+        sections: [
+          {
+            title: 'What is Concentration Risk?',
+            content:
+              'Concentration risk occurs when a large portion of your portfolio is invested in a few assets. This reduces diversification benefits and increases overall portfolio volatility.',
+          },
+          {
+            title: 'Why Concentration is Dangerous',
+            content:
+              'High concentration means poor diversification. If your largest holdings decline significantly, they will have a major impact on your entire portfolio performance. This can lead to larger losses during market downturns.',
+          },
+          {
+            title: 'Strategies to Reduce Concentration',
+            content:
+              '• Gradually reduce large positions to 5-15% of portfolio • Add more diverse assets across different sectors • Consider dollar-cost averaging into new positions • Set maximum allocation limits per asset (e.g., 10-15%)',
+          },
+          {
+            title: 'Rebalancing Approach',
+            content:
+              'Instead of selling all at once, consider: • Selling portions of large positions gradually • Investing new capital into other assets • Setting up automatic rebalancing rules • Using dollar-cost averaging to reduce impact',
+          },
+        ],
+        actions: [
+          { label: 'Create Rebalancing Plan', action: 'rebalancing-plan' },
+          {
+            label: 'Explore Diversification Tools',
+            action: 'diversification-tools',
+          },
+          { label: 'Set Allocation Targets', action: 'allocation-targets' },
+        ],
+      },
+      'single-asset-concentration': {
+        title: 'Managing Single Asset Concentration',
+        summary:
+          'A single asset represents a large portion of your portfolio, creating concentration risk and reducing diversification benefits.',
+        sections: [
+          {
+            title: 'Current Concentration Risk',
+            content:
+              'Having a single asset dominate your portfolio creates significant volatility risk. If this asset declines significantly, it will have a major impact on your entire portfolio performance.',
+          },
+          {
+            title: 'Recommended Allocation',
+            content:
+              'For most investors, no single asset should represent more than 10-15% of total portfolio. Consider reducing large positions to improve diversification and reduce risk.',
+          },
+          {
+            title: 'Reduction Strategies',
+            content:
+              '• Gradually reduce the large position over 3-6 months • Reallocate proceeds to diversified ETFs (VTI, VXUS, BND) • Consider dollar-cost averaging out to minimize tax impact • Replace with more stable, diversified assets',
+          },
+          {
+            title: 'Alternative Approaches',
+            content:
+              'If you want to maintain exposure to this asset class, consider: • Sector ETFs for broader exposure • Index funds for diversification • Smaller allocations across multiple related assets',
+          },
+        ],
+        actions: [
+          { label: 'Calculate Reduction Plan', action: 'reduction-calculator' },
+          {
+            label: 'Explore Diversified Alternatives',
+            action: 'diversified-alternatives',
+          },
+          { label: 'Set Up Dollar-Cost Averaging', action: 'dca-setup' },
+        ],
+      },
+      'top3-concentration': {
+        title: 'Addressing Top 3 Holdings Concentration',
+        summary:
+          'Your top 3 holdings represent a large portion of your portfolio, creating concentration risk and limiting diversification.',
+        sections: [
+          {
+            title: 'Current Concentration Risk',
+            content:
+              'Having your top 3 holdings dominate your portfolio reduces diversification benefits. This concentration can lead to higher volatility and increased risk during market downturns.',
+          },
+          {
+            title: 'Recommended Allocation',
+            content:
+              'Aim to have your top 3 holdings represent no more than 50-60% of your total portfolio. This provides better diversification across more assets and sectors.',
+          },
+          {
+            title: 'Diversification Strategies',
+            content:
+              '• Add 5-7 new positions across different asset classes • Consider international equities (VXUS, IEFA) • Add real estate (VNQ, IYR) and commodities (DJP, GSG) • Include sector-specific ETFs for targeted exposure',
+          },
+          {
+            title: 'Implementation Approach',
+            content:
+              '• Start with broad market ETFs for core positions • Add sector-specific funds gradually • Consider target-date funds for automatic rebalancing • Review and rebalance quarterly',
+          },
+        ],
+        actions: [
+          { label: 'Explore New Asset Classes', action: 'explore-assets' },
+          {
+            label: 'Portfolio Diversification Tool',
+            action: 'diversification-tool',
+          },
+          {
+            label: 'Asset Allocation Calculator',
+            action: 'allocation-calculator',
+          },
+        ],
+      },
+      diversification: {
+        title: 'Improving Portfolio Diversification',
+        summary:
+          'Your portfolio lacks sufficient diversification across asset classes, sectors, and geographies.',
+        sections: [
+          {
+            title: 'Current Diversification Issues',
+            content:
+              'Your portfolio is heavily concentrated in a few assets and lacks exposure to important asset classes like international equities, real estate, and commodities.',
+          },
+          {
+            title: 'Benefits of Diversification',
+            content:
+              'Proper diversification: • Reduces overall portfolio volatility • Improves risk-adjusted returns • Protects against sector-specific downturns • Provides exposure to different economic cycles',
+          },
+          {
+            title: 'Recommended Asset Allocation',
+            content:
+              'Consider a more balanced approach: • 40-60% US equities (VTI, VOO) • 20-30% International equities (VXUS, IEFA) • 10-20% Bonds (BND, TLT) • 5-10% Real estate (VNQ) • 5-10% Commodities/Alternatives',
+          },
+          {
+            title: 'Implementation Strategy',
+            content:
+              '• Start with broad market ETFs for core positions • Add sector-specific funds gradually • Consider target-date funds for automatic rebalancing • Review and rebalance quarterly',
+          },
+        ],
+        actions: [
+          { label: 'Build Diversified Portfolio', action: 'portfolio-builder' },
+          {
+            label: 'Asset Allocation Calculator',
+            action: 'allocation-calculator',
+          },
+          { label: 'Sector Analysis Tool', action: 'sector-analysis' },
+        ],
+      },
+    };
+
+    return content[topic as keyof typeof content] || content['diversification'];
+  };
+
   return (
     <Card className='border-2 border-border/50 shadow-lg'>
       <CardHeader className='pb-6'>
@@ -823,96 +1067,185 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
         </CardTitle>
       </CardHeader>
       <CardContent className='space-y-8'>
+        {/* Risk Summary Section - Redesigned for Impact */}
         <div>
           <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
             <Shield className='h-5 w-5 text-primary' />
             Risk Summary
           </h4>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+
+          {/* Mobile Layout */}
+          <div className='block lg:hidden space-y-6'>
+            {/* Dominant Risk Assessment Card */}
             <div
-              className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
-              style={{ borderColor: riskSummary.risk_color }}
+              className={`relative overflow-hidden rounded-2xl p-8 ${getRiskLevelBgColor(
+                riskSummary.overall_risk_level
+              )} text-white shadow-xl transform hover:scale-[1.02] transition-all duration-300`}
             >
-              <div className='flex items-center justify-between mb-4'>
-                <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
-                  <Shield
-                    className='h-5 w-5'
-                    style={{ color: riskSummary.risk_color }}
-                  />
+              <div className='absolute inset-0 bg-black/10'></div>
+              <div className='relative'>
+                <div className='flex items-center justify-between mb-6'>
+                  <div className='p-3 rounded-xl bg-white/20 backdrop-blur-sm shadow-lg'>
+                    <Shield className='h-8 w-8 text-white' />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-sm font-medium text-white/80'>
+                      Overall Assessment
+                    </p>
+                  </div>
                 </div>
-                <div className='text-right'>
-                  <p className='text-xs font-medium text-muted-foreground'>
-                    Overall Assessment
+                <div className='mb-6'>
+                  <p className='text-5xl font-black mb-3 leading-none'>
+                    {riskSummary.overall_risk_level}
+                  </p>
+                  <p className='text-lg text-white/90 font-medium'>
+                    Based on correlation & concentration analysis
                   </p>
                 </div>
-              </div>
-              <div>
-                <p
-                  className='text-2xl font-bold mb-2'
-                  style={{ color: riskSummary.risk_color }}
+                <button
+                  onClick={handleReviewRecommendations}
+                  className='w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold py-4 px-6 rounded-xl border border-white/30 transition-all duration-200 hover:shadow-lg'
                 >
-                  {riskSummary.overall_risk_level}
-                </p>
-                <p className='text-sm text-muted-foreground'>
-                  Based on correlation & concentration
-                </p>
+                  Review Recommendations →
+                </button>
               </div>
             </div>
 
-            <div
-              className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
-              style={{ borderColor: riskSummary.diversification_score.color }}
-            >
-              <div className='flex items-center justify-between mb-4'>
-                <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
-                  <PieChart
-                    className='h-5 w-5'
-                    style={{ color: riskSummary.diversification_score.color }}
-                  />
+            {/* Secondary Metrics Cards */}
+            <div className='grid grid-cols-1 gap-4'>
+              <div className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'>
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                    <PieChart className='h-5 w-5 text-blue-600' />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-xs font-medium text-muted-foreground'>
+                      Portfolio Balance
+                    </p>
+                  </div>
                 </div>
-                <div className='text-right'>
-                  <p className='text-xs font-medium text-muted-foreground'>
-                    Portfolio Balance
+                <div>
+                  <p className='text-3xl font-bold text-blue-600 mb-2'>
+                    {riskSummary.diversification_score.score}/100
+                  </p>
+                  <p className='text-sm text-muted-foreground line-clamp-2'>
+                    {riskSummary.diversification_score.explanation ||
+                      'Diversification analysis completed'}
                   </p>
                 </div>
               </div>
-              <div>
-                <p
-                  className='text-2xl font-bold mb-2'
-                  style={{ color: riskSummary.diversification_score.color }}
+
+              <div className='relative overflow-hidden rounded-xl border-2 border-primary/30 p-6 bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm hover:shadow-md transition-shadow'>
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                    <BarChart3 className='h-5 w-5 text-primary' />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-xs font-medium text-muted-foreground'>
+                      Risk Score
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-3xl font-bold text-primary mb-2'>
+                    {riskSummary.risk_score}/100
+                  </p>
+                  <p className='text-sm text-muted-foreground'>
+                    Comprehensive risk metric
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className='hidden lg:grid lg:grid-cols-12 lg:gap-6'>
+            {/* Dominant Risk Assessment Card - Takes 6 columns */}
+            <div
+              className={`lg:col-span-6 relative overflow-hidden rounded-2xl p-8 ${getRiskLevelBgColor(
+                riskSummary.overall_risk_level
+              )} text-white shadow-xl transform hover:scale-[1.02] transition-all duration-300`}
+            >
+              <div className='absolute inset-0 bg-black/10'></div>
+              <div className='relative'>
+                <div className='flex items-center justify-between mb-6'>
+                  <div className='p-3 rounded-xl bg-white/20 backdrop-blur-sm shadow-lg'>
+                    <Shield className='h-8 w-8 text-white' />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-sm font-medium text-white/80'>
+                      Overall Assessment
+                    </p>
+                  </div>
+                </div>
+                <div className='mb-6'>
+                  <p className='text-5xl font-black mb-3 leading-none'>
+                    {riskSummary.overall_risk_level}
+                  </p>
+                  <p className='text-lg text-white/90 font-medium'>
+                    Based on correlation & concentration analysis
+                  </p>
+                </div>
+                <button
+                  onClick={handleReviewRecommendations}
+                  className='bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold py-4 px-8 rounded-xl border border-white/30 transition-all duration-200 hover:shadow-lg'
                 >
-                  {riskSummary.diversification_score.score}/100
-                </p>
-                <p className='text-sm text-muted-foreground line-clamp-2'>
-                  {riskSummary.diversification_score.explanation ||
-                    'Diversification analysis completed'}
-                </p>
+                  Review Recommendations →
+                </button>
               </div>
             </div>
 
-            <div className='relative overflow-hidden rounded-xl border-2 border-primary/30 p-6 bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm hover:shadow-md transition-shadow'>
-              <div className='flex items-center justify-between mb-4'>
-                <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
-                  <BarChart3 className='h-5 w-5 text-primary' />
+            {/* Secondary Metrics Cards - Take 3 columns each */}
+            <div className='lg:col-span-3'>
+              <div className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow h-full'>
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                    <PieChart className='h-5 w-5 text-blue-600' />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-xs font-medium text-muted-foreground'>
+                      Portfolio Balance
+                    </p>
+                  </div>
                 </div>
-                <div className='text-right'>
-                  <p className='text-xs font-medium text-muted-foreground'>
-                    Risk Score
+                <div>
+                  <p className='text-2xl font-bold text-blue-600 mb-2'>
+                    {riskSummary.diversification_score.score}/100
+                  </p>
+                  <p className='text-sm text-muted-foreground line-clamp-2'>
+                    {riskSummary.diversification_score.explanation ||
+                      'Diversification analysis completed'}
                   </p>
                 </div>
               </div>
-              <div>
-                <p className='text-2xl font-bold text-primary mb-2'>
-                  {riskSummary.risk_score}/100
-                </p>
-                <p className='text-sm text-muted-foreground'>
-                  Comprehensive risk metric
-                </p>
+            </div>
+
+            <div className='lg:col-span-3'>
+              <div className='relative overflow-hidden rounded-xl border-2 border-primary/30 p-6 bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm hover:shadow-md transition-shadow h-full'>
+                <div className='flex items-center justify-between mb-4'>
+                  <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                    <BarChart3 className='h-5 w-5 text-primary' />
+                  </div>
+                  <div className='text-right'>
+                    <p className='text-xs font-medium text-muted-foreground'>
+                      Risk Score
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-2xl font-bold text-primary mb-2'>
+                    {riskSummary.risk_score}/100
+                  </p>
+                  <p className='text-sm text-muted-foreground'>
+                    Comprehensive risk metric
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Correlation Analysis Section - Enhanced with Action Items */}
         {correlationAnalysis.success ? (
           <div>
             <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
@@ -920,8 +1253,15 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
               Correlation Analysis
             </h4>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+              {/* Highest Correlation Card - Enhanced */}
               <div
-                className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
+                className={`relative overflow-hidden rounded-xl border-2 p-6 shadow-sm hover:shadow-md transition-shadow ${
+                  correlationAnalysis.most_correlated_pair.risk_level ===
+                    'Very High' ||
+                  correlationAnalysis.most_correlated_pair.risk_level === 'High'
+                    ? 'bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20 border-red-200 dark:border-red-800/30'
+                    : 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800'
+                }`}
                 style={{
                   borderColor:
                     correlationAnalysis.most_correlated_pair.risk_color,
@@ -949,7 +1289,7 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
                     {correlationAnalysis.most_correlated_pair.asset2}
                   </p>
                   <p
-                    className='text-xl font-bold mb-2'
+                    className='text-2xl font-bold mb-2'
                     style={{
                       color:
                         correlationAnalysis.most_correlated_pair.risk_color,
@@ -960,14 +1300,30 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
                     ).toFixed(1)}
                     %
                   </p>
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='text-xs text-muted-foreground mb-3'>
                     {correlationAnalysis.most_correlated_pair.risk_description}
                   </p>
+                  {(correlationAnalysis.most_correlated_pair.risk_level ===
+                    'Very High' ||
+                    correlationAnalysis.most_correlated_pair.risk_level ===
+                      'High') && (
+                    <button className='w-full bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 text-sm font-medium py-2 px-3 rounded-lg border border-red-200 dark:border-red-800/50 transition-colors'>
+                      Consider Diversifying
+                    </button>
+                  )}
                 </div>
               </div>
 
+              {/* Concentration Risk Card - Enhanced */}
               <div
-                className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
+                className={`relative overflow-hidden rounded-xl border-2 p-6 shadow-sm hover:shadow-md transition-shadow ${
+                  correlationAnalysis.concentration_metrics.risk_level ===
+                    'Very High' ||
+                  correlationAnalysis.concentration_metrics.risk_level ===
+                    'High'
+                    ? 'bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20 border-orange-200 dark:border-orange-800/30'
+                    : 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800'
+                }`}
                 style={{
                   borderColor:
                     correlationAnalysis.concentration_metrics.risk_color,
@@ -990,11 +1346,14 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
                   </div>
                 </div>
                 <div>
-                  <p className='text-lg font-semibold text-foreground mb-1'>
-                    HHI: {correlationAnalysis.concentration_metrics.hhi}
-                  </p>
+                  <div className='flex items-center gap-2 mb-1'>
+                    <p className='text-lg font-semibold text-foreground'>
+                      HHI: {correlationAnalysis.concentration_metrics.hhi}
+                    </p>
+                    <div className='w-2 h-2 rounded-full bg-primary/60'></div>
+                  </div>
                   <p
-                    className='text-xl font-bold mb-2'
+                    className='text-2xl font-bold mb-2'
                     style={{
                       color:
                         correlationAnalysis.concentration_metrics.risk_color,
@@ -1005,7 +1364,7 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
                         .concentration_level
                     }
                   </p>
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='text-xs text-muted-foreground mb-3'>
                     Largest:{' '}
                     {
                       correlationAnalysis.concentration_metrics.largest_holding
@@ -1018,9 +1377,18 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
                     }
                     %)
                   </p>
+                  {(correlationAnalysis.concentration_metrics.risk_level ===
+                    'Very High' ||
+                    correlationAnalysis.concentration_metrics.risk_level ===
+                      'High') && (
+                    <button className='w-full bg-orange-100 hover:bg-orange-200 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm font-medium py-2 px-3 rounded-lg border border-orange-200 dark:border-orange-800/50 transition-colors'>
+                      Rebalance Portfolio
+                    </button>
+                  )}
                 </div>
               </div>
 
+              {/* Portfolio Correlation Card - Neutral */}
               <div className='relative overflow-hidden rounded-xl border-2 border-primary/30 p-6 bg-gradient-to-br from-primary/5 to-primary/10 shadow-sm hover:shadow-md transition-shadow'>
                 <div className='flex items-center justify-between mb-4'>
                   <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
@@ -1075,79 +1443,500 @@ function RiskAnalysisDisplay({ riskAnalysis }: { riskAnalysis: any }) {
           </div>
         )}
 
+        {/* Key Concerns Section - Enhanced with Collapsible Mobile */}
         {riskSummary.key_concerns && riskSummary.key_concerns.length > 0 && (
           <div>
             <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
               <AlertTriangle className='h-5 w-5 text-amber-600' />
               Key Concerns
             </h4>
-            <div className='grid gap-4'>
-              {riskSummary.key_concerns.map(
-                (concern: string, index: number) => (
-                  <div
-                    key={index}
-                    className='flex items-start gap-4 p-4 bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-400 rounded-lg'
+            <div className='space-y-4'>
+              {/* Mobile: Show first 2 concerns, collapsible for more */}
+              <div className='block lg:hidden'>
+                {riskSummary.key_concerns
+                  .slice(0, expandedConcerns ? undefined : 2)
+                  .map((concern: string, index: number) => (
+                    <div
+                      key={index}
+                      className='flex items-start gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-l-4 border-amber-400 rounded-lg hover:shadow-md transition-shadow'
+                    >
+                      <AlertTriangle className='h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0' />
+                      <p className='text-sm text-amber-800 dark:text-amber-200 leading-relaxed'>
+                        {concern}
+                      </p>
+                    </div>
+                  ))}
+                {riskSummary.key_concerns.length > 2 && (
+                  <button
+                    onClick={() => setExpandedConcerns(!expandedConcerns)}
+                    className='w-full p-3 text-amber-700 dark:text-amber-300 font-medium hover:bg-amber-100 dark:hover:bg-amber-950/30 rounded-lg border border-amber-200 dark:border-amber-800/50 transition-colors'
                   >
-                    <AlertTriangle className='h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0' />
-                    <p className='text-sm text-amber-800 dark:text-amber-200 leading-relaxed'>
-                      {concern}
-                    </p>
-                  </div>
-                )
-              )}
+                    {expandedConcerns
+                      ? `Show Less`
+                      : `Show ${
+                          riskSummary.key_concerns.length - 2
+                        } More Concerns`}
+                  </button>
+                )}
+              </div>
+
+              {/* Desktop: Show all concerns */}
+              <div className='hidden lg:grid lg:gap-4'>
+                {riskSummary.key_concerns.map(
+                  (concern: string, index: number) => (
+                    <div
+                      key={index}
+                      className='flex items-start gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-l-4 border-amber-400 rounded-lg hover:shadow-md transition-shadow'
+                    >
+                      <AlertTriangle className='h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0' />
+                      <p className='text-sm text-amber-800 dark:text-amber-200 leading-relaxed'>
+                        {concern}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
             </div>
           </div>
         )}
 
+        {/* Recommendations Section - Enhanced with Action Buttons */}
         {recommendations && recommendations.length > 0 && (
-          <div>
+          <div id='recommendations-section'>
             <h4 className='text-lg font-semibold mb-6 flex items-center gap-2'>
               <Lightbulb className='h-5 w-5 text-primary' />
               Recommendations
             </h4>
+
+            {/* Enhanced Recommendations that directly address key concerns */}
             <div className='grid gap-6'>
-              {recommendations.map((rec: any, index: number) => (
-                <div
-                  key={index}
-                  className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
-                  style={{ borderColor: getPriorityColor(rec.priority) }}
-                >
-                  <div className='flex justify-between items-start mb-4'>
-                    <div className='flex items-center gap-3'>
-                      <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
-                        <Lightbulb
-                          className='h-5 w-5'
-                          style={{ color: getPriorityColor(rec.priority) }}
-                        />
+              {/* High Correlation Recommendation */}
+              {correlationAnalysis.success &&
+                correlationAnalysis.most_correlated_pair.risk_level ===
+                  'Very High' && (
+                  <div className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20 shadow-sm hover:shadow-md transition-shadow border-red-200 dark:border-red-800/30'>
+                    <div className='flex justify-between items-start mb-4'>
+                      <div className='flex items-center gap-3'>
+                        <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                          <TrendingUp className='h-5 w-5 text-red-600' />
+                        </div>
+                        <h5 className='font-semibold text-foreground text-lg'>
+                          Reduce High Correlation Between BND & TLT
+                        </h5>
                       </div>
-                      <h5 className='font-semibold text-foreground text-lg'>
-                        {rec.title}
-                      </h5>
+                      <Badge className='text-xs font-semibold px-3 py-1 bg-red-600 text-white'>
+                        HIGH PRIORITY
+                      </Badge>
                     </div>
-                    <Badge
-                      className='text-xs font-semibold px-3 py-1'
-                      style={{
-                        backgroundColor: getPriorityColor(rec.priority),
-                        color: 'white',
-                      }}
-                    >
-                      {rec.priority.toUpperCase()}
-                    </Badge>
-                  </div>
-                  <p className='text-muted-foreground mb-4 leading-relaxed'>
-                    {rec.description}
-                  </p>
-                  <div className='flex items-start gap-2 p-3 bg-muted/30 rounded-lg'>
-                    <ArrowUpRight className='h-4 w-4 text-primary mt-0.5 flex-shrink-0' />
-                    <p className='text-sm font-medium text-foreground'>
-                      <span className='text-primary'>Action:</span> {rec.action}
+                    <p className='text-muted-foreground mb-4 leading-relaxed'>
+                      Your BND and TLT holdings have a 93.8% correlation, which
+                      significantly reduces diversification benefits. Consider
+                      replacing one bond fund with a different asset class.
                     </p>
+                    <div className='mb-4 p-3 bg-white/50 dark:bg-black/20 rounded-lg'>
+                      <p className='text-sm font-medium text-foreground mb-2'>
+                        Target Goal:
+                      </p>
+                      <p className='text-sm text-muted-foreground'>
+                        Reduce correlation to below 70% by diversifying into
+                        international equities (VXUS) or real estate (VNQ)
+                      </p>
+                    </div>
+                    <div className='flex flex-col sm:flex-row gap-3'>
+                      <button className='flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-sm hover:shadow-md'>
+                        Replace TLT with VXUS
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleLearnMore('high-correlation', null)
+                        }
+                        className='px-6 py-3 bg-muted hover:bg-muted/80 text-muted-foreground font-medium rounded-lg border border-border transition-colors'
+                      >
+                        Learn More
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )}
+
+              {/* Dynamic Concentration Recommendation */}
+              {(() => {
+                // Analyze portfolio for concentration issues
+                const assets = portfolioAssets || [];
+                const sortedAssets = [...assets].sort(
+                  (a, b) => b.Weight - a.Weight
+                );
+                const largestHolding = sortedAssets[0];
+                const top3Holdings = sortedAssets.slice(0, 3);
+                const top3TotalWeight = top3Holdings.reduce(
+                  (sum, asset) => sum + asset.Weight,
+                  0
+                );
+
+                // Determine if we need to show concentration warning
+                const hasHighConcentration =
+                  largestHolding && largestHolding.Weight > 0.25; // >25%
+                const hasTop3Concentration = top3TotalWeight > 0.7; // >70%
+
+                if (!hasHighConcentration && !hasTop3Concentration) return null;
+
+                // Determine the specific concentration issue
+                const isSingleAssetConcentration = hasHighConcentration;
+                const concentrationType = isSingleAssetConcentration
+                  ? 'single-asset'
+                  : 'top3';
+
+                const getConcentrationContent = () => {
+                  // Helper function to normalize weights to percentages
+                  const normalizeWeight = (weight: number) => {
+                    // If weight is already a percentage (>= 1), return as is
+                    // If weight is a decimal (< 1), multiply by 100
+                    return weight >= 1 ? weight : weight * 100;
+                  };
+
+                  if (isSingleAssetConcentration) {
+                    const currentPercent = Math.round(
+                      normalizeWeight(largestHolding.Weight)
+                    );
+                    const targetPercent = Math.min(
+                      15,
+                      Math.round(currentPercent * 0.4)
+                    ); // Reduce to 40% of current or 15% max
+
+                    return {
+                      title: `Reduce ${largestHolding.Ticker} Concentration (${currentPercent}% → ${targetPercent}%)`,
+                      description: `${largestHolding.Ticker} represents ${currentPercent}% of your portfolio, creating concentration risk. This single holding dominates your portfolio performance.`,
+                      actionPlan: `Consider reducing ${largestHolding.Ticker} to ${targetPercent}% and reallocating to diversified assets`,
+                      priority: currentPercent > 40 ? 'CRITICAL' : 'HIGH',
+                      color: currentPercent > 40 ? 'orange' : 'yellow',
+                      topic: 'single-asset-concentration',
+                    };
+                  } else {
+                    const currentPercent = Math.round(
+                      normalizeWeight(top3TotalWeight)
+                    );
+                    const targetPercent = Math.round(currentPercent * 0.75); // Reduce by 25%
+
+                    return {
+                      title: `Diversify Top 3 Holdings (${currentPercent}% → ${targetPercent}%)`,
+                      description: `Your top 3 holdings (${top3Holdings
+                        .map(a => a.Ticker)
+                        .join(
+                          ', '
+                        )}) represent ${currentPercent}% of the portfolio, creating concentration risk.`,
+                      actionPlan: `Add 5-7 new positions to reduce top 3 concentration to ${targetPercent}%`,
+                      priority: 'HIGH',
+                      color: 'yellow',
+                      topic: 'top3-concentration',
+                    };
+                  }
+                };
+
+                const content = getConcentrationContent();
+                const colorClasses = {
+                  orange:
+                    'from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20 border-orange-200 dark:border-orange-800/30',
+                  yellow:
+                    'from-yellow-50 to-yellow-100 dark:from-yellow-950/20 dark:to-yellow-900/20 border-yellow-200 dark:border-yellow-800/30',
+                };
+                const badgeColors = {
+                  orange: 'bg-orange-600',
+                  yellow: 'bg-yellow-600',
+                };
+                const buttonColors = {
+                  orange: 'bg-orange-600 hover:bg-orange-700',
+                  yellow: 'bg-yellow-600 hover:bg-yellow-700',
+                };
+
+                return (
+                  <div
+                    className={`relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br ${
+                      colorClasses[content.color]
+                    } shadow-sm hover:shadow-md transition-shadow`}
+                  >
+                    <div className='flex justify-between items-start mb-4'>
+                      <div className='flex items-center gap-3'>
+                        <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                          <AlertTriangle
+                            className={`h-5 w-5 text-${content.color}-600`}
+                          />
+                        </div>
+                        <h5 className='font-semibold text-foreground text-lg'>
+                          {content.title}
+                        </h5>
+                      </div>
+                      <Badge
+                        className={`text-xs font-semibold px-3 py-1 ${
+                          badgeColors[content.color]
+                        } text-white`}
+                      >
+                        {content.priority}
+                      </Badge>
+                    </div>
+                    <p className='text-muted-foreground mb-4 leading-relaxed'>
+                      {content.description}
+                    </p>
+                    <div className='mb-4 p-3 bg-white/50 dark:bg-black/20 rounded-lg'>
+                      <p className='text-sm font-medium text-foreground mb-2'>
+                        Action Plan:
+                      </p>
+                      <p className='text-sm text-muted-foreground'>
+                        {content.actionPlan}
+                      </p>
+                    </div>
+                    <div className='flex flex-col sm:flex-row gap-3'>
+                      <button
+                        className={`flex-1 ${
+                          buttonColors[content.color]
+                        } text-white font-semibold py-3 px-6 rounded-lg transition-colors shadow-sm hover:shadow-md`}
+                      >
+                        {isSingleAssetConcentration
+                          ? 'Create Reduction Plan'
+                          : 'Explore New Assets'}
+                      </button>
+                      <button
+                        onClick={() => handleLearnMore(content.topic, null)}
+                        className='px-6 py-3 bg-muted hover:bg-muted/80 text-muted-foreground font-medium rounded-lg border border-border transition-colors'
+                      >
+                        Learn More
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Original Recommendations */}
+              {recommendations.map((rec: any, index: number) => {
+                // Determine the topic based on recommendation content
+                const getRecommendationTopic = (
+                  title: string,
+                  description: string
+                ) => {
+                  const lowerTitle = title.toLowerCase();
+                  const lowerDesc = description.toLowerCase();
+
+                  if (
+                    lowerTitle.includes('correlation') ||
+                    lowerDesc.includes('correlation') ||
+                    lowerDesc.includes('bnd') ||
+                    lowerDesc.includes('tlt')
+                  ) {
+                    return 'high-correlation';
+                  }
+                  if (
+                    lowerTitle.includes('concentration') ||
+                    lowerDesc.includes('concentration') ||
+                    lowerDesc.includes('hhi')
+                  ) {
+                    // Check if it's about top 3 holdings specifically
+                    if (
+                      lowerTitle.includes('top 3') ||
+                      lowerDesc.includes('top 3') ||
+                      lowerDesc.includes('top3')
+                    ) {
+                      return 'top3-concentration';
+                    }
+                    // Check if it's about a single asset
+                    if (
+                      lowerTitle.includes('reduce') &&
+                      (lowerTitle.includes('%') || lowerDesc.includes('%'))
+                    ) {
+                      return 'single-asset-concentration';
+                    }
+                    return 'portfolio-concentration';
+                  }
+                  if (
+                    lowerTitle.includes('diversification') ||
+                    lowerDesc.includes('diversification')
+                  ) {
+                    return 'diversification';
+                  }
+                  return 'diversification'; // default
+                };
+
+                const topic = getRecommendationTopic(
+                  rec.title,
+                  rec.description
+                );
+
+                return (
+                  <div
+                    key={index}
+                    className='relative overflow-hidden rounded-xl border-2 p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 shadow-sm hover:shadow-md transition-shadow'
+                    style={{ borderColor: getPriorityColor(rec.priority) }}
+                  >
+                    <div className='flex justify-between items-start mb-4'>
+                      <div className='flex items-center gap-3'>
+                        <div className='p-2 rounded-lg bg-white/80 dark:bg-black/20 shadow-sm'>
+                          <Lightbulb
+                            className='h-5 w-5'
+                            style={{ color: getPriorityColor(rec.priority) }}
+                          />
+                        </div>
+                        <h5 className='font-semibold text-foreground text-lg'>
+                          {rec.title}
+                        </h5>
+                      </div>
+                      <Badge
+                        className='text-xs font-semibold px-3 py-1'
+                        style={{
+                          backgroundColor: getPriorityColor(rec.priority),
+                          color: 'white',
+                        }}
+                      >
+                        {rec.priority.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <p className='text-muted-foreground mb-6 leading-relaxed'>
+                      {rec.description}
+                    </p>
+                    <div className='flex flex-col sm:flex-row gap-3'>
+                      <button
+                        className='flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 px-6 rounded-lg transition-colors shadow-sm hover:shadow-md'
+                        style={{
+                          backgroundColor: getPriorityColor(rec.priority),
+                        }}
+                      >
+                        {rec.action}
+                      </button>
+                      <button
+                        onClick={() => handleLearnMore(topic, rec)}
+                        className='px-6 py-3 bg-muted hover:bg-muted/80 text-muted-foreground font-medium rounded-lg border border-border transition-colors'
+                      >
+                        Learn More
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
+
+        {/* Learn More Dialog */}
+        <Dialog
+          open={learnMoreDialog.isOpen}
+          onOpenChange={open =>
+            setLearnMoreDialog(prev => ({ ...prev, isOpen: open }))
+          }
+        >
+          <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+            <DialogHeader>
+              <DialogTitle className='text-2xl font-bold text-foreground'>
+                {learnMoreDialog.isOpen &&
+                  getLearnMoreContent(
+                    learnMoreDialog.topic,
+                    learnMoreDialog.recommendation
+                  ).title}
+              </DialogTitle>
+            </DialogHeader>
+
+            {learnMoreDialog.isOpen && (
+              <div className='space-y-6'>
+                {/* Summary */}
+                <div className='p-4 bg-primary/5 rounded-lg border border-primary/20'>
+                  <p className='text-lg text-foreground font-medium'>
+                    {
+                      getLearnMoreContent(
+                        learnMoreDialog.topic,
+                        learnMoreDialog.recommendation
+                      ).summary
+                    }
+                  </p>
+                </div>
+
+                {/* Mobile Accordion Layout */}
+                <div className='block lg:hidden'>
+                  <Accordion type='single' collapsible className='w-full'>
+                    {getLearnMoreContent(
+                      learnMoreDialog.topic,
+                      learnMoreDialog.recommendation
+                    ).sections.map((section, index) => (
+                      <AccordionItem key={index} value={`item-${index}`}>
+                        <AccordionTrigger className='text-left font-semibold text-foreground hover:text-primary transition-colors'>
+                          {section.title}
+                        </AccordionTrigger>
+                        <AccordionContent className='text-muted-foreground leading-relaxed'>
+                          {section.content}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </div>
+
+                {/* Desktop Side-by-Side Layout */}
+                <div className='hidden lg:grid lg:grid-cols-2 lg:gap-8'>
+                  <div className='space-y-6'>
+                    {getLearnMoreContent(
+                      learnMoreDialog.topic,
+                      learnMoreDialog.recommendation
+                    )
+                      .sections.slice(0, 2)
+                      .map((section, index) => (
+                        <div key={index} className='space-y-3'>
+                          <h3 className='text-lg font-semibold text-foreground'>
+                            {section.title}
+                          </h3>
+                          <p className='text-muted-foreground leading-relaxed'>
+                            {section.content}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                  <div className='space-y-6'>
+                    {getLearnMoreContent(
+                      learnMoreDialog.topic,
+                      learnMoreDialog.recommendation
+                    )
+                      .sections.slice(2)
+                      .map((section, index) => (
+                        <div key={index} className='space-y-3'>
+                          <h3 className='text-lg font-semibold text-foreground'>
+                            {section.title}
+                          </h3>
+                          <p className='text-muted-foreground leading-relaxed'>
+                            {section.content}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className='border-t border-border pt-6'>
+                  <h3 className='text-lg font-semibold text-foreground mb-4'>
+                    Take Action
+                  </h3>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'>
+                    {getLearnMoreContent(
+                      learnMoreDialog.topic,
+                      learnMoreDialog.recommendation
+                    ).actions.map((action, index) => (
+                      <Button
+                        key={index}
+                        variant='outline'
+                        className='w-full justify-start text-left h-auto py-3 px-4'
+                        onClick={() => {
+                          // Handle different actions
+                          console.log(`Action: ${action.action}`);
+                          // TODO: Implement specific action handlers
+                        }}
+                      >
+                        <div className='flex flex-col items-start'>
+                          <span className='font-medium text-foreground'>
+                            {action.label}
+                          </span>
+                          <span className='text-xs text-muted-foreground'>
+                            Click to get started
+                          </span>
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

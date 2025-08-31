@@ -273,7 +273,7 @@ export default function ValidationResults({
           <div className='flex flex-col sm:flex-row gap-3 justify-center sm:justify-start'>
             {/* Download Sample Button */}
             <Button
-              variant='outline'
+              variant='outline-slate'
               onClick={downloadSample}
               className='flex items-center gap-2'
             >
@@ -287,7 +287,7 @@ export default function ValidationResults({
               onManualEntry &&
               !isManualPortfolio && (
                 <Button
-                  variant='outline'
+                  variant='outline-blue'
                   onClick={handleManualEntry}
                   className='flex items-center gap-2'
                 >
@@ -299,7 +299,7 @@ export default function ValidationResults({
             {/* Edit Portfolio Button - For manual portfolio validation */}
             {isManualPortfolio && onManualEntry && (
               <Button
-                variant='outline'
+                variant='outline-blue'
                 onClick={handleEditPortfolio}
                 className='flex items-center gap-2'
               >
