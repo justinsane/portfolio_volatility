@@ -333,65 +333,80 @@ export default function PortfolioUpload() {
   };
 
   return (
-    <div className='space-y-8'>
+    <div className='space-y-6 sm:space-y-8'>
       {/* Enhanced Portfolio Input Section */}
-      <div className='bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl border border-slate-200 shadow-lg overflow-hidden'>
-        <div className='bg-gradient-to-r from-slate-800 to-blue-800 text-white p-6'>
-          <div className='flex items-center gap-3 mb-2'>
-            <div className='flex items-center justify-center w-10 h-10 bg-white/20 rounded-lg'>
-              <Calculator className='h-6 w-6' />
+      <div className='bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg overflow-hidden'>
+        <div className='bg-gradient-to-r from-slate-800 to-blue-800 text-white p-4 sm:p-6'>
+          <div className='flex items-center gap-2 sm:gap-3 mb-2'>
+            <div className='flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg'>
+              <Calculator className='h-5 w-5 sm:h-6 sm:w-6' />
             </div>
-            <h2 className='text-2xl font-bold'>Portfolio Input</h2>
+            <h2 className='text-xl sm:text-2xl font-bold'>Portfolio Input</h2>
           </div>
-          <p className='text-slate-200 text-sm'>
+          <p className='text-slate-200 text-xs sm:text-sm'>
             Choose your preferred method to input your portfolio data for
             volatility analysis
           </p>
         </div>
 
-        <div className='p-6'>
+        <div className='p-4 sm:p-6'>
           {/* Enhanced Tab Navigation */}
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
             className='w-full'
           >
-            <TabsList className='grid w-full grid-cols-3 bg-slate-100 p-1 rounded-xl h-auto'>
+            <TabsList className='grid w-full grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 bg-slate-100 p-1 rounded-xl h-auto gap-1 lg:gap-0'>
               <TabsTrigger
                 value='snaptrade'
-                className='flex flex-col items-center gap-2 py-4 px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200'
+                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-3 lg:py-4 px-2 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm'
               >
-                <div className='flex items-center gap-2'>
-                  <Building2 className='h-5 w-5' />
-                  <span className='font-semibold'>Easy Connection</span>
+                <div className='flex items-center gap-1 lg:gap-2'>
+                  <Building2 className='h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0' />
+                  <span className='font-semibold whitespace-nowrap'>
+                    Easy Connection
+                  </span>
                 </div>
-                <span className='text-xs text-slate-600'>API Integration</span>
+                <span className='text-xs text-slate-600 hidden lg:block'>
+                  API Integration
+                </span>
               </TabsTrigger>
               <TabsTrigger
                 value='csv'
-                className='flex flex-col items-center gap-2 py-4 px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200'
+                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-3 lg:py-4 px-2 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm'
               >
-                <div className='flex items-center gap-2'>
-                  <FileSpreadsheet className='h-5 w-5' />
-                  <span className='font-semibold'>CSV Upload</span>
+                <div className='flex items-center gap-1 lg:gap-2'>
+                  <FileSpreadsheet className='h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0' />
+                  <span className='font-semibold whitespace-nowrap'>
+                    CSV Upload
+                  </span>
                 </div>
-                <span className='text-xs text-slate-600'>File Import</span>
+                <span className='text-xs text-slate-600 hidden lg:block'>
+                  File Import
+                </span>
               </TabsTrigger>
               <TabsTrigger
                 value='manual'
-                className='flex flex-col items-center gap-2 py-4 px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200'
+                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-3 lg:py-4 px-2 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm'
               >
-                <div className='flex items-center gap-2'>
-                  <Edit3 className='h-5 w-5' />
-                  <span className='font-semibold'>Manual Entry</span>
+                <div className='flex items-center gap-1 lg:gap-2'>
+                  <Edit3 className='h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0' />
+                  <span className='font-semibold whitespace-nowrap'>
+                    Manual Entry
+                  </span>
                 </div>
-                <span className='text-xs text-slate-600'>Direct Input</span>
+                <span className='text-xs text-slate-600 hidden lg:block'>
+                  Direct Input
+                </span>
               </TabsTrigger>
             </TabsList>
 
             {/* Easy Connection (API) - Enhanced */}
-            <TabsContent value='snaptrade' className='mt-6 min-h-[600px]'>
-              <div className='space-y-6'>
+            <TabsContent
+              value='snaptrade'
+              className='mt-4 sm:mt-6 min-h-[400px] sm:min-h-[600px]'
+            >
+              <div className='space-y-4 sm:space-y-6'>
                 {snapTradeStep === 'connection' && (
                   <SnapTradeConnection
                     onConnectionSuccess={handleSnapTradeConnectionSuccess}
@@ -442,8 +457,11 @@ export default function PortfolioUpload() {
             </TabsContent>
 
             {/* CSV Upload Tab - Enhanced */}
-            <TabsContent value='csv' className='mt-6 min-h-[600px]'>
-              <div className='space-y-6'>
+            <TabsContent
+              value='csv'
+              className='mt-4 sm:mt-6 min-h-[400px] sm:min-h-[600px]'
+            >
+              <div className='space-y-4 sm:space-y-6'>
                 {/* Enhanced Drag & Drop Area */}
                 <div
                   className={`relative border-3 border-dashed rounded-2xl p-8 text-center transition-all duration-300 ${
@@ -550,8 +568,11 @@ export default function PortfolioUpload() {
             </TabsContent>
 
             {/* Manual Entry Tab - Enhanced */}
-            <TabsContent value='manual' className='mt-6 min-h-[600px]'>
-              <div className='space-y-6'>
+            <TabsContent
+              value='manual'
+              className='mt-4 sm:mt-6 min-h-[400px] sm:min-h-[600px]'
+            >
+              <div className='space-y-4 sm:space-y-6'>
                 <ManualPortfolioSection
                   manualAssets={manualAssets}
                   onUpdateAssets={setManualAssets}
@@ -565,7 +586,7 @@ export default function PortfolioUpload() {
 
           {/* Enhanced Predict Button */}
           {isPortfolioReady() && (
-            <div className='mt-8 text-center'>
+            <div className='mt-6 sm:mt-8 text-center'>
               <Button
                 onClick={e => {
                   e.preventDefault();
@@ -575,18 +596,22 @@ export default function PortfolioUpload() {
                 disabled={isLoading}
                 size='lg'
                 type='button'
-                className='bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-200'
+                className='w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-4 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-200'
               >
                 {isLoading ? (
                   <>
-                    <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3'></div>
-                    Analyzing Portfolio...
+                    <div className='animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2 sm:mr-3'></div>
+                    <span className='text-sm sm:text-base'>
+                      Analyzing Portfolio...
+                    </span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className='mr-2 h-5 w-5' />
-                    Predict Volatility
-                    <ArrowRight className='ml-2 h-5 w-5' />
+                    <Sparkles className='mr-2 h-4 w-4 sm:h-5 sm:w-5' />
+                    <span className='text-sm sm:text-base'>
+                      Predict Volatility
+                    </span>
+                    <ArrowRight className='ml-2 h-4 w-4 sm:h-5 sm:w-5' />
                   </>
                 )}
               </Button>

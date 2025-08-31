@@ -292,28 +292,30 @@ export default function SnapTradeConnection({
     <>
       <Card className='w-full border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg'>
         <CardHeader className='pb-4'>
-          <CardTitle className='flex items-center gap-3 text-xl font-bold text-slate-800'>
-            <div className='flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg'>
-              <Building2 className='h-7 w-7 text-white' />
+          <CardTitle className='flex items-center gap-2 sm:gap-3 text-lg sm:text-xl font-bold text-slate-800'>
+            <div className='flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg'>
+              <Building2 className='h-6 w-6 sm:h-7 sm:w-7 text-white' />
             </div>
-            Securely Connect Your Brokerage
+            <span className='text-base sm:text-xl'>
+              Securely Connect Your Brokerage
+            </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className='space-y-6'>
+        <CardContent className='space-y-4 sm:space-y-6'>
           {step === 'initial' && (
             <>
-              <div className='space-y-6'>
+              <div className='space-y-4 sm:space-y-6'>
                 {/* Enhanced Security Section */}
-                <div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200'>
-                  <h3 className='font-bold text-green-800 mb-4 flex items-center gap-2 text-lg'>
-                    <Shield className='h-5 w-5 text-green-600' />
+                <div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 border border-green-200'>
+                  <h3 className='font-bold text-green-800 mb-3 sm:mb-4 flex items-center gap-2 text-base sm:text-lg'>
+                    <Shield className='h-4 w-4 sm:h-5 sm:w-5 text-green-600' />
                     Privacy & Security First
                   </h3>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4'>
                     <div className='space-y-3'>
-                      <div className='flex items-start gap-3'>
-                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
-                          <Eye className='h-4 w-4 text-green-600' />
+                      <div className='flex items-start gap-2 sm:gap-3'>
+                        <div className='flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Eye className='h-3 w-3 sm:h-4 sm:w-4 text-green-600' />
                         </div>
                         <div>
                           <p className='font-semibold text-green-800 text-sm'>
@@ -325,9 +327,9 @@ export default function SnapTradeConnection({
                           </p>
                         </div>
                       </div>
-                      <div className='flex items-start gap-3'>
-                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
-                          <Database className='h-4 w-4 text-green-600' />
+                      <div className='flex items-start gap-2 sm:gap-3'>
+                        <div className='flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Database className='h-3 w-3 sm:h-4 sm:w-4 text-green-600' />
                         </div>
                         <div>
                           <p className='font-semibold text-green-800 text-sm'>
@@ -340,9 +342,9 @@ export default function SnapTradeConnection({
                       </div>
                     </div>
                     <div className='space-y-3'>
-                      <div className='flex items-start gap-3'>
-                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
-                          <Lock className='h-4 w-4 text-green-600' />
+                      <div className='flex items-start gap-2 sm:gap-3'>
+                        <div className='flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Lock className='h-3 w-3 sm:h-4 sm:w-4 text-green-600' />
                         </div>
                         <div>
                           <p className='font-semibold text-green-800 text-sm'>
@@ -353,9 +355,9 @@ export default function SnapTradeConnection({
                           </p>
                         </div>
                       </div>
-                      <div className='flex items-start gap-3'>
-                        <div className='flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
-                          <Zap className='h-4 w-4 text-green-600' />
+                      <div className='flex items-start gap-2 sm:gap-3'>
+                        <div className='flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex-shrink-0 mt-0.5'>
+                          <Zap className='h-3 w-3 sm:h-4 sm:w-4 text-green-600' />
                         </div>
                         <div>
                           <p className='font-semibold text-green-800 text-sm'>
@@ -372,12 +374,12 @@ export default function SnapTradeConnection({
                 </div>
 
                 {/* How It Works Section */}
-                <div className='bg-white rounded-xl p-6 border border-blue-200 shadow-sm'>
-                  <h3 className='font-semibold text-blue-800 mb-4 flex items-center gap-2'>
-                    <Link className='h-5 w-5 text-blue-600' />
+                <div className='bg-white rounded-xl p-4 sm:p-6 border border-blue-200 shadow-sm'>
+                  <h3 className='font-semibold text-blue-800 mb-3 sm:mb-4 flex items-center gap-2'>
+                    <Link className='h-4 w-4 sm:h-5 sm:w-5 text-blue-600' />
                     How It Works
                   </h3>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4'>
                     <div className='space-y-3'>
                       <div className='flex items-start gap-3'>
                         <div className='flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg flex-shrink-0 mt-0.5'>
@@ -448,13 +450,13 @@ export default function SnapTradeConnection({
                 {/* Supported Brokers */}
                 <div className='bg-slate-50 rounded-xl p-6 border border-slate-200'>
                   <h3 className='font-semibold text-slate-800 mb-3 flex items-center gap-2'>
-                    <Users className='h-5 w-5 text-slate-600' />
+                    <Users className='h-4 w-4 sm:h-5 sm:w-5 text-slate-600' />
                     Supported Brokers
                   </h3>
                   <p className='text-sm text-slate-600 mb-3'>
                     Connect with major brokerage platforms including:
                   </p>
-                  <div className='flex flex-wrap gap-2'>
+                  <div className='flex flex-wrap gap-1 sm:gap-2'>
                     {[
                       'TD Ameritrade',
                       'Charles Schwab',
@@ -467,7 +469,7 @@ export default function SnapTradeConnection({
                     ].map(broker => (
                       <span
                         key={broker}
-                        className='px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-medium text-slate-700'
+                        className='px-2 sm:px-3 py-1 bg-white border border-slate-200 rounded-full text-xs font-medium text-slate-700'
                       >
                         {broker}
                       </span>
@@ -479,18 +481,18 @@ export default function SnapTradeConnection({
               <div className='p-2 -m-2'>
                 <Button
                   onClick={startConnection}
-                  className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:from-blue-800 active:to-indigo-800 text-white font-bold py-4 sm:py-4 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer rounded-xl'
+                  className='w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:from-blue-800 active:to-indigo-800 text-white font-bold py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer rounded-xl'
                   size='lg'
-                  style={{ minHeight: '56px' }}
+                  style={{ minHeight: '48px' }}
                 >
-                  <Link className='mr-3 h-6 w-6 flex-shrink-0' />
-                  <span className='whitespace-nowrap'>
+                  <Link className='mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0' />
+                  <span className='whitespace-nowrap text-sm sm:text-base'>
                     <span className='hidden sm:inline'>
                       Connect Brokerage Account
                     </span>
                     <span className='sm:hidden'>Connect Account</span>
                   </span>
-                  <ArrowRight className='ml-3 h-5 w-5 flex-shrink-0' />
+                  <ArrowRight className='ml-2 sm:ml-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0' />
                 </Button>
               </div>
             </>
@@ -498,18 +500,18 @@ export default function SnapTradeConnection({
 
           {(step === 'registering' || step === 'connecting') && (
             <>
-              <div className='bg-white rounded-xl p-8 border border-blue-200 shadow-sm'>
-                <div className='flex items-center justify-center mb-6'>
+              <div className='bg-white rounded-xl p-4 sm:p-8 border border-blue-200 shadow-sm'>
+                <div className='flex items-center justify-center mb-4 sm:mb-6'>
                   <div className='relative'>
-                    <div className='flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full'>
-                      <Loader2 className='h-8 w-8 animate-spin text-blue-600' />
+                    <div className='flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full'>
+                      <Loader2 className='h-6 w-6 sm:h-8 sm:w-8 animate-spin text-blue-600' />
                     </div>
                     <div className='absolute inset-0 rounded-full border-4 border-transparent border-t-blue-400 animate-ping'></div>
                   </div>
                 </div>
 
-                <div className='text-center space-y-4'>
-                  <h3 className='font-bold text-slate-800 text-lg'>
+                <div className='text-center space-y-3 sm:space-y-4'>
+                  <h3 className='font-bold text-slate-800 text-base sm:text-lg'>
                     {step === 'registering'
                       ? 'Setting up secure connection...'
                       : 'Generating connection portal...'}
@@ -521,7 +523,7 @@ export default function SnapTradeConnection({
                   </p>
                 </div>
 
-                <div className='mt-8 space-y-3'>
+                <div className='mt-6 sm:mt-8 space-y-3'>
                   <div className='flex items-center justify-between text-sm'>
                     <span className='text-slate-600 font-medium'>Progress</span>
                     <span className='font-bold text-blue-600'>{progress}%</span>
@@ -534,15 +536,15 @@ export default function SnapTradeConnection({
 
           {step === 'connecting' && loginUrl && (
             <>
-              <div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-8 border border-green-200 shadow-sm'>
-                <div className='flex items-center justify-center mb-6'>
-                  <div className='flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full'>
-                    <CheckCircle className='h-8 w-8 text-green-600' />
+              <div className='bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-8 border border-green-200 shadow-sm'>
+                <div className='flex items-center justify-center mb-4 sm:mb-6'>
+                  <div className='flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full'>
+                    <CheckCircle className='h-6 w-6 sm:h-8 sm:w-8 text-green-600' />
                   </div>
                 </div>
 
-                <div className='text-center space-y-4'>
-                  <h3 className='font-bold text-green-800 text-lg'>
+                <div className='text-center space-y-3 sm:space-y-4'>
+                  <h3 className='font-bold text-green-800 text-base sm:text-lg'>
                     Connection Portal Ready!
                   </h3>
                   <p className='text-sm text-green-700'>
@@ -555,18 +557,18 @@ export default function SnapTradeConnection({
                 <div className='p-2 -m-2 mt-6'>
                   <Button
                     onClick={openConnectionPortal}
-                    className='w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 active:from-green-800 active:to-emerald-800 text-white font-bold py-4 sm:py-4 text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none rounded-xl'
+                    className='w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 active:from-green-800 active:to-emerald-800 text-white font-bold py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none rounded-xl'
                     size='lg'
-                    style={{ minHeight: '56px' }}
+                    style={{ minHeight: '48px' }}
                   >
-                    <ExternalLink className='mr-3 h-6 w-6 flex-shrink-0' />
-                    <span className='whitespace-nowrap'>
+                    <ExternalLink className='mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0' />
+                    <span className='whitespace-nowrap text-sm sm:text-base'>
                       <span className='hidden sm:inline'>
                         Open Connection Portal
                       </span>
                       <span className='sm:hidden'>Open Portal</span>
                     </span>
-                    <ArrowRight className='ml-3 h-5 w-5 flex-shrink-0' />
+                    <ArrowRight className='ml-2 sm:ml-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0' />
                   </Button>
                 </div>
 
