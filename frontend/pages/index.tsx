@@ -15,20 +15,20 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Head>
 
-      <main className='p-4'>
+      <main className='p-3 sm:p-4'>
         <div className='max-w-6xl mx-auto'>
-          <div className='bg-white rounded-2xl shadow-2xl overflow-hidden'>
-            {/* Header */}
-            <div className='bg-gradient-to-r from-gray-800 to-gray-700 text-white p-4 sm:p-8 text-center'>
+          <div className='bg-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden'>
+            {/* Header - Mobile Optimized */}
+            <div className='bg-gradient-to-r from-gray-800 to-gray-700 text-white p-4 sm:p-6 lg:p-8 text-center'>
               <div className='flex flex-col items-center mb-4'>
                 <Image
                   src='/port_vol_Logo_1.png'
                   alt='Portfolio Volatility Logo'
                   width={60}
                   height={60}
-                  className='mb-3 sm:mb-4 sm:w-20 sm:h-20'
+                  className='mb-3 sm:mb-4 w-16 h-16 sm:w-20 sm:h-20'
                 />
-                <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold mb-2 px-2'>
+                <h1 className='text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-3 sm:mb-4 px-2'>
                   Portfolio Volatility Predictor
                 </h1>
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm max-w-4xl mx-auto px-2'>
@@ -72,8 +72,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Main Content */}
-            <div className='p-8'>
+            {/* Main Content - Mobile Optimized */}
+            <div className='p-4 sm:p-6 lg:p-8'>
               <PortfolioUpload />
             </div>
           </div>

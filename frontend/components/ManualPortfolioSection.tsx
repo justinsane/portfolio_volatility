@@ -229,31 +229,32 @@ export default function ManualPortfolioSection({
   const hasAssets = manualAssets.some(a => a.ticker.trim() && a.weight > 0);
 
   return (
-    <div className='space-y-6'>
-      {/* Header with Total Weight Display */}
-      <div className='bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-6 border border-slate-200'>
+    <div className='space-y-4 sm:space-y-6'>
+      {/* Header with Total Weight Display - Mobile Optimized */}
+      <div className='bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 sm:p-6 border border-slate-200'>
         <div className='flex items-center justify-between mb-4'>
-          <div className='flex items-center gap-3'>
-            <div className='flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg'>
-              <Calculator className='h-5 w-5 text-blue-600' />
+          <div className='flex items-center gap-2 sm:gap-3'>
+            <div className='flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg'>
+              <Calculator className='h-4 w-4 sm:h-5 sm:w-5 text-blue-600' />
             </div>
-            <h3 className='text-xl font-bold text-slate-800'>
+            <h3 className='text-lg sm:text-xl font-bold text-slate-800'>
               Portfolio Assets
             </h3>
           </div>
           <Button
             onClick={addAsset}
             size='sm'
-            className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+            className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-10 sm:h-auto px-3 sm:px-4'
           >
-            <Plus className='h-4 w-4 mr-2' />
-            Add Asset
+            <Plus className='h-4 w-4 mr-1 sm:mr-2' />
+            <span className='hidden sm:inline'>Add Asset</span>
+            <span className='sm:hidden'>Add</span>
           </Button>
         </div>
 
-        {/* Enhanced Total Weight Display */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <div className='bg-white rounded-lg p-4 border border-slate-200 shadow-sm'>
+        {/* Enhanced Total Weight Display - Mobile Stacked */}
+        <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4'>
+          <div className='bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-sm'>
             <div className='flex items-center gap-2 mb-1'>
               <Target className='h-4 w-4 text-slate-600' />
               <span className='text-sm font-medium text-slate-600'>
@@ -261,41 +262,43 @@ export default function ManualPortfolioSection({
               </span>
             </div>
             <div
-              className={`text-2xl font-bold ${getWeightColor(totalWeight)}`}
+              className={`text-xl sm:text-2xl font-bold ${getWeightColor(
+                totalWeight
+              )}`}
             >
               {totalWeight.toFixed(1)}%
             </div>
             <div className='text-xs text-slate-500 mt-1'>Target: 100%</div>
           </div>
 
-          <div className='bg-white rounded-lg p-4 border border-slate-200 shadow-sm'>
+          <div className='bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-sm'>
             <div className='flex items-center gap-2 mb-1'>
               <Zap className='h-4 w-4 text-slate-600' />
               <span className='text-sm font-medium text-slate-600'>Assets</span>
             </div>
-            <div className='text-2xl font-bold text-slate-800'>
+            <div className='text-xl sm:text-2xl font-bold text-slate-800'>
               {manualAssets.filter(a => a.ticker.trim() && a.weight > 0).length}
             </div>
             <div className='text-xs text-slate-500 mt-1'>Active positions</div>
           </div>
 
-          <div className='bg-white rounded-lg p-4 border border-slate-200 shadow-sm'>
+          <div className='bg-white rounded-lg p-3 sm:p-4 border border-slate-200 shadow-sm'>
             <div className='flex items-center gap-2 mb-1'>
               <CheckCircle className='h-4 w-4 text-slate-600' />
               <span className='text-sm font-medium text-slate-600'>Status</span>
             </div>
-            <div className='text-lg font-bold'>
+            <div className='text-base sm:text-lg font-bold'>
               {isWeightValid ? (
-                <Badge className='bg-green-100 text-green-800 border-green-200'>
+                <Badge className='bg-green-100 text-green-800 border-green-200 text-xs sm:text-sm'>
                   <CheckCircle className='h-3 w-3 mr-1' />
                   Ready
                 </Badge>
               ) : hasAssets ? (
-                <Badge className='bg-yellow-100 text-yellow-800 border-yellow-200'>
+                <Badge className='bg-yellow-100 text-yellow-800 border-yellow-200 text-xs sm:text-sm'>
                   Needs Adjustment
                 </Badge>
               ) : (
-                <Badge className='bg-slate-100 text-slate-600 border-slate-200'>
+                <Badge className='bg-slate-100 text-slate-600 border-slate-200 text-xs sm:text-sm'>
                   No Assets
                 </Badge>
               )}
@@ -308,18 +311,18 @@ export default function ManualPortfolioSection({
           </div>
         </div>
 
-        {/* Weight Warning */}
+        {/* Weight Warning - Mobile Optimized */}
         {hasAssets && !isWeightValid && (
-          <div className='mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
-            <div className='flex items-start gap-3'>
-              <div className='flex items-center justify-center w-6 h-6 bg-yellow-100 rounded-full flex-shrink-0 mt-0.5'>
+          <div className='mt-3 sm:mt-4 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
+            <div className='flex items-start gap-2 sm:gap-3'>
+              <div className='flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 bg-yellow-100 rounded-full flex-shrink-0 mt-0.5'>
                 <Target className='h-3 w-3 text-yellow-600' />
               </div>
               <div>
-                <p className='font-medium text-yellow-800'>
+                <p className='font-medium text-yellow-800 text-sm sm:text-base'>
                   Weights don&apos;t add up to 100%
                 </p>
-                <p className='text-sm text-yellow-700 mt-1'>
+                <p className='text-xs sm:text-sm text-yellow-700 mt-1'>
                   Current total: {totalWeight.toFixed(1)}%. Please adjust
                   weights to reach exactly 100%.
                 </p>
@@ -329,25 +332,25 @@ export default function ManualPortfolioSection({
         )}
       </div>
 
-      {/* Assets List */}
-      <div className='space-y-4' ref={assetCardsRef}>
+      {/* Assets List - Mobile Optimized */}
+      <div className='space-y-3 sm:space-y-4' ref={assetCardsRef}>
         <div className='flex items-center justify-between'>
-          <h4 className='text-lg font-semibold text-slate-800'>
+          <h4 className='text-base sm:text-lg font-semibold text-slate-800'>
             Asset Positions
           </h4>
-          <div className='text-sm text-slate-500'>
+          <div className='text-xs sm:text-sm text-slate-500'>
             {manualAssets.filter(a => a.ticker.trim() && a.weight > 0).length}{' '}
             of {manualAssets.length} assets
           </div>
         </div>
 
-        <div className='space-y-3'>
+        <div className='space-y-3 sm:space-y-3'>
           {manualAssets.map((asset, index) => (
             <div
               key={index}
-              className='bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200'
+              className='bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow duration-200'
             >
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
                 <div>
                   <label className='block text-sm font-medium text-slate-700 mb-2'>
                     Ticker Symbol
@@ -362,7 +365,7 @@ export default function ManualPortfolioSection({
                       updateAsset(index, 'ticker', e.target.value.toUpperCase())
                     }
                     onKeyDown={e => handleTickerKeyDown(index, asset, e)}
-                    className='uppercase font-medium'
+                    className='uppercase font-medium h-11 sm:h-10 text-base'
                   />
                 </div>
                 <div>
@@ -385,7 +388,7 @@ export default function ManualPortfolioSection({
                         )
                       }
                       onKeyDown={e => handleWeightKeyDown(index, asset, e)}
-                      className='flex-1'
+                      className='flex-1 h-11 sm:h-10 text-base'
                       min='0'
                       max='100'
                       step='0.1'
@@ -398,7 +401,7 @@ export default function ManualPortfolioSection({
                         onClick={() => removeAsset(index)}
                         size='sm'
                         variant='ghost'
-                        className='text-red-500 hover:text-red-700 hover:bg-red-50'
+                        className='text-red-500 hover:text-red-700 hover:bg-red-50 h-11 w-11 sm:h-10 sm:w-10 p-0'
                       >
                         <Trash2 className='h-4 w-4' />
                       </Button>
@@ -411,23 +414,23 @@ export default function ManualPortfolioSection({
         </div>
       </div>
 
-      {/* Weight Management Tools */}
-      <div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200'>
-        <h4 className='font-semibold text-blue-800 mb-4 flex items-center gap-2'>
-          <Sparkles className='h-5 w-5 text-blue-600' />
+      {/* Weight Management Tools - Mobile Optimized */}
+      <div className='bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-200'>
+        <h4 className='font-semibold text-blue-800 mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base'>
+          <Sparkles className='h-4 w-4 sm:h-5 sm:w-5 text-blue-600' />
           Portfolio Tools
         </h4>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div className='space-y-3'>
-            <h5 className='text-sm font-medium text-blue-700'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4'>
+          <div className='space-y-2 sm:space-y-3'>
+            <h5 className='text-xs sm:text-sm font-medium text-blue-700'>
               Weight Management
             </h5>
-            <div className='flex flex-wrap gap-2'>
+            <div className='flex flex-col sm:flex-row gap-2'>
               <Button
                 size='sm'
                 variant='outline-blue'
-                className='h-8 px-3 text-xs'
+                className='h-10 sm:h-8 px-3 text-xs justify-start sm:justify-center'
                 onClick={normalizeWeights}
               >
                 Normalize to 100%
@@ -435,7 +438,7 @@ export default function ManualPortfolioSection({
               <Button
                 size='sm'
                 variant='outline-blue'
-                className='h-8 px-3 text-xs'
+                className='h-10 sm:h-8 px-3 text-xs justify-start sm:justify-center'
                 onClick={evenSplitWeights}
               >
                 Even Split
@@ -443,7 +446,7 @@ export default function ManualPortfolioSection({
               <Button
                 size='sm'
                 variant='outline-red'
-                className='h-8 px-3 text-xs'
+                className='h-10 sm:h-8 px-3 text-xs justify-start sm:justify-center'
                 onClick={clearAllAssets}
               >
                 Clear All
@@ -451,15 +454,15 @@ export default function ManualPortfolioSection({
             </div>
           </div>
 
-          <div className='space-y-3'>
-            <h5 className='text-sm font-medium text-blue-700'>
+          <div className='space-y-2 sm:space-y-3'>
+            <h5 className='text-xs sm:text-sm font-medium text-blue-700'>
               Quick Templates
             </h5>
             <div className='flex flex-col gap-2'>
               <Button
                 size='sm'
                 variant='outline-blue'
-                className='h-8 px-3 text-xs'
+                className='h-10 sm:h-8 px-3 text-xs justify-start sm:justify-center'
                 onClick={loadDemoETF}
               >
                 Load Diversified ETF Demo
@@ -467,7 +470,7 @@ export default function ManualPortfolioSection({
               <Button
                 size='sm'
                 variant='outline-blue'
-                className='h-8 px-3 text-xs'
+                className='h-10 sm:h-8 px-3 text-xs justify-start sm:justify-center'
                 onClick={loadDemoMutualFunds}
               >
                 Load Mutual Funds Demo
@@ -477,12 +480,12 @@ export default function ManualPortfolioSection({
         </div>
       </div>
 
-      {/* Quick Add Common Assets */}
-      <div className='bg-slate-50 rounded-xl p-6 border border-slate-200'>
-        <h4 className='text-sm font-medium text-slate-700 mb-3'>
+      {/* Quick Add Common Assets - Mobile Optimized */}
+      <div className='bg-slate-50 rounded-xl p-4 sm:p-6 border border-slate-200'>
+        <h4 className='text-xs sm:text-sm font-medium text-slate-700 mb-3'>
           Quick Add Common Assets
         </h4>
-        <div className='flex flex-wrap gap-2'>
+        <div className='flex flex-col sm:flex-row gap-2'>
           {[
             { ticker: 'SPY', weight: 60 },
             { ticker: 'QQQ', weight: 30 },
@@ -495,7 +498,7 @@ export default function ManualPortfolioSection({
               onClick={() => {
                 onUpdateAssets([quickAsset]);
               }}
-              className='text-xs'
+              className='text-xs h-10 sm:h-8 justify-start sm:justify-center'
             >
               {quickAsset.ticker} ({quickAsset.weight}%)
             </Button>
@@ -503,16 +506,16 @@ export default function ManualPortfolioSection({
         </div>
       </div>
 
-      {/* Manual Portfolio Validation */}
+      {/* Manual Portfolio Validation - Mobile Optimized */}
       {hasAssets && (
         <div className='flex gap-3'>
           <Button
             variant='outline-slate'
             onClick={onValidate}
-            className='flex items-center gap-2'
+            className='flex items-center gap-2 h-12 sm:h-10 w-full sm:w-auto'
           >
             <CheckCircle className='h-4 w-4' />
-            Validate Portfolio
+            <span className='text-sm sm:text-base'>Validate Portfolio</span>
             <ChevronDown className='h-4 w-4' />
           </Button>
         </div>

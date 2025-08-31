@@ -333,15 +333,17 @@ export default function PortfolioUpload() {
   };
 
   return (
-    <div className='space-y-6 sm:space-y-8'>
-      {/* Enhanced Portfolio Input Section */}
+    <div className='space-y-4 sm:space-y-6 lg:space-y-8'>
+      {/* Enhanced Portfolio Input Section - Mobile Optimized */}
       <div className='bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg overflow-hidden'>
         <div className='bg-gradient-to-r from-slate-800 to-blue-800 text-white p-4 sm:p-6'>
           <div className='flex items-center gap-2 sm:gap-3 mb-2'>
             <div className='flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg'>
-              <Calculator className='h-5 w-5 sm:h-6 sm:w-6' />
+              <Calculator className='h-4 w-4 sm:h-5 sm:w-5' />
             </div>
-            <h2 className='text-xl sm:text-2xl font-bold'>Portfolio Input</h2>
+            <h2 className='text-lg sm:text-xl lg:text-2xl font-bold'>
+              Portfolio Input
+            </h2>
           </div>
           <p className='text-slate-200 text-xs sm:text-sm'>
             Choose your preferred method to input your portfolio data for
@@ -350,7 +352,7 @@ export default function PortfolioUpload() {
         </div>
 
         <div className='p-4 sm:p-6'>
-          {/* Enhanced Tab Navigation */}
+          {/* Enhanced Tab Navigation - Mobile Optimized */}
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -359,11 +361,11 @@ export default function PortfolioUpload() {
             <TabsList className='grid w-full grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 bg-slate-100 p-1 rounded-xl h-auto gap-1 lg:gap-0'>
               <TabsTrigger
                 value='snaptrade'
-                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-3 lg:py-4 px-2 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm'
+                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-4 lg:py-4 px-3 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm h-auto min-h-[60px] lg:min-h-[auto]'
               >
                 <div className='flex items-center gap-1 lg:gap-2'>
                   <Building2 className='h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0' />
-                  <span className='font-semibold whitespace-nowrap'>
+                  <span className='font-semibold whitespace-nowrap text-xs sm:text-sm'>
                     Easy Connection
                   </span>
                 </div>
@@ -373,11 +375,11 @@ export default function PortfolioUpload() {
               </TabsTrigger>
               <TabsTrigger
                 value='csv'
-                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-3 lg:py-4 px-2 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm'
+                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-4 lg:py-4 px-3 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm h-auto min-h-[60px] lg:min-h-[auto]'
               >
                 <div className='flex items-center gap-1 lg:gap-2'>
                   <FileSpreadsheet className='h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0' />
-                  <span className='font-semibold whitespace-nowrap'>
+                  <span className='font-semibold whitespace-nowrap text-xs sm:text-sm'>
                     CSV Upload
                   </span>
                 </div>
@@ -387,11 +389,11 @@ export default function PortfolioUpload() {
               </TabsTrigger>
               <TabsTrigger
                 value='manual'
-                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-3 lg:py-4 px-2 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm'
+                className='flex flex-col lg:flex-row items-center gap-1 lg:gap-2 py-4 lg:py-4 px-3 lg:px-3 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-blue-600 rounded-lg transition-all duration-200 text-xs lg:text-sm h-auto min-h-[60px] lg:min-h-[auto]'
               >
                 <div className='flex items-center gap-1 lg:gap-2'>
                   <Edit3 className='h-4 w-4 lg:h-5 lg:w-5 flex-shrink-0' />
-                  <span className='font-semibold whitespace-nowrap'>
+                  <span className='font-semibold whitespace-nowrap text-xs sm:text-sm'>
                     Manual Entry
                   </span>
                 </div>
@@ -445,7 +447,7 @@ export default function PortfolioUpload() {
                     </Alert>
                     <Button
                       onClick={() => setActiveTab('manual')}
-                      className='w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                      className='w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-12 sm:h-10'
                       size='lg'
                     >
                       <Edit3 className='mr-2 h-4 w-4' />
@@ -462,9 +464,9 @@ export default function PortfolioUpload() {
               className='mt-4 sm:mt-6 min-h-[400px] sm:min-h-[600px]'
             >
               <div className='space-y-4 sm:space-y-6'>
-                {/* Enhanced Drag & Drop Area */}
+                {/* Enhanced Drag & Drop Area - Mobile Optimized */}
                 <div
-                  className={`relative border-3 border-dashed rounded-2xl p-8 text-center transition-all duration-300 ${
+                  className={`relative border-3 border-dashed rounded-2xl p-6 sm:p-8 text-center transition-all duration-300 ${
                     isDragOver
                       ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
                       : 'border-slate-300 hover:border-slate-400 bg-white'
@@ -476,21 +478,21 @@ export default function PortfolioUpload() {
                   <div className='absolute inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl opacity-0 transition-opacity duration-300 pointer-events-none'></div>
 
                   <div className='relative z-10'>
-                    <div className='flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full'>
-                      <Upload className='h-8 w-8 text-blue-600' />
+                    <div className='flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full'>
+                      <Upload className='h-6 w-6 sm:h-8 sm:w-8 text-blue-600' />
                     </div>
 
-                    <h3 className='text-xl font-semibold mb-2 text-slate-800'>
+                    <h3 className='text-lg sm:text-xl font-semibold mb-2 text-slate-800'>
                       Upload Your Portfolio CSV
                     </h3>
-                    <p className='text-slate-600 mb-4'>
+                    <p className='text-slate-600 mb-4 text-sm sm:text-base'>
                       Drag and drop your CSV file here or click to browse
                     </p>
 
                     <div className='bg-blue-50 rounded-lg p-3 mb-4 inline-block'>
-                      <p className='text-sm font-medium text-blue-800'>
+                      <p className='text-xs sm:text-sm font-medium text-blue-800'>
                         Required columns:{' '}
-                        <code className='bg-blue-100 px-2 py-1 rounded'>
+                        <code className='bg-blue-100 px-2 py-1 rounded text-xs sm:text-sm'>
                           Ticker, Weight
                         </code>
                       </p>
@@ -506,7 +508,7 @@ export default function PortfolioUpload() {
                     <label htmlFor='file-input'>
                       <Button
                         asChild
-                        className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+                        className='bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-12 sm:h-10'
                       >
                         <span>
                           <FileText className='h-4 w-4 mr-2' />
@@ -517,7 +519,7 @@ export default function PortfolioUpload() {
                   </div>
                 </div>
 
-                {/* File Status */}
+                {/* File Status - Mobile Optimized */}
                 {selectedFile && (
                   <div className='p-4 bg-green-50 border border-green-200 rounded-xl'>
                     <div className='flex items-center gap-3'>
@@ -525,10 +527,10 @@ export default function PortfolioUpload() {
                         <CheckCircle className='h-5 w-5 text-green-600' />
                       </div>
                       <div>
-                        <div className='font-semibold text-green-800'>
+                        <div className='font-semibold text-green-800 text-sm sm:text-base'>
                           {selectedFile.name}
                         </div>
-                        <div className='text-sm text-green-600'>
+                        <div className='text-xs sm:text-sm text-green-600'>
                           Size: {(selectedFile.size / 1024).toFixed(2)} KB
                         </div>
                       </div>
@@ -536,32 +538,36 @@ export default function PortfolioUpload() {
                   </div>
                 )}
 
-                {/* Validation Actions */}
+                {/* Validation Actions - Mobile Optimized */}
                 {selectedFile && validationResult && (
                   <div className='flex gap-3'>
                     <Button
                       variant='outline'
                       onClick={handleShowValidation}
                       disabled={isLoading}
-                      className='flex items-center gap-2'
+                      className='flex items-center gap-2 h-12 sm:h-10 w-full sm:w-auto'
                     >
                       <CheckCircle className='h-4 w-4' />
-                      View Validation Details
+                      <span className='text-sm sm:text-base'>
+                        View Validation Details
+                      </span>
                       <ChevronDown className='h-4 w-4' />
                     </Button>
                   </div>
                 )}
 
-                {/* Sample Download */}
+                {/* Sample Download - Mobile Optimized */}
                 <div className='text-center'>
                   <Button
                     variant='outline'
                     onClick={downloadSample}
                     size='sm'
-                    className='border-slate-300 hover:border-slate-400'
+                    className='border-slate-300 hover:border-slate-400 h-12 sm:h-10'
                   >
                     <Download className='h-4 w-4 mr-2' />
-                    Download Sample Portfolio CSV
+                    <span className='text-sm sm:text-base'>
+                      Download Sample Portfolio CSV
+                    </span>
                   </Button>
                 </div>
               </div>
@@ -584,7 +590,7 @@ export default function PortfolioUpload() {
             </TabsContent>
           </Tabs>
 
-          {/* Enhanced Predict Button */}
+          {/* Enhanced Predict Button - Mobile Optimized */}
           {isPortfolioReady() && (
             <div className='mt-6 sm:mt-8 text-center'>
               <Button
@@ -596,7 +602,7 @@ export default function PortfolioUpload() {
                 disabled={isLoading}
                 size='lg'
                 type='button'
-                className='w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-4 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-200'
+                className='w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-4 sm:px-8 py-4 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-200 h-14 sm:h-12'
               >
                 {isLoading ? (
                   <>
@@ -623,7 +629,7 @@ export default function PortfolioUpload() {
       {/* Loading State - Enhanced */}
       {isLoading && (
         <Card className='border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50'>
-          <CardContent className='p-8'>
+          <CardContent className='p-6 sm:p-8'>
             <div className='text-center space-y-4'>
               <div className='flex items-center justify-center'>
                 <div className='relative'>
@@ -635,7 +641,7 @@ export default function PortfolioUpload() {
                 <h3 className='text-lg font-semibold text-slate-800 mb-2'>
                   Analyzing Your Portfolio
                 </h3>
-                <p className='text-slate-600'>
+                <p className='text-slate-600 text-sm sm:text-base'>
                   Processing your data and generating volatility forecast...
                 </p>
               </div>
@@ -649,7 +655,9 @@ export default function PortfolioUpload() {
       {error && (
         <Alert variant='destructive' className='border-red-200 bg-red-50'>
           <AlertCircle className='h-4 w-4' />
-          <AlertDescription className='font-medium'>{error}</AlertDescription>
+          <AlertDescription className='font-medium text-sm sm:text-base'>
+            {error}
+          </AlertDescription>
         </Alert>
       )}
 

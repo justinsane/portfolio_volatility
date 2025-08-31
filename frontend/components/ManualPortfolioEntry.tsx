@@ -185,12 +185,12 @@ export default function ManualPortfolioEntry({
           </div>
         </div>
 
-        {/* Weight Warning */}
+        {/* Weight Warning - Mobile Optimized */}
         {hasWarnings && (
-          <Alert className='border-yellow-200 bg-yellow-50'>
+          <Alert className='border-yellow-200 bg-yellow-50 p-3 sm:p-4'>
             <AlertTriangle className='h-4 w-4 text-yellow-600' />
-            <AlertDescription>
-              <strong>Weights don't add up to 100%</strong>
+            <AlertDescription className='text-sm sm:text-base'>
+              <strong>Weights don&apos;t add up to 100%</strong>
               <br />
               Current total: {totalWeight.toFixed(2)}%. Please adjust weights to
               reach exactly 100%.
@@ -275,7 +275,7 @@ export default function ManualPortfolioEntry({
                     size='sm'
                     onClick={() => removeAsset(index)}
                     disabled={assets.length === 1}
-                    className='h-10 w-10 p-0 text-red-600 hover:text-red-700'
+                    className='h-11 w-11 sm:h-10 sm:w-10 p-0 text-red-600 hover:text-red-700'
                   >
                     <Trash2 className='h-4 w-4' />
                   </Button>
