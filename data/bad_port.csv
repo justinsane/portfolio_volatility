@@ -1,3 +1,4 @@
-ticker, weight
-SPY,80%
-BND,20%
+Ticker, weight
+SPY,80
+HYG,19.99
+BND,.01

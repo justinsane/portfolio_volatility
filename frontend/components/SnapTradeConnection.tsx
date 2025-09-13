@@ -389,7 +389,7 @@ export default function SnapTradeConnection({
                         </div>
                         <div>
                           <p className='font-semibold text-blue-800 text-sm'>
-                            Click "Connect Account"
+                            Click &quot;Connect Account&quot;
                           </p>
                           <p className='text-xs text-blue-700'>
                             Opens the secure connection portal
@@ -424,7 +424,7 @@ export default function SnapTradeConnection({
                             Extract Positions
                           </p>
                           <p className='text-xs text-blue-700'>
-                            We'll extract your current portfolio positions
+                            We&apos;ll extract your current portfolio positions
                           </p>
                         </div>
                       </div>
@@ -458,11 +458,10 @@ export default function SnapTradeConnection({
                   </p>
                   <div className='flex flex-wrap gap-1 sm:gap-2'>
                     {[
-                      'TD Ameritrade',
+                      'Robinhood',
                       'Charles Schwab',
                       'Fidelity',
                       'E*TRADE',
-                      'Robinhood',
                       'Vanguard',
                       'Interactive Brokers',
                       'Ally Invest',

@@ -92,9 +92,17 @@ export default function PortfolioUpload() {
       } else {
         // Show validation results for errors
         setShowValidation(true);
+        // Also set a general error message for the first error
+        if (validation.errors.length > 0) {
+          setError(validation.errors[0].message);
+        }
       }
     } catch (err) {
-      setError('Error validating file. Please try again.');
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(
+        `Error validating file: ${errorMessage}. Please check your file format and try again.`
+      );
       console.error('Validation error:', err);
     }
   }, []);

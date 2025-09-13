@@ -36,10 +36,30 @@ class RiskAnalyzer:
             if portfolio_df.empty:
                 return self._create_error_result("Portfolio data is empty")
             
+            # Validate required columns (case-insensitive)
             required_columns = ['Ticker', 'Weight']
-            missing_columns = [col for col in required_columns if col not in portfolio_df.columns]
+            df_columns_lower = [col.lower().strip() for col in portfolio_df.columns]
+            required_columns_lower = [col.lower() for col in required_columns]
+            
+            missing_columns = []
+            for req_col in required_columns_lower:
+                if req_col not in df_columns_lower:
+                    missing_columns.append(req_col.title())  # Convert back to title case for error message
+            
             if missing_columns:
                 return self._create_error_result(f"Missing required columns: {missing_columns}")
+            
+            # Normalize column names to standard case
+            column_mapping = {}
+            for col in portfolio_df.columns:
+                col_lower = col.lower().strip()
+                if col_lower == 'ticker':
+                    column_mapping[col] = 'Ticker'
+                elif col_lower == 'weight':
+                    column_mapping[col] = 'Weight'
+            
+            # Rename columns to standard case
+            portfolio_df = portfolio_df.rename(columns=column_mapping)
             
             # Store portfolio data for asset type analysis
             self._current_portfolio_df = portfolio_df.copy()

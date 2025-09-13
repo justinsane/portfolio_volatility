@@ -57,8 +57,9 @@ export async function validateCSVFile(
     errors.push({
       type: 'file_type',
       message: 'Invalid file type',
-      details: 'Please upload a CSV file',
-      suggestion: 'Download our sample CSV template to see the correct format',
+      details: 'Please upload a CSV file (.csv extension required)',
+      suggestion:
+        'Make sure your file has a .csv extension. Download our sample CSV template to see the correct format.',
     });
     return { isValid: false, errors, warnings };
   }
@@ -71,42 +72,52 @@ export async function validateCSVFile(
     errors.push({
       type: 'file_type',
       message: 'Unable to read file',
-      details: 'The file may be corrupted or in an unsupported format',
-      suggestion: 'Try downloading our sample CSV and using it as a template',
+      details:
+        'The file may be corrupted, password-protected, or in an unsupported format',
+      suggestion:
+        'Try saving your file as a plain CSV format and upload again. Download our sample CSV template for reference.',
     });
     return { isValid: false, errors, warnings };
   }
 
   // 3. Parse CSV content
-  const lines = csvText.trim().split('\n');
+  const lines = csvText
+    .trim()
+    .split('\n')
+    .filter(line => line.trim() !== '');
   if (lines.length < 2) {
     errors.push({
       type: 'headers',
       message: 'Invalid CSV format',
       details: 'File must contain at least a header row and one data row',
-      suggestion: 'Download our sample CSV to see the correct format',
+      suggestion:
+        'Your CSV should have a header row (like "Ticker,Weight") followed by at least one data row. Download our sample CSV to see the correct format.',
     });
     return { isValid: false, errors, warnings };
   }
 
-  // 4. Validate headers
+  // 4. Validate headers (case-insensitive and flexible)
   const headerLine = lines[0];
   const headers = parseCSVLine(headerLine);
-  const requiredHeaders = ['Ticker', 'Weight'];
-  const missingHeaders = requiredHeaders.filter(
-    h => !headers.some(header => header.toLowerCase() === h.toLowerCase())
-  );
+  const requiredHeaders = ['ticker', 'weight'];
+  const headerMap = new Map<string, number>();
+
+  // Create a map of normalized headers to their positions
+  headers.forEach((header, index) => {
+    const normalized = header.toLowerCase().trim();
+    headerMap.set(normalized, index);
+  });
+
+  // Check for required headers (case-insensitive)
+  const missingHeaders = requiredHeaders.filter(h => !headerMap.has(h));
 
   if (missingHeaders.length > 0) {
+    const foundHeaders = headers.length > 0 ? headers.join(', ') : 'none';
     errors.push({
       type: 'headers',
       message: 'Missing required columns',
-      details: `Required columns: ${requiredHeaders.join(
-        ', '
-      )}. Found: ${headers.join(', ')}`,
-      suggestion: `Your CSV should have these exact column names: ${requiredHeaders.join(
-        ', '
-      )}`,
+      details: `Required columns: Ticker, Weight (case doesn't matter). Found: ${foundHeaders}`,
+      suggestion: `Your CSV should have columns named "Ticker" and "Weight" (case doesn't matter). Found: ${foundHeaders}. Download our sample CSV template for reference.`,
     });
     return { isValid: false, errors, warnings };
   }
@@ -131,7 +142,8 @@ export async function validateCSVFile(
         type: 'data_format',
         message: `Invalid data in row ${i + 2}`,
         details: 'Each row must have at least 2 values (Ticker and Weight)',
-        suggestion: 'Make sure each row follows the format: Ticker,Weight',
+        suggestion:
+          'Make sure each row follows the format: Ticker,Weight (e.g., "AAPL,25.5")',
       });
       continue;
     }
@@ -156,7 +168,8 @@ export async function validateCSVFile(
         type: 'data_format',
         message: `Invalid weight in row ${i + 2}`,
         details: `"${weightStr}" is not a valid number`,
-        suggestion: 'Weights should be numbers (e.g., 25.5 for 25.5%)',
+        suggestion:
+          'Weights should be numbers (e.g., 25.5 for 25.5%). Make sure there are no extra characters or spaces.',
       });
       continue;
     }
@@ -202,7 +215,8 @@ export async function validateCSVFile(
       type: 'data_format',
       message: 'Duplicate tickers found',
       details: `Duplicate symbols: ${duplicates.join(', ')}`,
-      suggestion: 'Each ticker should appear only once in your portfolio',
+      suggestion:
+        'Each ticker should appear only once in your portfolio. Combine the weights if you want to represent multiple positions of the same asset.',
     });
   }
 
@@ -251,7 +265,7 @@ export async function validateCSVFile(
       message: 'Some symbols may not be recognized',
       details: `Unknown symbols: ${unknownSymbols.join(', ')}`,
       suggestion:
-        "We'll attempt to analyze these symbols, but results may be limited",
+        "We'll attempt to analyze these symbols, but results may be limited. Make sure the ticker symbols are correct.",
     });
   }
 
@@ -289,6 +303,12 @@ function parseCSVLine(line: string): string[] {
   }
 
   result.push(current.trim());
+
+  // Remove empty strings from the end (common with trailing commas)
+  while (result.length > 0 && result[result.length - 1] === '') {
+    result.pop();
+  }
+
   return result;
 }
 
@@ -427,6 +447,7 @@ function isKnownSymbol(ticker: string): boolean {
     'DOT',
     'AVAX',
     'MATIC',
+    'MFEIX', // Added mutual fund example
   ]);
 
   return knownSymbols.has(ticker);

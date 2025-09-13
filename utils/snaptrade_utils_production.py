@@ -426,16 +426,28 @@ class ProductionSnapTradeManager:
             portfolio_assets = []
             total_value = 0.0
             
-            # Calculate total portfolio value
+            # First pass: Calculate total portfolio value using the same filtering logic as portfolio creation
             for position in positions:
-                units = position.get("units", 0)
-                price = position.get("price", 0)
+                # Extract symbol from nested structure (same logic as below)
+                symbol_obj = position.get("symbol", {})
+                if isinstance(symbol_obj, dict):
+                    nested_symbol = symbol_obj.get("symbol", {})
+                    if isinstance(nested_symbol, dict):
+                        ticker = nested_symbol.get("symbol", "")
+                    else:
+                        ticker = str(nested_symbol) if nested_symbol else ""
+                else:
+                    ticker = str(symbol_obj) if symbol_obj else ""
                 
-                if units and price:
-                    market_value = float(units) * float(price)
+                units = float(position.get("units", 0))
+                price = float(position.get("price", 0))
+                market_value = units * price
+                
+                # Use the same filtering condition as portfolio creation
+                if market_value > 0 and ticker:
                     total_value += market_value
             
-            # Transform positions to portfolio format
+            # Second pass: Transform positions to portfolio format
             for position in positions:
                 # Extract symbol from nested structure
                 symbol_obj = position.get("symbol", {})

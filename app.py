@@ -129,13 +129,33 @@ async def predict_api(file: UploadFile = File(...)):
         # Read CSV from the StringIO object
         df = pd.read_csv(csv_string)
         
-        # Validate required columns
+        # Validate required columns (case-insensitive)
         required_columns = ['Ticker', 'Weight']
-        if not all(col in df.columns for col in required_columns):
+        df_columns_lower = [col.lower().strip() for col in df.columns]
+        required_columns_lower = [col.lower() for col in required_columns]
+        
+        missing_columns = []
+        for req_col in required_columns_lower:
+            if req_col not in df_columns_lower:
+                missing_columns.append(req_col.title())  # Convert back to title case for error message
+        
+        if missing_columns:
             return JSONResponse(
                 status_code=400,
-                content={"error": f"CSV must contain columns: {required_columns}"}
+                content={"error": f"CSV must contain columns: {required_columns}. Found: {list(df.columns)}"}
             )
+        
+        # Normalize column names to standard case
+        column_mapping = {}
+        for col in df.columns:
+            col_lower = col.lower().strip()
+            if col_lower == 'ticker':
+                column_mapping[col] = 'Ticker'
+            elif col_lower == 'weight':
+                column_mapping[col] = 'Weight'
+        
+        # Rename columns to standard case
+        df = df.rename(columns=column_mapping)
         
         # Get volatility prediction
         volatility_result = predict_volatility(df)

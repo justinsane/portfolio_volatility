@@ -637,8 +637,22 @@ class EnhancedVolatilityEstimator:
         Returns:
             Dict with portfolio volatility and detailed asset breakdown
         """
-        if 'Ticker' not in portfolio_df.columns or 'Weight' not in portfolio_df.columns:
+        # Validate required columns (case-insensitive)
+        df_columns_lower = [col.lower().strip() for col in portfolio_df.columns]
+        if 'ticker' not in df_columns_lower or 'weight' not in df_columns_lower:
             raise ValueError("Portfolio DataFrame must have 'Ticker' and 'Weight' columns")
+        
+        # Normalize column names to standard case
+        column_mapping = {}
+        for col in portfolio_df.columns:
+            col_lower = col.lower().strip()
+            if col_lower == 'ticker':
+                column_mapping[col] = 'Ticker'
+            elif col_lower == 'weight':
+                column_mapping[col] = 'Weight'
+        
+        # Rename columns to standard case
+        portfolio_df = portfolio_df.rename(columns=column_mapping)
         
         # Normalize weights
         weights = portfolio_df['Weight'].values
