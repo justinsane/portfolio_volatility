@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Lock, Eye } from 'lucide-react';
@@ -78,25 +78,32 @@ export default function GateWrapper({
         }));
       }, 1000);
 
-      // Track scroll percentage
+      // Track scroll percentage with throttling
+      let scrollTimeout: NodeJS.Timeout;
       const handleScroll = () => {
-        const scrollTop = window.pageYOffset;
-        const docHeight =
-          document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / docHeight) * 100;
+        if (scrollTimeout) return;
 
-        setEngagementData(prev => ({
-          ...prev,
-          scrollPercentage: Math.max(prev.scrollPercentage, scrollPercent),
-          hasScrolled: true,
-        }));
+        scrollTimeout = setTimeout(() => {
+          const scrollTop = window.pageYOffset;
+          const docHeight =
+            document.documentElement.scrollHeight - window.innerHeight;
+          const scrollPercent = (scrollTop / docHeight) * 100;
+
+          setEngagementData(prev => ({
+            ...prev,
+            scrollPercentage: Math.max(prev.scrollPercentage, scrollPercent),
+            hasScrolled: true,
+          }));
+          scrollTimeout = null as any;
+        }, 100); // Throttle to 100ms
       };
 
-      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', handleScroll, { passive: true });
 
       return () => {
         clearInterval(timeInterval);
         window.removeEventListener('scroll', handleScroll);
+        if (scrollTimeout) clearTimeout(scrollTimeout);
       };
     }
   }, [triggerType, isGated, hasTriggered]);
@@ -120,29 +127,38 @@ export default function GateWrapper({
   // Scroll-based trigger
   useEffect(() => {
     if (triggerType === 'scroll' && isGated && !hasTriggered) {
+      let scrollTimeout: NodeJS.Timeout;
       const handleScroll = () => {
-        const element = document.getElementById(`gate-${gateId}`);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+        if (scrollTimeout) return;
 
-          if (isVisible) {
-            // Small delay to make it feel more natural
-            setTimeout(() => {
-              setShowPreview(true); // Show preview overlay first
-            }, 1000);
-            setHasTriggered(true);
-            window.removeEventListener('scroll', handleScroll);
+        scrollTimeout = setTimeout(() => {
+          const element = document.getElementById(`gate-${gateId}`);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+            if (isVisible) {
+              // Small delay to make it feel more natural
+              setTimeout(() => {
+                setShowPreview(true); // Show preview overlay first
+              }, 1000);
+              setHasTriggered(true);
+              window.removeEventListener('scroll', handleScroll);
+            }
           }
-        }
+          scrollTimeout = null as any;
+        }, 100); // Throttle to 100ms
       };
 
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+      };
     }
   }, [triggerType, gateId, isGated, hasTriggered]);
 
-  const handleUnlock = () => {
+  const handleUnlock = useCallback(() => {
     const unlockedGates = JSON.parse(
       localStorage.getItem('unlockedGates') || '[]'
     );
@@ -153,13 +169,13 @@ export default function GateWrapper({
     setIsGated(false);
     setShowModal(false);
     setShowPreview(false);
-  };
+  }, [gateId]);
 
-  const handleTriggerClick = () => {
+  const handleTriggerClick = useCallback(() => {
     if (triggerType === 'click') {
       setShowPreview(true);
     }
-  };
+  }, [triggerType]);
 
   if (!isGated) {
     return <>{children}</>;
@@ -171,31 +187,38 @@ export default function GateWrapper({
       {showPreview && previewContent ? (
         <div className='relative'>
           {previewContent}
-          <div className='absolute inset-0 bg-background/80 backdrop-blur-sm rounded-lg flex items-center justify-center'>
-            <div className='text-center space-y-3 p-6'>
-              <div className='mx-auto p-3 rounded-full bg-primary/10 border border-primary/20 w-fit'>
-                {icon || <Lock className='h-6 w-6 text-primary' />}
+          <div className='absolute inset-0 bg-background/90 backdrop-blur-sm rounded-lg flex items-center justify-center p-4'>
+            <div className='text-center space-y-4 p-4 sm:p-6 max-w-sm mx-auto'>
+              <div className='mx-auto p-4 rounded-full bg-primary/10 border border-primary/20 w-fit'>
+                {icon || (
+                  <Lock className='h-6 w-6 sm:h-8 sm:w-8 text-primary' />
+                )}
               </div>
               <div>
-                <h3 className='font-semibold text-lg text-foreground'>
+                <h3 className='font-semibold text-lg sm:text-xl text-foreground leading-tight'>
                   Unlock Detailed Analysis
                 </h3>
-                <p className='text-sm text-muted-foreground'>
+                <p className='text-sm sm:text-base text-muted-foreground mt-2 leading-relaxed'>
                   Get personalized insights and 20+ recommendations
                 </p>
-                <div className='mt-2 text-xs text-primary/70'>
+                <div className='mt-3 text-sm text-primary/80 font-medium'>
                   ✓ Free consultation with financial advisor
                 </div>
               </div>
-              <div className='space-y-2'>
-                <Button onClick={() => setShowModal(true)} className='w-full'>
-                  <Eye className='h-4 w-4 mr-2' />
-                  Get Free Analysis
+              <div className='space-y-3'>
+                <Button
+                  onClick={() => setShowModal(true)}
+                  size='mobile'
+                  className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
+                >
+                  <Eye className='h-5 w-5 mr-3 flex-shrink-0' />
+                  <span className='whitespace-nowrap'>Get Free Analysis</span>
                 </Button>
                 <Button
                   variant='outline'
                   onClick={() => setShowPreview(false)}
-                  className='w-full text-sm'
+                  size='mobile'
+                  className='w-full text-base'
                 >
                   Maybe Later
                 </Button>

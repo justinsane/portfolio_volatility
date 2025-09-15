@@ -90,19 +90,22 @@ export default function EmailSignup({ onSubmit }: EmailSignupProps) {
 
   return (
     <Card className='border-2 border-border/50 mx-2 sm:mx-0'>
-      <CardHeader className='pb-4'>
+      <CardHeader className='pb-4 px-4 sm:px-6'>
         <CardTitle className='flex flex-col sm:flex-row items-start sm:items-center gap-3 text-lg sm:text-xl'>
-          <div className='p-2 rounded-lg bg-primary/10 border border-primary/20 flex-shrink-0'>
-            <Mail className='h-4 w-4 sm:h-5 sm:w-5 text-primary' />
+          <div className='p-3 rounded-lg bg-primary/10 border border-primary/20 flex-shrink-0'>
+            <Mail className='h-5 w-5 sm:h-6 sm:w-6 text-primary' />
           </div>
           <span className='leading-tight'>Unlock Your Analysis</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className='pt-0'>
-        <form onSubmit={handleSubmit} className='space-y-4'>
-          <div className='grid grid-cols-1 gap-4'>
+      <CardContent className='pt-0 px-4 sm:px-6'>
+        <form onSubmit={handleSubmit} className='space-y-5'>
+          <div className='grid grid-cols-1 gap-5'>
             <div className='space-y-2'>
-              <Label htmlFor='name' className='text-sm font-medium'>
+              <Label
+                htmlFor='name'
+                className='text-sm sm:text-base font-medium'
+              >
                 Name (optional)
               </Label>
               <Input
@@ -114,11 +117,14 @@ export default function EmailSignup({ onSubmit }: EmailSignupProps) {
                   setFormData(prev => ({ ...prev, name: e.target.value }))
                 }
                 disabled={isSubmitting}
-                className='h-10'
+                className='h-12 text-base'
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='email' className='text-sm font-medium'>
+              <Label
+                htmlFor='email'
+                className='text-sm sm:text-base font-medium'
+              >
                 Email Address *
               </Label>
               <Input
@@ -131,11 +137,14 @@ export default function EmailSignup({ onSubmit }: EmailSignupProps) {
                 }
                 disabled={isSubmitting}
                 required
-                className='h-10'
+                className='h-12 text-base'
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='phone' className='text-sm font-medium'>
+              <Label
+                htmlFor='phone'
+                className='text-sm sm:text-base font-medium'
+              >
                 Phone Number (optional)
               </Label>
               <Input
@@ -147,13 +156,13 @@ export default function EmailSignup({ onSubmit }: EmailSignupProps) {
                   setFormData(prev => ({ ...prev, phone: e.target.value }))
                 }
                 disabled={isSubmitting}
-                className='h-10'
+                className='h-12 text-base'
               />
             </div>
             <div className='space-y-2'>
               <Label
                 htmlFor='preferred_contact_time'
-                className='text-sm font-medium'
+                className='text-sm sm:text-base font-medium'
               >
                 Preferred Contact Time (optional)
               </Label>
@@ -167,7 +176,7 @@ export default function EmailSignup({ onSubmit }: EmailSignupProps) {
                   }))
                 }
                 disabled={isSubmitting}
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                className='flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               >
                 <option value=''>Select preferred time</option>
                 <option value='morning'>Morning (9 AM - 12 PM)</option>
@@ -187,21 +196,26 @@ export default function EmailSignup({ onSubmit }: EmailSignupProps) {
           <Button
             type='submit'
             disabled={isSubmitting || !formData.email.trim()}
-            className='w-full h-11 text-sm sm:text-base font-medium'
+            size='mobile'
+            className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
           >
             {isSubmitting ? (
               <>
-                <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
-                <span className='hidden sm:inline'>Sending...</span>
-                <span className='sm:hidden'>Sending...</span>
+                <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3' />
+                <span className='whitespace-nowrap'>
+                  <span className='hidden sm:inline'>Sending...</span>
+                  <span className='sm:hidden'>Sending...</span>
+                </span>
               </>
             ) : (
               <>
-                <Send className='h-4 w-4 mr-2' />
-                <span className='hidden sm:inline'>
-                  Unlock Analysis & Get Recommendations
+                <Send className='h-5 w-5 mr-3 flex-shrink-0' />
+                <span className='whitespace-nowrap'>
+                  <span className='hidden sm:inline'>
+                    Unlock Analysis & Get Recommendations
+                  </span>
+                  <span className='sm:hidden'>Unlock Analysis</span>
                 </span>
-                <span className='sm:hidden'>Unlock Analysis</span>
               </>
             )}
           </Button>

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,7 @@ interface GateModalProps {
   onUnlock?: () => void;
 }
 
-export default function GateModal({
+const GateModal = memo(function GateModal({
   isOpen,
   onClose,
   title,
@@ -40,76 +40,87 @@ export default function GateModal({
 }: GateModalProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleEmailSubmit = async (
-    data: EmailSignupRequest
-  ): Promise<EmailSignupResponse> => {
-    const response = await submitEmailSignup(data);
-    setIsSubmitted(true);
-    // Trigger unlock callback after successful submission
-    setTimeout(() => {
-      onUnlock?.();
-    }, 2000); // Wait 2 seconds to show success message
-    return response;
-  };
+  const handleEmailSubmit = useCallback(
+    async (data: EmailSignupRequest): Promise<EmailSignupResponse> => {
+      const response = await submitEmailSignup(data);
+      setIsSubmitted(true);
+      // Trigger unlock callback after successful submission
+      setTimeout(() => {
+        onUnlock?.();
+      }, 2000); // Wait 2 seconds to show success message
+      return response;
+    },
+    [onUnlock]
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsSubmitted(false);
     onClose();
-  };
+  }, [onClose]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-md max-h-[90vh] overflow-y-auto'>
-        <DialogHeader className='text-center space-y-4'>
-          <div className='mx-auto p-3 rounded-full bg-primary/10 border border-primary/20 w-fit'>
+      <DialogContent className='sm:max-w-md max-h-[95vh] overflow-y-auto mx-4 sm:mx-auto'>
+        <DialogHeader className='text-center space-y-4 px-2 sm:px-0'>
+          <div className='mx-auto p-4 rounded-full bg-primary/10 border border-primary/20 w-fit'>
             {icon}
           </div>
-          <DialogTitle className='text-xl font-bold text-foreground'>
+          <DialogTitle className='text-xl sm:text-2xl font-bold text-foreground leading-tight'>
             {title}
           </DialogTitle>
-          <DialogDescription className='text-base text-muted-foreground'>
+          <DialogDescription className='text-base sm:text-lg text-muted-foreground leading-relaxed'>
             {description}
           </DialogDescription>
-          <div className='bg-primary/5 border border-primary/20 rounded-lg p-3 text-sm text-primary/80'>
-            💡 Provide your contact info to unlock this analysis and get
-            personalized recommendations
+          <div className='bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm sm:text-base text-primary/80 leading-relaxed'>
+            💡 <strong>Free consultation:</strong> Provide your contact info to
+            unlock this analysis and get personalized recommendations from a
+            certified financial advisor
           </div>
         </DialogHeader>
 
         {!isSubmitted ? (
-          <div className='space-y-6'>
+          <div className='space-y-6 px-2 sm:px-0'>
             {/* Benefits Section */}
-            <div className='space-y-3'>
-              <h4 className='font-semibold text-sm text-foreground flex items-center gap-2'>
-                <Star className='h-4 w-4 text-yellow-500' />
+            <div className='space-y-4'>
+              <h4 className='font-semibold text-base sm:text-lg text-foreground flex items-center gap-2'>
+                <Star className='h-5 w-5 text-yellow-500' />
                 What you&apos;ll get:
               </h4>
-              <div className='space-y-2'>
+              <div className='space-y-3'>
                 {benefits.map((benefit, index) => (
-                  <div key={index} className='flex items-start gap-3 text-sm'>
-                    <div className='w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0' />
-                    <span className='text-muted-foreground'>{benefit}</span>
+                  <div
+                    key={index}
+                    className='flex items-start gap-3 text-sm sm:text-base'
+                  >
+                    <div className='w-2.5 h-2.5 rounded-full bg-primary mt-2 flex-shrink-0' />
+                    <span className='text-muted-foreground leading-relaxed'>
+                      {benefit}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Social Proof */}
-            <div className='bg-muted/50 rounded-lg p-4 space-y-2'>
-              <div className='flex items-center gap-2 text-sm font-medium text-foreground'>
-                <Users className='h-4 w-4 text-primary' />
+            <div className='bg-muted/50 rounded-lg p-4 sm:p-5 space-y-3'>
+              <div className='flex items-center gap-2 text-sm sm:text-base font-medium text-foreground'>
+                <Users className='h-5 w-5 text-primary' />
                 Trusted by 500+ investors
               </div>
               <div className='flex items-center gap-1'>
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className='h-4 w-4 fill-yellow-400 text-yellow-400'
+                    className='h-5 w-5 fill-yellow-400 text-yellow-400'
                   />
                 ))}
-                <span className='text-sm text-muted-foreground ml-2'>
+                <span className='text-sm sm:text-base text-muted-foreground ml-2'>
                   4.9/5 rating
                 </span>
+              </div>
+              <div className='text-xs sm:text-sm text-muted-foreground/80 italic'>
+                "This analysis helped me identify risks I never knew existed in
+                my portfolio." - Sarah M.
               </div>
             </div>
 
@@ -122,17 +133,17 @@ export default function GateModal({
           <div className='text-center space-y-6 py-6 px-4 sm:px-6'>
             {/* Large success icon with better styling */}
             <div className='flex justify-center'>
-              <div className='p-4 sm:p-5 rounded-full bg-green-100 dark:bg-green-900/30 border-2 border-green-200 dark:border-green-800 shadow-sm'>
-                <Shield className='h-8 w-8 sm:h-10 sm:w-10 text-green-600 dark:text-green-400' />
+              <div className='p-5 sm:p-6 rounded-full bg-green-100 dark:bg-green-900/30 border-2 border-green-200 dark:border-green-800 shadow-sm'>
+                <Shield className='h-10 w-10 sm:h-12 sm:w-12 text-green-600 dark:text-green-400' />
               </div>
             </div>
 
             {/* Success message with improved typography */}
             <div className='space-y-4'>
-              <h3 className='text-xl sm:text-2xl font-bold text-green-700 dark:text-green-400'>
+              <h3 className='text-2xl sm:text-3xl font-bold text-green-700 dark:text-green-400'>
                 Thank you!
               </h3>
-              <p className='text-sm sm:text-base text-green-600 dark:text-green-300 leading-relaxed max-w-sm mx-auto'>
+              <p className='text-base sm:text-lg text-green-600 dark:text-green-300 leading-relaxed max-w-md mx-auto'>
                 A financial advisor will contact you within 24 hours to discuss
                 your portfolio analysis and personalized recommendations.
               </p>
@@ -140,13 +151,14 @@ export default function GateModal({
 
             {/* Visual separator */}
             <div className='flex justify-center'>
-              <div className='w-16 h-1 bg-green-300 dark:bg-green-600 rounded-full'></div>
+              <div className='w-20 h-1 bg-green-300 dark:bg-green-600 rounded-full'></div>
             </div>
 
             {/* Continue button with better styling */}
             <Button
               onClick={handleClose}
-              className='w-full h-11 sm:h-12 text-sm sm:text-base font-medium bg-green-600 hover:bg-green-700 text-white border-0'
+              size='mobile'
+              className='w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white border-0 shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
             >
               Continue Exploring
             </Button>
@@ -155,4 +167,6 @@ export default function GateModal({
       </DialogContent>
     </Dialog>
   );
-}
+});
+
+export default GateModal;
