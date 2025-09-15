@@ -225,6 +225,8 @@ export async function submitFeedback(
 export interface EmailSignupRequest {
   name?: string;
   email: string;
+  phone?: string;
+  preferred_contact_time?: string;
 }
 
 export interface EmailSignupResponse {

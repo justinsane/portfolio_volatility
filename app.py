@@ -407,6 +407,8 @@ Sent from Portfolio Volatility Predictor API
 class EmailSignupRequest(BaseModel):
     name: Optional[str] = None
     email: str
+    phone: Optional[str] = None
+    preferred_contact_time: Optional[str] = None
 
 @app.post("/api/email-signup")
 async def submit_email_signup(signup: EmailSignupRequest):
@@ -438,19 +440,21 @@ async def submit_email_signup(signup: EmailSignupRequest):
         
         # Send notification to admin only
         admin_message = MessageSchema(
-            subject=f"New Email Signup Request: {signup.email}",
+            subject=f"New Lead Capture: {signup.email}",
             recipients=[os.getenv("ADMIN_EMAIL", os.getenv("FEEDBACK_EMAIL", "test@gmail.com"))],
             body=f"""
-New email signup request received:
+New lead captured from Portfolio Volatility Predictor:
 
 Name: {signup.name or 'Anonymous'}
 Email: {signup.email}
+Phone: {signup.phone or 'Not provided'}
+Preferred Contact Time: {signup.preferred_contact_time or 'Not specified'}
 
-User has requested a full portfolio analysis report.
-Please send them a comprehensive report manually.
+User has requested detailed portfolio analysis and recommendations.
+Please follow up with personalized financial advisory services.
 
 ---
-Portfolio Volatility Predictor
+Portfolio Volatility Predictor - Lead Generation
             """.strip(),
             subtype="plain"
         )

@@ -19,6 +19,7 @@ import RiskSummarySection from './RiskSummarySection';
 import CorrelationAnalysisSection from './CorrelationAnalysisSection';
 import KeyConcernsSection from './KeyConcernsSection';
 import RecommendationsSection from './RecommendationsSection';
+import GateWrapper from './GateWrapper';
 
 interface RiskAnalysisDisplayProps {
   riskAnalysis: any;
@@ -124,13 +125,55 @@ export default function RiskAnalysisDisplay({
           }
         />
 
-        {/* Recommendations Section */}
-        <RecommendationsSection
-          recommendations={recommendations}
-          portfolioAssets={portfolioAssets}
-          correlationAnalysis={correlationAnalysis}
-          onLearnMore={handleLearnMore}
-        />
+        {/* Recommendations Section - Gated */}
+        <GateWrapper
+          gateId='recommendations'
+          title='Get Personalized Recommendations'
+          description='Receive actionable investment recommendations tailored to your portfolio and financial goals.'
+          benefits={[
+            'Personalized investment recommendations',
+            'Portfolio optimization suggestions',
+            'Risk mitigation strategies',
+            'Next steps and action items',
+            'Ongoing portfolio monitoring advice',
+          ]}
+          icon={<TrendingUp className='h-6 w-6' />}
+          triggerType='click'
+          previewContent={
+            <div className='border-2 border-blue-200 bg-blue-50 rounded-xl p-6'>
+              <div className='flex items-center gap-3 mb-4'>
+                <div className='p-2 rounded-lg bg-blue-100 border border-blue-200'>
+                  <TrendingUp className='h-5 w-5 text-blue-600' />
+                </div>
+                <h3 className='text-lg font-semibold text-blue-800'>
+                  Recommendations Preview
+                </h3>
+              </div>
+              <div className='space-y-3'>
+                <div className='flex justify-between items-center'>
+                  <span className='text-sm font-medium text-blue-700'>
+                    Recommendations Available
+                  </span>
+                  <span className='px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold'>
+                    {recommendations?.length || 5} items
+                  </span>
+                </div>
+                <div className='text-xs text-blue-600 mt-3'>
+                  Personalized investment recommendations, optimization
+                  strategies, and risk mitigation plans available with advisor
+                  consultation.
+                </div>
+              </div>
+            </div>
+          }
+        >
+          <RecommendationsSection
+            recommendations={recommendations}
+            portfolioAssets={portfolioAssets}
+            correlationAnalysis={correlationAnalysis}
+            onLearnMore={handleLearnMore}
+          />
+        </GateWrapper>
 
         {/* Learn More Dialog */}
         <LearnMoreDialog
