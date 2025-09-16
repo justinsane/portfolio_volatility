@@ -1,7 +1,15 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { PieChart, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { Button } from './ui/button';
+import {
+  PieChart,
+  ArrowUpDown,
+  ChevronUp,
+  ChevronDown,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
 import { type PredictionResult } from '@/lib/api';
 import { getETFInfo } from '@/lib/etf-mapping';
 import { getDisplayName, getCategory } from '@/lib/tickerDirectory';
@@ -19,6 +27,7 @@ export default function PortfolioComposition({
     direction: 'asc' | 'desc';
   } | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [isVisible, setIsVisible] = useState(false);
 
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
@@ -177,341 +186,388 @@ export default function PortfolioComposition({
               </p>
             </div>
           </div>
-          <Badge variant='outline' className='self-start sm:self-auto'>
-            {result.portfolio_assets.length} Assets
-          </Badge>
+          <div className='flex items-center gap-3'>
+            <Badge variant='outline' className='self-start sm:self-auto'>
+              {result.portfolio_assets.length} Assets
+            </Badge>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => setIsVisible(!isVisible)}
+              className='btn-outline-enhanced flex items-center gap-2 font-semibold'
+            >
+              {isVisible ? (
+                <>
+                  <EyeOff className='h-4 w-4' />
+                  <span className='hidden sm:inline'>Hide Details</span>
+                  <span className='sm:hidden'>Hide</span>
+                </>
+              ) : (
+                <>
+                  <Eye className='h-4 w-4' />
+                  <span className='hidden sm:inline'>Show Details</span>
+                  <span className='sm:hidden'>Show</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
-        {/* Mobile Card Layout */}
-        <div className='block lg:hidden space-y-4'>
-          {sortedAssets.map((asset, index) => {
-            const etfInfo = getETFInfo(asset.Ticker);
-            const enhancedDetails =
-              result.enhancement_data?.asset_details?.find(
-                (detail: any) => detail.ticker === asset.Ticker
-              );
-
-            const assetType =
-              enhancedDetails?.asset_type ||
-              getCategory(asset.Ticker) ||
-              etfInfo?.category ||
-              'Unknown';
-            const volatility = enhancedDetails?.volatility
-              ? `${(enhancedDetails.volatility * 100).toFixed(1)}%`
-              : 'N/A';
-            const confidence = enhancedDetails?.confidence || 'unknown';
-            const directoryName = getDisplayName(asset.Ticker);
-            const displayName =
-              (enhancedDetails?.name && enhancedDetails.name !== asset.Ticker
-                ? enhancedDetails.name
-                : undefined) ||
-              directoryName ||
-              etfInfo?.name;
-
-            const percent = weightsAreFractional
-              ? asset.Weight * 100
-              : asset.Weight;
-            const percentInt = Math.round(percent);
-            const isExpanded = expandedRows.has(index);
-
-            return (
-              <div
-                key={index}
-                className='group relative overflow-hidden rounded-xl border-2 border-border/50 bg-gradient-to-br from-background to-muted/30 transition-all duration-200 hover:shadow-md hover:border-primary/30 hover:scale-[1.01] transform'
-              >
-                {/* Main Asset Info Row */}
-                <div
-                  className='flex items-start justify-between p-6 cursor-pointer'
-                  onClick={() => handleAssetClick(asset)}
-                >
-                  <div className='flex items-center gap-3 flex-1 min-w-0'>
-                    <div className='w-12 h-12 rounded-xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center flex-shrink-0'>
-                      <span className='text-sm font-bold text-primary'>
-                        {asset.Ticker.slice(0, 2)}
-                      </span>
-                    </div>
-                    <div className='min-w-0 flex-1'>
-                      <div className='font-bold text-lg text-foreground group-hover:text-primary transition-colors'>
-                        {asset.Ticker}
-                      </div>
-                      {displayName && (
-                        <div className='text-sm text-muted-foreground mt-1 line-clamp-2 leading-relaxed'>
-                          {displayName}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className='text-right flex-shrink-0'>
-                    <div className='text-2xl font-black text-primary mb-1'>
-                      {percentInt}%
-                    </div>
-                    <div className='w-20 h-2 bg-muted rounded-full overflow-hidden'>
-                      <div
-                        className='h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-300'
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Secondary Metrics Row */}
-                <div className='px-6 pb-4'>
-                  <div className='grid grid-cols-2 gap-4 pt-4 border-t border-border/30'>
-                    <div className='space-y-2'>
-                      <div className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
-                        Volatility
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <span
-                          className={`font-semibold text-lg ${getVolatilityColor(
-                            volatility
-                          )}`}
-                        >
-                          {volatility}
-                        </span>
-                        {volatility !== 'N/A' && (
-                          <div className='w-2 h-2 rounded-full bg-primary/60'></div>
-                        )}
-                      </div>
-                    </div>
-                    <div className='space-y-2'>
-                      <div className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
-                        Category
-                      </div>
-                      <Badge
-                        variant='outline'
-                        className={`font-medium border text-sm ${getCategoryColor(
-                          assetType
-                        )}`}
-                      >
-                        {assetType}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  {/* Expandable Section */}
-                  <div className='pt-4 border-t border-border/30'>
-                    <div className='flex items-center justify-between'>
-                      <div className='space-y-2 flex-1'>
-                        <div className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
-                          Confidence
-                        </div>
-                        <Badge
-                          variant='outline'
-                          className={`font-medium border text-sm ${getConfidenceColor(
-                            confidence
-                          )}`}
-                        >
-                          {confidence}
-                        </Badge>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            toggleRowExpansion(index);
-                          }}
-                          className='p-2 rounded-lg hover:bg-muted/50 transition-colors'
-                        >
-                          {isExpanded ? (
-                            <ChevronUp className='h-5 w-5 text-muted-foreground' />
-                          ) : (
-                            <ChevronDown className='h-5 w-5 text-muted-foreground' />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Expanded Content */}
-                    {isExpanded && (
-                      <div className='mt-4 pt-4 border-t border-border/30 space-y-3'>
-                        <div className='text-sm text-muted-foreground'>
-                          <strong>Asset Details:</strong> Click to view
-                          comprehensive information about this holding.
-                        </div>
-                        <div className='flex gap-2'>
-                          <button className='flex-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm font-medium'>
-                            View Details
-                          </button>
-                          <button className='px-3 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors text-sm font-medium'>
-                            Edit
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+        {!isVisible && (
+          <div className='text-center py-12 text-muted-foreground'>
+            <div className='flex flex-col items-center gap-4'>
+              <div className='p-4 rounded-full bg-primary/5 border-2 border-primary/10'>
+                <PieChart className='h-8 w-8 text-primary/60' />
               </div>
-            );
-          })}
-        </div>
+              <div className='space-y-2'>
+                <p className='text-base font-medium text-foreground/80'>
+                  Portfolio composition is hidden
+                </p>
+                <p className='text-sm text-muted-foreground'>
+                  Click "Show Details" above to view your holdings and
+                  allocation
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Desktop Table Layout */}
-        <div className='hidden lg:block'>
-          <div className='overflow-x-auto'>
-            <table className='w-full'>
-              <thead className='sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10'>
-                <tr className='border-b-2 border-border'>
-                  <th className='text-left p-4 font-semibold text-foreground sticky left-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20'>
-                    <button
-                      onClick={() => handleSort('asset')}
-                      className='flex items-center gap-2 hover:text-primary transition-colors'
-                    >
-                      Asset
-                      {getSortIcon('asset')}
-                    </button>
-                  </th>
-                  <th className='text-left p-4 font-semibold text-foreground'>
-                    <button
-                      onClick={() => handleSort('weight')}
-                      className='flex items-center gap-2 hover:text-primary transition-colors'
-                    >
-                      Weight
-                      {getSortIcon('weight')}
-                    </button>
-                  </th>
-                  <th className='text-left p-4 font-semibold text-foreground'>
-                    <button
-                      onClick={() => handleSort('volatility')}
-                      className='flex items-center gap-2 hover:text-primary transition-colors'
-                    >
-                      Volatility
-                      {getSortIcon('volatility')}
-                    </button>
-                  </th>
-                  <th className='text-left p-4 font-semibold text-foreground'>
-                    <button
-                      onClick={() => handleSort('confidence')}
-                      className='flex items-center gap-2 hover:text-primary transition-colors'
-                    >
-                      Confidence
-                      {getSortIcon('confidence')}
-                    </button>
-                  </th>
-                  <th className='text-left p-4 font-semibold text-foreground'>
-                    <button
-                      onClick={() => handleSort('category')}
-                      className='flex items-center gap-2 hover:text-primary transition-colors'
-                    >
-                      Category
-                      {getSortIcon('category')}
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className='divide-y divide-border/50'>
-                {sortedAssets.map((asset, index) => {
-                  const etfInfo = getETFInfo(asset.Ticker);
-                  const enhancedDetails =
-                    result.enhancement_data?.asset_details?.find(
-                      (detail: any) => detail.ticker === asset.Ticker
-                    );
+        {isVisible && (
+          <>
+            {/* Mobile Card Layout */}
+            <div className='block lg:hidden space-y-4'>
+              {sortedAssets.map((asset, index) => {
+                const etfInfo = getETFInfo(asset.Ticker);
+                const enhancedDetails =
+                  result.enhancement_data?.asset_details?.find(
+                    (detail: any) => detail.ticker === asset.Ticker
+                  );
 
-                  const assetType =
-                    enhancedDetails?.asset_type ||
-                    getCategory(asset.Ticker) ||
-                    etfInfo?.category ||
-                    'Unknown';
-                  const volatility = enhancedDetails?.volatility
-                    ? `${(enhancedDetails.volatility * 100).toFixed(1)}%`
-                    : 'N/A';
-                  const confidence = enhancedDetails?.confidence || 'unknown';
-                  const directoryName = getDisplayName(asset.Ticker);
-                  const displayName =
-                    (enhancedDetails?.name &&
-                    enhancedDetails.name !== asset.Ticker
-                      ? enhancedDetails.name
-                      : undefined) ||
-                    directoryName ||
-                    etfInfo?.name;
+                const assetType =
+                  enhancedDetails?.asset_type ||
+                  getCategory(asset.Ticker) ||
+                  etfInfo?.category ||
+                  'Unknown';
+                const volatility = enhancedDetails?.volatility
+                  ? `${(enhancedDetails.volatility * 100).toFixed(1)}%`
+                  : 'N/A';
+                const confidence = enhancedDetails?.confidence || 'unknown';
+                const directoryName = getDisplayName(asset.Ticker);
+                const displayName =
+                  (enhancedDetails?.name &&
+                  enhancedDetails.name !== asset.Ticker
+                    ? enhancedDetails.name
+                    : undefined) ||
+                  directoryName ||
+                  etfInfo?.name;
 
-                  const percent = weightsAreFractional
-                    ? asset.Weight * 100
-                    : asset.Weight;
-                  const percentInt = Math.round(percent);
+                const percent = weightsAreFractional
+                  ? asset.Weight * 100
+                  : asset.Weight;
+                const percentInt = Math.round(percent);
+                const isExpanded = expandedRows.has(index);
 
-                  return (
-                    <tr
-                      key={index}
-                      className='hover:bg-muted/30 transition-all duration-200 group cursor-pointer'
+                return (
+                  <div
+                    key={index}
+                    className='group relative overflow-hidden rounded-xl border-2 border-border/50 bg-gradient-to-br from-background to-muted/30 transition-all duration-200 hover:shadow-md hover:border-primary/30 hover:scale-[1.01] transform'
+                  >
+                    {/* Main Asset Info Row */}
+                    <div
+                      className='flex items-start justify-between p-6 cursor-pointer'
                       onClick={() => handleAssetClick(asset)}
                     >
-                      <td className='p-4 sticky left-0 bg-background group-hover:bg-muted/30 transition-colors z-10'>
-                        <div className='flex items-center gap-3'>
-                          <div className='w-12 h-12 rounded-xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center flex-shrink-0'>
-                            <span className='text-sm font-bold text-primary'>
-                              {asset.Ticker.slice(0, 2)}
-                            </span>
+                      <div className='flex items-center gap-3 flex-1 min-w-0'>
+                        <div className='w-12 h-12 rounded-xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center flex-shrink-0'>
+                          <span className='text-sm font-bold text-primary'>
+                            {asset.Ticker.slice(0, 2)}
+                          </span>
+                        </div>
+                        <div className='min-w-0 flex-1'>
+                          <div className='font-bold text-lg text-foreground group-hover:text-primary transition-colors'>
+                            {asset.Ticker}
                           </div>
-                          <div className='min-w-0 flex-1'>
-                            <div className='font-bold text-lg text-foreground group-hover:text-primary transition-colors'>
-                              {asset.Ticker}
+                          {displayName && (
+                            <div className='text-sm text-muted-foreground mt-1 line-clamp-2 leading-relaxed'>
+                              {displayName}
                             </div>
-                            {displayName && (
-                              <div className='text-sm text-muted-foreground mt-1 line-clamp-1'>
-                                {displayName}
-                              </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className='text-right flex-shrink-0'>
+                        <div className='text-2xl font-black text-primary mb-1'>
+                          {percentInt}%
+                        </div>
+                        <div className='w-20 h-2 bg-muted rounded-full overflow-hidden'>
+                          <div
+                            className='h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-300'
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Secondary Metrics Row */}
+                    <div className='px-6 pb-4'>
+                      <div className='grid grid-cols-2 gap-4 pt-4 border-t border-border/30'>
+                        <div className='space-y-2'>
+                          <div className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
+                            Volatility
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <span
+                              className={`font-semibold text-lg ${getVolatilityColor(
+                                volatility
+                              )}`}
+                            >
+                              {volatility}
+                            </span>
+                            {volatility !== 'N/A' && (
+                              <div className='w-2 h-2 rounded-full bg-primary/60'></div>
                             )}
                           </div>
                         </div>
-                      </td>
-                      <td className='p-4'>
-                        <div className='flex items-center gap-3'>
-                          <span className='font-bold text-xl text-primary min-w-[3rem]'>
-                            {percentInt}%
-                          </span>
-                          <div className='flex-1 max-w-32'>
-                            <div className='w-full h-3 bg-muted rounded-full overflow-hidden'>
-                              <div
-                                className='h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-300'
-                                style={{ width: `${percent}%` }}
-                              />
-                            </div>
+                        <div className='space-y-2'>
+                          <div className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
+                            Category
                           </div>
-                        </div>
-                      </td>
-                      <td className='p-4'>
-                        <div className='flex items-center gap-2'>
-                          <span
-                            className={`font-semibold text-lg ${getVolatilityColor(
-                              volatility
+                          <Badge
+                            variant='outline'
+                            className={`font-medium border text-sm ${getCategoryColor(
+                              assetType
                             )}`}
                           >
-                            {volatility}
-                          </span>
-                          {volatility !== 'N/A' && (
-                            <div className='w-3 h-3 rounded-full bg-primary/60'></div>
-                          )}
+                            {assetType}
+                          </Badge>
                         </div>
-                      </td>
-                      <td className='p-4'>
-                        <Badge
-                          variant='outline'
-                          className={`font-medium border text-sm ${getConfidenceColor(
-                            confidence
-                          )}`}
+                      </div>
+
+                      {/* Expandable Section */}
+                      <div className='pt-4 border-t border-border/30'>
+                        <div className='flex items-center justify-between'>
+                          <div className='space-y-2 flex-1'>
+                            <div className='text-xs font-medium text-muted-foreground uppercase tracking-wide'>
+                              Confidence
+                            </div>
+                            <Badge
+                              variant='outline'
+                              className={`font-medium border text-sm ${getConfidenceColor(
+                                confidence
+                              )}`}
+                            >
+                              {confidence}
+                            </Badge>
+                          </div>
+                          <div className='flex items-center gap-2'>
+                            <button
+                              onClick={e => {
+                                e.stopPropagation();
+                                toggleRowExpansion(index);
+                              }}
+                              className='p-2 rounded-lg hover:bg-muted/50 transition-colors'
+                            >
+                              {isExpanded ? (
+                                <ChevronUp className='h-5 w-5 text-muted-foreground' />
+                              ) : (
+                                <ChevronDown className='h-5 w-5 text-muted-foreground' />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Expanded Content */}
+                        {isExpanded && (
+                          <div className='mt-4 pt-4 border-t border-border/30 space-y-3'>
+                            <div className='text-sm text-muted-foreground'>
+                              <strong>Asset Details:</strong> Click to view
+                              comprehensive information about this holding.
+                            </div>
+                            <div className='flex gap-2'>
+                              <button className='flex-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors text-sm font-medium'>
+                                View Details
+                              </button>
+                              <button className='px-3 py-2 bg-muted text-muted-foreground rounded-lg hover:bg-muted/80 transition-colors text-sm font-medium'>
+                                Edit
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table Layout */}
+            <div className='hidden lg:block'>
+              <div className='overflow-x-auto'>
+                <table className='w-full'>
+                  <thead className='sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10'>
+                    <tr className='border-b-2 border-border'>
+                      <th className='text-left p-4 font-semibold text-foreground sticky left-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-20'>
+                        <button
+                          onClick={() => handleSort('asset')}
+                          className='flex items-center gap-2 hover:text-primary transition-colors'
                         >
-                          {confidence}
-                        </Badge>
-                      </td>
-                      <td className='p-4'>
-                        <Badge
-                          variant='outline'
-                          className={`font-medium border text-sm ${getCategoryColor(
-                            assetType
-                          )}`}
+                          Asset
+                          {getSortIcon('asset')}
+                        </button>
+                      </th>
+                      <th className='text-left p-4 font-semibold text-foreground'>
+                        <button
+                          onClick={() => handleSort('weight')}
+                          className='flex items-center gap-2 hover:text-primary transition-colors'
                         >
-                          {assetType}
-                        </Badge>
-                      </td>
+                          Weight
+                          {getSortIcon('weight')}
+                        </button>
+                      </th>
+                      <th className='text-left p-4 font-semibold text-foreground'>
+                        <button
+                          onClick={() => handleSort('volatility')}
+                          className='flex items-center gap-2 hover:text-primary transition-colors'
+                        >
+                          Volatility
+                          {getSortIcon('volatility')}
+                        </button>
+                      </th>
+                      <th className='text-left p-4 font-semibold text-foreground'>
+                        <button
+                          onClick={() => handleSort('confidence')}
+                          className='flex items-center gap-2 hover:text-primary transition-colors'
+                        >
+                          Confidence
+                          {getSortIcon('confidence')}
+                        </button>
+                      </th>
+                      <th className='text-left p-4 font-semibold text-foreground'>
+                        <button
+                          onClick={() => handleSort('category')}
+                          className='flex items-center gap-2 hover:text-primary transition-colors'
+                        >
+                          Category
+                          {getSortIcon('category')}
+                        </button>
+                      </th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </thead>
+                  <tbody className='divide-y divide-border/50'>
+                    {sortedAssets.map((asset, index) => {
+                      const etfInfo = getETFInfo(asset.Ticker);
+                      const enhancedDetails =
+                        result.enhancement_data?.asset_details?.find(
+                          (detail: any) => detail.ticker === asset.Ticker
+                        );
+
+                      const assetType =
+                        enhancedDetails?.asset_type ||
+                        getCategory(asset.Ticker) ||
+                        etfInfo?.category ||
+                        'Unknown';
+                      const volatility = enhancedDetails?.volatility
+                        ? `${(enhancedDetails.volatility * 100).toFixed(1)}%`
+                        : 'N/A';
+                      const confidence =
+                        enhancedDetails?.confidence || 'unknown';
+                      const directoryName = getDisplayName(asset.Ticker);
+                      const displayName =
+                        (enhancedDetails?.name &&
+                        enhancedDetails.name !== asset.Ticker
+                          ? enhancedDetails.name
+                          : undefined) ||
+                        directoryName ||
+                        etfInfo?.name;
+
+                      const percent = weightsAreFractional
+                        ? asset.Weight * 100
+                        : asset.Weight;
+                      const percentInt = Math.round(percent);
+
+                      return (
+                        <tr
+                          key={index}
+                          className='hover:bg-muted/30 transition-all duration-200 group cursor-pointer'
+                          onClick={() => handleAssetClick(asset)}
+                        >
+                          <td className='p-4 sticky left-0 bg-background group-hover:bg-muted/30 transition-colors z-10'>
+                            <div className='flex items-center gap-3'>
+                              <div className='w-12 h-12 rounded-xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center flex-shrink-0'>
+                                <span className='text-sm font-bold text-primary'>
+                                  {asset.Ticker.slice(0, 2)}
+                                </span>
+                              </div>
+                              <div className='min-w-0 flex-1'>
+                                <div className='font-bold text-lg text-foreground group-hover:text-primary transition-colors'>
+                                  {asset.Ticker}
+                                </div>
+                                {displayName && (
+                                  <div className='text-sm text-muted-foreground mt-1 line-clamp-1'>
+                                    {displayName}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className='p-4'>
+                            <div className='flex items-center gap-3'>
+                              <span className='font-bold text-xl text-primary min-w-[3rem]'>
+                                {percentInt}%
+                              </span>
+                              <div className='flex-1 max-w-32'>
+                                <div className='w-full h-3 bg-muted rounded-full overflow-hidden'>
+                                  <div
+                                    className='h-full bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-300'
+                                    style={{ width: `${percent}%` }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className='p-4'>
+                            <div className='flex items-center gap-2'>
+                              <span
+                                className={`font-semibold text-lg ${getVolatilityColor(
+                                  volatility
+                                )}`}
+                              >
+                                {volatility}
+                              </span>
+                              {volatility !== 'N/A' && (
+                                <div className='w-3 h-3 rounded-full bg-primary/60'></div>
+                              )}
+                            </div>
+                          </td>
+                          <td className='p-4'>
+                            <Badge
+                              variant='outline'
+                              className={`font-medium border text-sm ${getConfidenceColor(
+                                confidence
+                              )}`}
+                            >
+                              {confidence}
+                            </Badge>
+                          </td>
+                          <td className='p-4'>
+                            <Badge
+                              variant='outline'
+                              className={`font-medium border text-sm ${getCategoryColor(
+                                assetType
+                              )}`}
+                            >
+                              {assetType}
+                            </Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

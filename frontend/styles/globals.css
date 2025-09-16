@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -159,5 +159,17 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Enhanced button visibility for outline variants */
+  .btn-outline-enhanced {
+    @apply border-2 border-primary/30 bg-background text-primary hover:bg-primary/10 hover:border-primary/50 hover:text-primary/90 shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  /* Ensure proper contrast for outline buttons */
+  .btn-outline-contrast {
+    @apply border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 hover:text-slate-800 shadow-sm hover:shadow-md transition-all duration-200;
   }
 }
