@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
@@ -51,7 +51,7 @@ export default function PositionExtractor({
   const [isSyncError, setIsSyncError] = useState(false);
 
   // Fetch positions from SnapTrade
-  const fetchPositions = async () => {
+  const fetchPositions = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -129,12 +129,12 @@ export default function PositionExtractor({
     } finally {
       setLoading(false);
     }
-  };
+  }, [userData, accountId, onError]);
 
   // Load positions on component mount
   useEffect(() => {
     fetchPositions();
-  }, [userData, accountId]);
+  }, [userData, accountId, fetchPositions]);
 
   const handleContinue = () => {
     if (portfolioAssets.length > 0) {

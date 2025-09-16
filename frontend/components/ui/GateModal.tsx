@@ -119,8 +119,8 @@ const GateModal = memo(function GateModal({
                 </span>
               </div>
               <div className='text-xs sm:text-sm text-muted-foreground/80 italic'>
-                "This analysis helped me identify risks I never knew existed in
-                my portfolio." - Sarah M.
+                &ldquo;This analysis helped me identify risks I never knew
+                existed in my portfolio.&rdquo; - Sarah M.
               </div>
             </div>
 

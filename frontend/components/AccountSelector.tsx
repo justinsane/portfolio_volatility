@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
@@ -41,7 +41,7 @@ export default function AccountSelector({
   const [selectedAccount, setSelectedAccount] = useState<string>('');
 
   // Fetch accounts from SnapTrade
-  const fetchAccounts = async () => {
+  const fetchAccounts = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -77,12 +77,12 @@ export default function AccountSelector({
     } finally {
       setLoading(false);
     }
-  };
+  }, [userData, onError]);
 
   // Load accounts on component mount
   useEffect(() => {
     fetchAccounts();
-  }, [userData]);
+  }, [userData, fetchAccounts]);
 
   const handleAccountSelect = (accountId: string) => {
     setSelectedAccount(accountId);
@@ -177,7 +177,7 @@ export default function AccountSelector({
       </CardHeader>
       <CardContent className='space-y-4'>
         <p className='text-sm text-gray-600'>
-          Choose the brokerage account you'd like to analyze for portfolio
+          Choose the brokerage account you&apos;d like to analyze for portfolio
           volatility.
         </p>
 

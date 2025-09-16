@@ -22,7 +22,7 @@ export default function GateExample() {
           title={riskAnalysisConfig.title}
           description={riskAnalysisConfig.description}
           benefits={riskAnalysisConfig.benefits}
-          icon={riskAnalysisConfig.icon}
+          icon={<riskAnalysisConfig.icon className='h-6 w-6' />}
           triggerType={riskAnalysisConfig.triggerType}
           triggerDelay={riskAnalysisConfig.triggerDelay}
           previewContent={
@@ -122,7 +122,7 @@ export default function GateExample() {
           title={recommendationsConfig.title}
           description={recommendationsConfig.description}
           benefits={recommendationsConfig.benefits}
-          icon={recommendationsConfig.icon}
+          icon={<recommendationsConfig.icon className='h-6 w-6' />}
           triggerType={recommendationsConfig.triggerType}
           previewContent={
             <Card className='border-2 border-blue-200 bg-blue-50'>
@@ -230,7 +230,7 @@ export default function GateExample() {
               to gated sections
             </p>
             <p>
-              • <strong>Preview content:</strong> Shows a preview of what's
+              • <strong>Preview content:</strong> Shows a preview of what&apos;s
               behind the gate
             </p>
             <p>
