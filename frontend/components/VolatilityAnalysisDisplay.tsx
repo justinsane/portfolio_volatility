@@ -4,14 +4,14 @@ import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import {
   TrendingUp,
-  Shield,
+  Activity,
   AlertTriangle,
   Lightbulb,
   BarChart3,
   Target,
-  Activity,
   PieChart,
   Info,
+  Shield,
 } from 'lucide-react';
 import { useState } from 'react';
 import LearnMoreDialog from './LearnMoreDialog';
@@ -20,15 +20,15 @@ import KeyConcernsSection from './KeyConcernsSection';
 import RecommendationsSection from './RecommendationsSection';
 import GateWrapper from './GateWrapper';
 
-interface RiskAnalysisDisplayProps {
+interface VolatilityAnalysisDisplayProps {
   riskAnalysis: any;
   portfolioAssets: any[];
 }
 
-export default function RiskAnalysisDisplay({
+export default function VolatilityAnalysisDisplay({
   riskAnalysis,
   portfolioAssets,
-}: RiskAnalysisDisplayProps) {
+}: VolatilityAnalysisDisplayProps) {
   const [expandedConcerns, setExpandedConcerns] = useState(false);
   const [learnMoreDialog, setLearnMoreDialog] = useState<{
     isOpen: boolean;
@@ -46,20 +46,20 @@ export default function RiskAnalysisDisplay({
       <Card className='border-2 border-border/50 shadow-lg'>
         <CardHeader className='pb-6'>
           <CardTitle className='flex items-center gap-3 text-xl'>
-            <div className='p-2 rounded-lg bg-primary/10 border border-primary/20'>
-              <Shield className='h-5 w-5 text-primary' />
+            <div className='p-2 rounded-lg bg-blue-10 border border-blue-20'>
+              <Activity className='h-5 w-5 text-blue-600' />
             </div>
-            Risk Analysis
+            Volatility Assessment
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertTriangle className='h-4 w-4' />
             <AlertDescription>
-              <strong>Risk Analysis Unavailable</strong>
+              <strong>Volatility Assessment Unavailable</strong>
               <br />
-              Risk analysis data is not available for this portfolio. Please try
-              again or contact support if the issue persists.
+              Volatility analysis data is not available for this portfolio.
+              Please try again or contact support if the issue persists.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -94,11 +94,19 @@ export default function RiskAnalysisDisplay({
     <Card className='border-2 border-border/50 shadow-lg'>
       <CardHeader className='pb-6'>
         <CardTitle className='flex items-center gap-3 text-xl'>
-          <div className='p-2 rounded-lg bg-primary/10 border border-primary/20'>
-            <Shield className='h-5 w-5 text-primary' />
+          <div className='p-2 rounded-lg bg-blue-10 border border-blue-20'>
+            <Activity className='h-5 w-5 text-blue-600' />
           </div>
-          Risk Analysis
+          Volatility Assessment
+          <Badge variant='secondary' className='ml-2 text-xs'>
+            Supporting Metric
+          </Badge>
         </CardTitle>
+        <p className='text-sm text-muted-foreground mt-2'>
+          Volatility contributes to your overall risk but isn't the full
+          picture. This analysis provides additional context for your
+          portfolio's price movements.
+        </p>
       </CardHeader>
       <CardContent className='space-y-8'>
         {/* Risk Summary Section */}
@@ -171,25 +179,25 @@ export default function RiskAnalysisDisplay({
         {/* Recommendations Section - Gated */}
         <GateWrapper
           gateId='recommendations'
-          title='Get Personalized Recommendations'
-          description='Receive actionable investment recommendations tailored to your portfolio and financial goals.'
+          title='Get Personalized Investment Recommendations'
+          description='Connect with a financial advisor to receive actionable investment recommendations tailored to your portfolio and financial goals.'
           benefits={[
             'Personalized investment recommendations',
-            'Portfolio optimization suggestions',
-            'Risk mitigation strategies',
+            'Portfolio optimization strategies',
+            'Risk mitigation plans',
             'Next steps and action items',
             'Ongoing portfolio monitoring advice',
           ]}
           icon={<TrendingUp className='h-6 w-6' />}
           triggerType='click'
           previewContent={
-            <div className='border-2 border-blue-200 bg-blue-50 rounded-xl p-6'>
+            <div className='border-2 border-blue-200 bg-blue-50 rounded-xl p-4 sm:p-6'>
               <div className='flex items-center gap-3 mb-4'>
                 <div className='p-2 rounded-lg bg-blue-100 border border-blue-200'>
                   <TrendingUp className='h-5 w-5 text-blue-600' />
                 </div>
                 <h3 className='text-lg font-semibold text-blue-800'>
-                  Recommendations Preview
+                  Investment Recommendations Preview
                 </h3>
               </div>
               <div className='space-y-3'>

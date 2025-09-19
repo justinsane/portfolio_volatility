@@ -196,13 +196,14 @@ export default function GateWrapper({
               </div>
               <div>
                 <h3 className='font-semibold text-lg sm:text-xl text-foreground leading-tight'>
-                  Unlock Detailed Analysis
+                  Get Your Complete Portfolio Analysis
                 </h3>
                 <p className='text-sm sm:text-base text-muted-foreground mt-2 leading-relaxed'>
-                  Get personalized insights and 20+ recommendations
+                  Connect with a financial advisor for personalized insights and
+                  actionable recommendations
                 </p>
                 <div className='mt-3 text-sm text-primary/80 font-medium'>
-                  ✓ Free consultation with financial advisor
+                  ✓ Free consultation with certified financial advisor
                 </div>
               </div>
               <div className='space-y-3'>
@@ -212,7 +213,9 @@ export default function GateWrapper({
                   className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
                 >
                   <Eye className='h-5 w-5 mr-3 flex-shrink-0' />
-                  <span className='whitespace-nowrap'>Get Free Analysis</span>
+                  <span className='whitespace-nowrap'>
+                    Connect with Advisor
+                  </span>
                 </Button>
                 <Button
                   variant='outline'
