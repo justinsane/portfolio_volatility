@@ -60,7 +60,7 @@ const GateModal = memo(function GateModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-md max-h-[95vh] overflow-y-auto mx-4 sm:mx-auto'>
+      <DialogContent className='sm:max-w-md max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto bg-background border-2 shadow-2xl'>
         <DialogHeader className='text-center space-y-4 px-2 sm:px-0'>
           <div className='mx-auto p-4 rounded-full bg-primary/10 border border-primary/20 w-fit'>
             {icon}

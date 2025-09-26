@@ -47,47 +47,47 @@
   - [x] Support "Your risk is X because..." format
 
 ### Phase 3: Restructure Information Flow
-- [ ] **Update SimplifiedResultsLayout.tsx**
-  - [ ] Step 1: Hero (Risk Level only)
-  - [ ] Step 2: Two Key Insights (Volatility + Diversification)
-  - [ ] Step 3: Advisor CTA (unchanged)
-  - [ ] Remove Portfolio Composition from main flow
+- [x] **Update SimplifiedResultsLayout.tsx**
+  - [x] Step 1: Hero (Risk Level only)
+  - [x] Step 2: Two Key Insights (Volatility + Diversification)
+  - [x] Step 3: Advisor CTA (unchanged)
+  - [x] Remove Portfolio Composition from main flow
 
-- [ ] **Gate Portfolio Composition**
-  - [ ] Move `PortfolioComposition.tsx` behind advisor gate
-  - [ ] Add to "Advanced Analysis" section
-  - [ ] Update gate description to include portfolio breakdown
+- [x] **Gate Portfolio Composition**
+  - [x] Move `PortfolioComposition.tsx` behind advisor gate
+  - [x] Add to "Advanced Analysis" section
+  - [x] Update gate description to include portfolio breakdown
 
 ### Phase 4: Simplify Advanced Analysis
-- [ ] **Update VolatilityAnalysisDisplay.tsx**
-  - [ ] Remove "Volatility Assessment" title (confusing)
-  - [ ] Rename to "Portfolio Insights" or "Detailed Analysis"
-  - [ ] Hide model-related details (model type, confidence, data coverage)
-  - [ ] Focus on correlation analysis and recommendations
+- [x] **Update VolatilityAnalysisDisplay.tsx**
+  - [x] Remove "Volatility Assessment" title (confusing)
+  - [x] Rename to "Portfolio Insights" or "Detailed Analysis"
+  - [x] Hide model-related details (model type, confidence, data coverage)
+  - [x] Focus on correlation analysis and recommendations
 
-- [ ] **Update GateWrapper descriptions**
-  - [ ] Remove technical terms like "correlation analysis heatmap"
-  - [ ] Use retail-friendly language
-  - [ ] Focus on benefits: "personalized recommendations", "risk reduction strategies"
+- [x] **Update GateWrapper descriptions**
+  - [x] Remove technical terms like "correlation analysis heatmap"
+  - [x] Use retail-friendly language
+  - [x] Focus on benefits: "personalized recommendations", "risk reduction strategies"
 
 ### Phase 5: Content & Language Updates
-- [ ] **Replace technical terminology**
-  - [ ] "Volatility Forecast Results" → "Your Portfolio Insights"
-  - [ ] "Diversification Score" → "How spread out your investments are"
-  - [ ] "Risk Summary" → Remove (redundant)
-  - [ ] "Portfolio Composition" → "Your Holdings Breakdown"
+- [x] **Replace technical terminology**
+  - [x] "Volatility Forecast Results" → "Your Portfolio Insights"
+  - [x] "Diversification Score" → "How spread out your investments are"
+  - [x] "Risk Summary" → Remove (redundant)
+  - [x] "Portfolio Composition" → "Your Holdings Breakdown"
 
-- [ ] **Add contextual explanations**
-  - [ ] "Your risk is Very High because your portfolio is highly concentrated (Diversification Score 64/100)"
-  - [ ] "Expected Volatility: 15.4% means your portfolio could swing this much in a year"
-  - [ ] "Diversification Score 64/100 means your investments could be more spread out"
+- [x] **Add contextual explanations**
+  - [x] "Your risk is Very High because your portfolio is highly concentrated (Diversification Score 64/100)"
+  - [x] "Expected Volatility: 15.4% means your portfolio could swing this much in a year"
+  - [x] "Diversification Score 64/100 means your investments could be more spread out"
 
 ### Phase 6: Mobile Optimization
-- [ ] **Ensure mobile-first design**
-  - [ ] Test 2-card layout on mobile (Volatility + Diversification)
-  - [ ] Verify hero banner scales properly
-  - [ ] Check CTA button sizing and placement
-  - [ ] Test gated content previews on mobile
+- [x] **Ensure mobile-first design**
+  - [x] Test 2-card layout on mobile (Volatility + Diversification)
+  - [x] Verify hero banner scales properly
+  - [x] Check CTA button sizing and placement
+  - [x] Test gated content previews on mobile
 
 ### Phase 7: Testing & Validation
 - [ ] **Test with different risk levels**

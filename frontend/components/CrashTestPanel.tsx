@@ -754,7 +754,6 @@ export default function CrashTestPanel({
     </div>
   );
 }
-
 function MetricCard({
   label,
   value,
@@ -804,3 +803,4 @@ function MetricCard({
     </div>
   );
 }
+

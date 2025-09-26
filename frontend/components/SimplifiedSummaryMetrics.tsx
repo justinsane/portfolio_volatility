@@ -36,7 +36,7 @@ export default function SimplifiedSummaryMetrics({
   );
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 px-4 sm:px-0'>
       <div className='text-center'>
         <h2 className='text-2xl sm:text-3xl font-bold text-foreground mb-2'>
           Your Portfolio Insights
@@ -46,10 +46,10 @@ export default function SimplifiedSummaryMetrics({
         </p>
       </div>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto'>
         {/* Expected Volatility */}
         {volatility !== undefined && (
-          <div className='group relative overflow-hidden rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
+          <div className='group relative overflow-hidden rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
             <div className='flex items-center justify-between mb-4'>
               <div className='p-3 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
                 <Activity className='h-6 w-6' />
@@ -98,7 +98,7 @@ export default function SimplifiedSummaryMetrics({
         )}
 
         {/* Diversification Score */}
-        <div className='group relative overflow-hidden rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-800/30 p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
+        <div className='group relative overflow-hidden rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 dark:bg-purple-950/20 dark:text-purple-400 dark:border-purple-800/30 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] transform shadow-lg'>
           <div className='flex items-center justify-between mb-4'>
             <div className='p-3 rounded-lg bg-white/60 dark:bg-black/30 shadow-sm'>
               <PieChart className='h-6 w-6' />

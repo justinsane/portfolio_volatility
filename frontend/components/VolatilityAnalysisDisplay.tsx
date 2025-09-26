@@ -97,15 +97,14 @@ export default function VolatilityAnalysisDisplay({
           <div className='p-2 rounded-lg bg-blue-10 border border-blue-20'>
             <Activity className='h-5 w-5 text-blue-600' />
           </div>
-          Volatility Assessment
+          Portfolio Insights
           <Badge variant='secondary' className='ml-2 text-xs'>
-            Supporting Metric
+            Detailed Analysis
           </Badge>
         </CardTitle>
         <p className='text-sm text-muted-foreground mt-2'>
-          Volatility contributes to your overall risk but isn't the full
-          picture. This analysis provides additional context for your
-          portfolio's price movements.
+          Get deeper insights into your portfolio's risk factors and how your
+          investments work together to help you make better decisions.
         </p>
       </CardHeader>
       <CardContent className='space-y-8'>

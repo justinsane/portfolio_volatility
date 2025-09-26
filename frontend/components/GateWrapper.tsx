@@ -187,30 +187,31 @@ export default function GateWrapper({
       {showPreview && previewContent ? (
         <div className='relative'>
           {previewContent}
-          <div className='absolute inset-0 bg-background/90 backdrop-blur-sm rounded-lg flex items-center justify-center p-4'>
-            <div className='text-center space-y-4 p-4 sm:p-6 max-w-sm mx-auto'>
-              <div className='mx-auto p-4 rounded-full bg-primary/10 border border-primary/20 w-fit'>
+          <div className='absolute inset-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-lg flex items-center justify-center p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-2xl'>
+            <div className='text-center space-y-6 p-6 sm:p-8 max-w-md mx-auto bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200/60 dark:border-gray-600/60 shadow-xl'>
+              <div className='mx-auto p-4 rounded-full bg-primary/15 border-2 border-primary/30 w-fit shadow-lg'>
                 {icon || (
                   <Lock className='h-6 w-6 sm:h-8 sm:w-8 text-primary' />
                 )}
               </div>
-              <div>
-                <h3 className='font-semibold text-lg sm:text-xl text-foreground leading-tight'>
+              <div className='space-y-3'>
+                <h3 className='font-bold text-xl sm:text-2xl text-gray-900 dark:text-white leading-tight'>
                   Get Your Complete Portfolio Analysis
                 </h3>
-                <p className='text-sm sm:text-base text-muted-foreground mt-2 leading-relaxed'>
+                <p className='text-base sm:text-lg text-gray-700 dark:text-gray-300 leading-relaxed'>
                   Connect with a financial advisor for personalized insights and
                   actionable recommendations
                 </p>
-                <div className='mt-3 text-sm text-primary/80 font-medium'>
-                  ✓ Free consultation with certified financial advisor
+                <div className='inline-flex items-center gap-2 px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full text-sm font-semibold border border-green-200 dark:border-green-700'>
+                  <span className='w-2 h-2 bg-green-500 rounded-full'></span>
+                  Free consultation with certified financial advisor
                 </div>
               </div>
-              <div className='space-y-3'>
+              <div className='space-y-3 pt-2'>
                 <Button
                   onClick={() => setShowModal(true)}
                   size='mobile'
-                  className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
+                  className='w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-4 sm:py-3 text-lg shadow-xl hover:shadow-2xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer border-2 border-blue-500'
                 >
                   <Eye className='h-5 w-5 mr-3 flex-shrink-0' />
                   <span className='whitespace-nowrap'>
@@ -221,7 +222,7 @@ export default function GateWrapper({
                   variant='outline'
                   onClick={() => setShowPreview(false)}
                   size='mobile'
-                  className='w-full text-base'
+                  className='w-full text-base font-medium border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                 >
                   Maybe Later
                 </Button>

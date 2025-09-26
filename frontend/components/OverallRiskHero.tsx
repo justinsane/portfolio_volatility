@@ -24,8 +24,8 @@ export default function OverallRiskHero({ result }: OverallRiskHeroProps) {
       <Card
         className={`border-0 shadow-2xl overflow-hidden ${colors.bg} ${colors.text}`}
       >
-        <CardContent className='p-6 sm:p-8 lg:p-12'>
-          <div className='text-center space-y-6'>
+        <CardContent className='p-4 sm:p-6 md:p-8 lg:p-12'>
+          <div className='text-center space-y-4 sm:space-y-6'>
             {/* Risk Level Badge */}
             <div className='flex justify-center'>
               <div

@@ -37,21 +37,18 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
       {/* Simplified Results Layout - New 3-step flow */}
       <SimplifiedResultsLayout result={result} />
 
-      {/* Portfolio Composition - Keep this as it's valuable */}
-      <PortfolioComposition result={result} />
-
       {/* Advanced Analysis - Gated behind advisor connection */}
       {result.risk_analysis && result.risk_analysis.success && (
         <GateWrapper
           gateId='risk-analysis'
           title='Get Your Complete Portfolio Analysis'
-          description="Connect with a financial advisor to unlock detailed insights into your portfolio's risk factors, correlations, and concentration metrics."
+          description="Connect with a financial advisor to unlock detailed insights into your portfolio's risk factors and personalized recommendations."
           benefits={[
-            'Detailed risk score breakdown',
-            'Correlation analysis heatmap',
-            'Concentration risk explanation',
-            'Risk factor explanations and mitigation strategies',
-            'Personalized risk assessment recommendations',
+            'Detailed risk breakdown and explanations',
+            'How your investments work together',
+            'Concentration risk analysis',
+            'Personalized risk reduction strategies',
+            'Custom recommendations for your goals',
           ]}
           icon={<Shield className='h-6 w-6' />}
           triggerType='engagement'
@@ -63,7 +60,7 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
                   <Shield className='h-5 w-5 text-orange-600' />
                 </div>
                 <h3 className='text-lg font-semibold text-orange-800'>
-                  Volatility Assessment Preview
+                  Portfolio Analysis Preview
                 </h3>
               </div>
               <div className='space-y-3'>
@@ -87,8 +84,8 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
                   </span>
                 </div>
                 <div className='text-xs text-orange-600 mt-3'>
-                  Detailed breakdown, correlation analysis, and concentration
-                  metrics available with advisor consultation.
+                  Detailed breakdown, investment relationships, and risk
+                  reduction strategies available with advisor consultation.
                 </div>
               </div>
             </div>
@@ -101,14 +98,76 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
         </GateWrapper>
       )}
 
+      {/* Portfolio Composition - Gated behind advisor connection */}
+      <GateWrapper
+        gateId='portfolio-composition'
+        title='View Your Detailed Holdings Breakdown'
+        description='Connect with a financial advisor to see your complete portfolio composition, asset allocation, and detailed holdings analysis.'
+        benefits={[
+          'Complete portfolio breakdown',
+          'Asset allocation analysis',
+          'Individual holding details',
+          'Volatility and confidence metrics',
+          'Portfolio optimization insights',
+        ]}
+        icon={<BarChart3 className='h-6 w-6' />}
+        triggerType='engagement'
+        engagementThreshold={60} // 1 minute engagement
+        previewContent={
+          <div className='border-2 border-blue-200 bg-blue-50 rounded-xl p-6'>
+            <div className='flex items-center gap-3 mb-4'>
+              <div className='p-2 rounded-lg bg-blue-100 border border-blue-200'>
+                <BarChart3 className='h-5 w-5 text-blue-600' />
+              </div>
+              <h3 className='text-lg font-semibold text-blue-800'>
+                Portfolio Composition Preview
+              </h3>
+            </div>
+            <div className='space-y-3'>
+              <div className='flex justify-between items-center'>
+                <span className='text-sm font-medium text-blue-700'>
+                  Total Assets
+                </span>
+                <span className='px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold'>
+                  {result.portfolio_assets.length} Holdings
+                </span>
+              </div>
+              <div className='flex justify-between items-center'>
+                <span className='text-sm font-medium text-blue-700'>
+                  Largest Holding
+                </span>
+                <span className='px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold'>
+                  {Math.max(
+                    ...result.portfolio_assets.map(a =>
+                      typeof a.Weight === 'number'
+                        ? a.Weight <= 1
+                          ? a.Weight * 100
+                          : a.Weight
+                        : 0
+                    )
+                  ).toFixed(1)}
+                  %
+                </span>
+              </div>
+              <div className='text-xs text-blue-600 mt-3'>
+                Detailed breakdown of all holdings, allocation percentages, and
+                asset categories available with advisor consultation.
+              </div>
+            </div>
+          </div>
+        }
+      >
+        <PortfolioComposition result={result} />
+      </GateWrapper>
+
       {/* Advanced Tools - Gated behind advisor connection */}
       <GateWrapper
         gateId='advanced-tools'
         title='Access Advanced Portfolio Tools'
-        description='Connect with a financial advisor to explore sophisticated portfolio analysis tools and what-if scenarios.'
+        description='Connect with a financial advisor to explore powerful portfolio analysis tools and personalized strategies.'
         benefits={[
-          'What-If Scenarios functionality',
-          'Advanced portfolio optimization',
+          'What-if scenario planning',
+          'Portfolio optimization strategies',
           'Market stress testing',
           'Rebalancing recommendations',
           'Tax optimization strategies',
@@ -122,13 +181,13 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
                 <Users className='h-5 w-5 text-purple-600' />
               </div>
               <h3 className='text-lg font-semibold text-purple-800'>
-                Advanced Tools Preview
+                Portfolio Tools Preview
               </h3>
             </div>
             <div className='space-y-3'>
               <div className='flex justify-between items-center'>
                 <span className='text-sm font-medium text-purple-700'>
-                  Crash Test Scenarios
+                  Market Stress Testing
                 </span>
                 <span className='px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold'>
                   Available
@@ -136,14 +195,14 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
               </div>
               <div className='flex justify-between items-center'>
                 <span className='text-sm font-medium text-purple-700'>
-                  What-If Analysis
+                  Scenario Planning
                 </span>
                 <span className='px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold'>
                   Available
                 </span>
               </div>
               <div className='text-xs text-purple-600 mt-3'>
-                Advanced portfolio stress testing, scenario analysis, and
+                Market stress testing, scenario planning, and portfolio
                 optimization tools available with advisor consultation.
               </div>
             </div>

@@ -125,13 +125,17 @@ function generateRiskExplanation(
 ): string {
   const concerns = riskSummary.key_concerns || [];
   const riskLevel = riskSummary.overall_risk_level?.toLowerCase() || '';
+  const diversificationScore = riskSummary.diversification_score?.score;
 
-  // Check for specific concerns
+  // Check for specific concerns with contextual information
   if (
     concerns.some((concern: string) =>
       concern.toLowerCase().includes('concentration')
     )
   ) {
+    if (diversificationScore !== undefined) {
+      return `Your portfolio has high risk due to concentration in a few assets (Diversification Score ${diversificationScore}/100).`;
+    }
     return 'Your portfolio has high risk due to concentration in a few assets.';
   } else if (
     concerns.some((concern: string) =>
@@ -147,15 +151,27 @@ function generateRiskExplanation(
     return 'Your portfolio has high risk due to volatile asset holdings.';
   }
 
-  // Generate based on risk level
+  // Generate based on risk level with contextual information
   switch (riskLevel) {
     case 'very high':
+      if (diversificationScore !== undefined) {
+        return `Your portfolio has very high risk due to multiple factors, including poor diversification (Score ${diversificationScore}/100).`;
+      }
       return 'Your portfolio has very high risk due to multiple risk factors.';
     case 'high':
+      if (diversificationScore !== undefined && diversificationScore < 60) {
+        return `Your portfolio has high risk that may need attention, particularly due to limited diversification (Score ${diversificationScore}/100).`;
+      }
       return 'Your portfolio has high risk that may need attention.';
     case 'moderate':
+      if (diversificationScore !== undefined) {
+        return `Your portfolio has moderate risk with room for improvement (Diversification Score ${diversificationScore}/100).`;
+      }
       return 'Your portfolio has moderate risk with room for improvement.';
     case 'low':
+      if (diversificationScore !== undefined && diversificationScore >= 80) {
+        return `Your portfolio has low risk with good diversification (Score ${diversificationScore}/100).`;
+      }
       return 'Your portfolio has low risk with good diversification.';
     case 'very low':
       return 'Your portfolio has very low risk with excellent diversification.';
@@ -292,25 +308,33 @@ export function generateMetricExplanation(
     const volatilityPercent = volatility * 100;
 
     if (volatilityPercent >= 25) {
-      return 'High volatility means your portfolio could experience significant price swings. This increases risk but may offer higher potential returns.';
+      return `Expected Volatility: ${volatilityPercent.toFixed(
+        1
+      )}% means your portfolio could swing this much in a year. High volatility increases risk but may offer higher potential returns.`;
     } else if (volatilityPercent >= 15) {
-      return 'Moderate volatility suggests your portfolio will have some price movement. This is typical for balanced portfolios.';
+      return `Expected Volatility: ${volatilityPercent.toFixed(
+        1
+      )}% means your portfolio could swing this much in a year. This is typical for balanced portfolios.`;
     } else if (volatilityPercent >= 10) {
-      return 'Low volatility indicates your portfolio should be relatively stable. This is common with conservative investments.';
+      return `Expected Volatility: ${volatilityPercent.toFixed(
+        1
+      )}% means your portfolio could swing this much in a year. This indicates relative stability, common with conservative investments.`;
     } else {
-      return 'Very low volatility suggests your portfolio is very stable, typical of cash or bond-heavy portfolios.';
+      return `Expected Volatility: ${volatilityPercent.toFixed(
+        1
+      )}% means your portfolio could swing this much in a year. Very low volatility suggests your portfolio is very stable, typical of cash or bond-heavy portfolios.`;
     }
   }
 
   if (metricType === 'diversification' && diversificationScore !== undefined) {
     if (diversificationScore >= 80) {
-      return 'Excellent diversification means your investments are well spread out, reducing risk from any single asset or sector.';
+      return `Diversification Score ${diversificationScore}/100 means your investments are well spread out, reducing risk from any single asset or sector.`;
     } else if (diversificationScore >= 60) {
-      return 'Good diversification shows your portfolio is reasonably balanced, though there may be room for improvement.';
+      return `Diversification Score ${diversificationScore}/100 means your investments could be more spread out. Your portfolio is reasonably balanced, though there may be room for improvement.`;
     } else if (diversificationScore >= 40) {
-      return 'Fair diversification suggests your portfolio could benefit from spreading investments across more assets or sectors.';
+      return `Diversification Score ${diversificationScore}/100 means your investments could be more spread out. Your portfolio could benefit from spreading investments across more assets or sectors.`;
     } else {
-      return 'Poor diversification means your portfolio is concentrated in a few investments, which increases risk significantly.';
+      return `Diversification Score ${diversificationScore}/100 means your investments could be more spread out. Your portfolio is concentrated in a few investments, which increases risk significantly.`;
     }
   }
 

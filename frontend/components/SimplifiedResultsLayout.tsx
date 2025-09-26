@@ -56,7 +56,7 @@ export default function SimplifiedResultsLayout({
   };
 
   return (
-    <div className='space-y-12 max-w-6xl mx-auto'>
+    <div className='space-y-8 sm:space-y-12 max-w-6xl mx-auto px-4 sm:px-6'>
       {/* Step 1: Hero Section - Overall Risk Assessment */}
       <section className='w-full'>
         <OverallRiskHero result={result} />
@@ -69,8 +69,8 @@ export default function SimplifiedResultsLayout({
 
       {/* Step 3: Call to Action - Advisor Connection */}
       <section className='w-full'>
-        <div className='bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl border border-border/50 p-8'>
-          <div className='text-center mb-8'>
+        <div className='bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl border border-border/50 p-6 sm:p-8'>
+          <div className='text-center mb-6 sm:mb-8'>
             <h2 className='text-2xl sm:text-3xl font-bold text-foreground mb-4'>
               Get Your Complete Portfolio Analysis
             </h2>
@@ -82,7 +82,7 @@ export default function SimplifiedResultsLayout({
           </div>
 
           {/* Benefits List */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8'>
             <div className='text-center p-4'>
               <div className='w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3'>
                 <span className='text-primary font-bold text-lg'>📊</span>

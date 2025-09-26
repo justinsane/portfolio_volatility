@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, BarChart3, TrendingUp, Shield, Users } from 'lucide-react';
+import { Lock, TrendingUp, Shield, Users } from 'lucide-react';
 
 export interface GateConfig {
   id: string;
@@ -27,21 +27,6 @@ export const GATE_CONFIGS: Record<string, GateConfig> = {
     icon: Shield,
     triggerType: 'time',
     triggerDelay: 120000, // 2 minutes
-  },
-  'ai-model-details': {
-    id: 'ai-model-details',
-    title: 'See How Our AI Analyzes Your Portfolio',
-    description:
-      "Get behind-the-scenes insights into our advanced AI model's confidence levels, data quality assessment, and prediction accuracy.",
-    benefits: [
-      '🎯 Data Quality breakdown (100% score explained)',
-      '📈 Coverage metrics detailed analysis',
-      '🔬 Reliability scores methodology',
-      '🤖 Model confidence indicators',
-      '📊 AI prediction accuracy insights',
-    ],
-    icon: BarChart3,
-    triggerType: 'scroll',
   },
   recommendations: {
     id: 'recommendations',

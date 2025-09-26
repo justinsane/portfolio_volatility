@@ -1,0 +1,1 @@
+Be sure to check what components we already have. Don't duplicate code. Reuse components when possible. When files become too large, make new components and utilize a modular coding paradigm. Make designs responsive. @rule-tailwind-v4-ext.mdc @ui_styling.mdc 
