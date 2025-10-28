@@ -28,7 +28,8 @@ export default function SimplifiedResultsLayout({
   // Generate explanation based on risk analysis
   const getRiskExplanation = () => {
     if (
-      result.risk_analysis?.risk_metrics?.risk_summary?.key_concerns?.length > 0
+      result.risk_analysis?.risk_metrics?.risk_summary?.key_concerns &&
+      result.risk_analysis.risk_metrics.risk_summary.key_concerns.length > 0
     ) {
       const concerns =
         result.risk_analysis.risk_metrics.risk_summary.key_concerns;

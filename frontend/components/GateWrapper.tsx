@@ -59,7 +59,7 @@ export default function GateWrapper({
     });
 
     return cleanup;
-  }, [gateId, priority]);
+  }, [gateId, priority, showPreview]);
 
   // Check if user has already unlocked this gate
   useEffect(() => {
@@ -174,7 +174,7 @@ export default function GateWrapper({
         }
       }
     }
-  }, [triggerType, isGated, hasTriggered, engagementData, engagementThreshold]);
+  }, [triggerType, isGated, hasTriggered, engagementData, engagementThreshold, gateId]);
 
   // Prevent multiple gates from triggering simultaneously
   useEffect(() => {

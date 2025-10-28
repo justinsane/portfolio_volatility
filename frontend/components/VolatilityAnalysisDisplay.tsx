@@ -103,7 +103,7 @@ export default function VolatilityAnalysisDisplay({
           </Badge>
         </CardTitle>
         <p className='text-sm text-muted-foreground mt-2'>
-          Get deeper insights into your portfolio's risk factors and how your
+          Get deeper insights into your portfolio&apos;s risk factors and how your
           investments work together to help you make better decisions.
         </p>
       </CardHeader>

@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Shield } from 'lucide-react';
-import { type CrashScenarioResult } from './CrashTestPanel';
+import { type CrashScenarioResult } from '../CrashTestPanel';
 
 interface BenchmarkComparisonProps {
   scenarios: CrashScenarioResult[];

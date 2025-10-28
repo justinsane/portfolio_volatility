@@ -225,7 +225,7 @@ export default function PortfolioComposition({
                   Portfolio composition is hidden
                 </p>
                 <p className='text-sm text-muted-foreground'>
-                  Click "Show Details" above to view your holdings and
+                  Click &quot;Show Details&quot; above to view your holdings and
                   allocation
                 </p>
               </div>

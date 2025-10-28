@@ -168,7 +168,7 @@ export default function AdvancedDetailsTab({
                 </div>
                 <div>
                   <p className='text-2xl sm:text-3xl font-black mb-2 leading-none'>
-                    {result.enhancement_data.coverage_analysis.total_sources ||
+                    {result.enhancement_data.coverage_analysis.total_assets ||
                       'Multiple'}
                   </p>
                   <p className='text-sm font-medium opacity-80'>Data Sources</p>

@@ -18,7 +18,7 @@ import {
   Maximize2,
   Activity,
 } from 'lucide-react';
-import { type CrashScenarioResult, type CrashMetrics } from './CrashTestPanel';
+import { type CrashScenarioResult, type CrashMetrics } from '../CrashTestPanel';
 import { type CrashScenario } from './ScenarioSelector';
 import MetricCard from './MetricCard';
 import UnderwaterSparkline from '../charts/UnderwaterSparkline';
