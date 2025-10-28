@@ -17,7 +17,7 @@ export default function CrashTestHeader({
   return (
     <Card className='border-0 shadow-sm bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20'>
       <CardHeader className='pb-4'>
-        <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+        <div className='flex flex-col gap-4'>
           <div className='flex items-center gap-4'>
             <div className='p-3 rounded-xl bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800/30 flex-shrink-0'>
               <TrendingDown className='h-6 w-6 text-red-600 dark:text-red-400' />
@@ -33,7 +33,7 @@ export default function CrashTestHeader({
             </div>
           </div>
 
-          <div className='flex-shrink-0'>
+          <div className='flex justify-center sm:justify-end'>
             <Button
               onClick={onRunTest}
               disabled={loading || !hasPortfolio}
@@ -55,6 +55,3 @@ export default function CrashTestHeader({
     </Card>
   );
 }
-
-
-

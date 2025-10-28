@@ -72,70 +72,17 @@ export default function SimplifiedResultsLayout({
         <div className='bg-gradient-to-r from-primary/5 to-accent/5 rounded-2xl border border-border/50 p-6 sm:p-8'>
           <div className='text-center mb-6 sm:mb-8'>
             <h2 className='text-2xl sm:text-3xl font-bold text-foreground mb-4'>
-              Get Your Complete Portfolio Analysis
+              Ready for Deeper Analysis?
             </h2>
             <p className='text-muted-foreground text-lg max-w-2xl mx-auto'>
-              We've analyzed your portfolio's risk profile. To see the full
-              breakdown, detailed recommendations, and personalized strategies,
-              connect with a certified financial advisor.
+              Scroll down to explore detailed risk analysis, portfolio
+              composition, and advanced tools. Each section provides deeper
+              insights into your portfolio.
             </p>
           </div>
 
-          {/* Benefits List */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8'>
-            <div className='text-center p-4'>
-              <div className='w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3'>
-                <span className='text-primary font-bold text-lg'>📊</span>
-              </div>
-              <h3 className='font-semibold text-foreground mb-2'>
-                Detailed Analysis
-              </h3>
-              <p className='text-sm text-muted-foreground'>
-                Complete risk breakdown and correlation analysis
-              </p>
-            </div>
-            <div className='text-center p-4'>
-              <div className='w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3'>
-                <span className='text-primary font-bold text-lg'>🎯</span>
-              </div>
-              <h3 className='font-semibold text-foreground mb-2'>
-                Personalized Recommendations
-              </h3>
-              <p className='text-sm text-muted-foreground'>
-                Actionable strategies tailored to your goals
-              </p>
-            </div>
-            <div className='text-center p-4'>
-              <div className='w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3'>
-                <span className='text-primary font-bold text-lg'>🛡️</span>
-              </div>
-              <h3 className='font-semibold text-foreground mb-2'>
-                Risk Mitigation
-              </h3>
-              <p className='text-sm text-muted-foreground'>
-                Strategies to reduce risk and improve returns
-              </p>
-            </div>
-            <div className='text-center p-4'>
-              <div className='w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3'>
-                <span className='text-primary font-bold text-lg'>📈</span>
-              </div>
-              <h3 className='font-semibold text-foreground mb-2'>
-                Ongoing Support
-              </h3>
-              <p className='text-sm text-muted-foreground'>
-                Continuous monitoring and portfolio optimization
-              </p>
-            </div>
-          </div>
-
-          {/* Email Signup Form */}
-          <div className='max-w-md mx-auto'>
-            <EmailSignup onSubmit={submitEmailSignup} />
-          </div>
-
           {/* Trust Indicators */}
-          <div className='mt-8 text-center'>
+          <div className='text-center'>
             <div className='flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-muted-foreground'>
               <div className='flex items-center gap-2'>
                 <span className='w-2 h-2 bg-green-500 rounded-full'></span>

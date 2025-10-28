@@ -84,44 +84,72 @@ export interface ApiError {
 }
 
 export async function predictVolatility(file: File): Promise<PredictionResult> {
+  console.log(
+    '🔍 DEBUG: predictVolatility called with file:',
+    file.name,
+    'size:',
+    file.size
+  );
+  console.log('🔍 DEBUG: API_BASE_URL:', API_BASE_URL);
+  console.log('🔍 DEBUG: Full URL:', `${API_BASE_URL}/api/predict`);
+
   const formData = new FormData();
   formData.append('file', file);
+  console.log('🔍 DEBUG: FormData created, about to make fetch request');
 
-  const response = await fetch(`${API_BASE_URL}/api/predict`, {
-    method: 'POST',
-    body: formData,
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/predict`, {
+      method: 'POST',
+      body: formData,
+    });
+    console.log(
+      '🔍 DEBUG: Fetch response received:',
+      response.status,
+      response.statusText
+    );
 
-  if (!response.ok) {
-    const errorData: ApiError = await response.json();
+    if (!response.ok) {
+      const errorData: ApiError = await response.json();
 
-    // Provide more helpful error messages based on common issues
-    let errorMessage =
-      errorData.error || `HTTP error! status: ${response.status}`;
+      // Provide more helpful error messages based on common issues
+      let errorMessage =
+        errorData.error || `HTTP error! status: ${response.status}`;
 
-    if (response.status === 400) {
-      if (errorMessage.includes('CSV must contain columns')) {
+      if (response.status === 400) {
+        if (errorMessage.includes('CSV must contain columns')) {
+          errorMessage =
+            'Invalid CSV format. Please ensure your file has "Ticker" and "Weight" columns. Download our sample file for reference.';
+        } else if (errorMessage.includes('File must be a CSV file')) {
+          errorMessage =
+            'Please upload a CSV file. Other file types are not supported.';
+        } else if (errorMessage.includes('Error processing file')) {
+          errorMessage =
+            'Unable to process your CSV file. Please check the format and try again.';
+        }
+      } else if (response.status === 413) {
         errorMessage =
-          'Invalid CSV format. Please ensure your file has "Ticker" and "Weight" columns. Download our sample file for reference.';
-      } else if (errorMessage.includes('File must be a CSV file')) {
+          'File too large. Please upload a smaller CSV file (max 10MB).';
+      } else if (response.status === 500) {
         errorMessage =
-          'Please upload a CSV file. Other file types are not supported.';
-      } else if (errorMessage.includes('Error processing file')) {
-        errorMessage =
-          'Unable to process your CSV file. Please check the format and try again.';
+          'Server error. Please try again later or contact support if the problem persists.';
       }
-    } else if (response.status === 413) {
-      errorMessage =
-        'File too large. Please upload a smaller CSV file (max 10MB).';
-    } else if (response.status === 500) {
-      errorMessage =
-        'Server error. Please try again later or contact support if the problem persists.';
+
+      throw new Error(errorMessage);
     }
 
-    throw new Error(errorMessage);
+    return response.json();
+  } catch (error) {
+    console.error('🔍 DEBUG: Fetch error caught:', error);
+    if (
+      error instanceof TypeError &&
+      error.message.includes('Failed to fetch')
+    ) {
+      throw new Error(
+        `Network error: Unable to connect to the server. Please check that the backend is running on ${API_BASE_URL}`
+      );
+    }
+    throw error;
   }
-
-  return response.json();
 }
 
 export function getSampleDownloadUrl(): string {

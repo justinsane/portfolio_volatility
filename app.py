@@ -36,6 +36,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",  # Local development
+        "http://localhost:3001",  # Local development (alternative port)
         "https://portfolio-volatility.vercel.app",  # Vercel frontend
         "https://*.vercel.app",  # Any Vercel subdomain
         os.getenv("FRONTEND_URL", ""),  # Custom frontend URL

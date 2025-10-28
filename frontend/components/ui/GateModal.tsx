@@ -60,18 +60,18 @@ const GateModal = memo(function GateModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-md max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto bg-background border-2 shadow-2xl'>
-        <DialogHeader className='text-center space-y-4 px-2 sm:px-0'>
-          <div className='mx-auto p-4 rounded-full bg-primary/10 border border-primary/20 w-fit'>
+      <DialogContent className='sm:max-w-md max-h-[95vh] overflow-y-auto mx-2 sm:mx-4 bg-background border-2 shadow-2xl'>
+        <DialogHeader className='text-center space-y-3 sm:space-y-4 px-1 sm:px-2'>
+          <div className='mx-auto p-3 sm:p-4 rounded-full bg-primary/10 border border-primary/20 w-fit'>
             {icon}
           </div>
-          <DialogTitle className='text-xl sm:text-2xl font-bold text-foreground leading-tight'>
+          <DialogTitle className='text-lg sm:text-xl lg:text-2xl font-bold text-foreground leading-tight px-2'>
             {title}
           </DialogTitle>
-          <DialogDescription className='text-base sm:text-lg text-muted-foreground leading-relaxed'>
+          <DialogDescription className='text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed px-2'>
             {description}
           </DialogDescription>
-          <div className='bg-primary/5 border border-primary/20 rounded-lg p-4 text-sm sm:text-base text-primary/80 leading-relaxed'>
+          <div className='bg-primary/5 border border-primary/20 rounded-lg p-3 sm:p-4 text-xs sm:text-sm lg:text-base text-primary/80 leading-relaxed'>
             💡 <strong>Free consultation:</strong> Provide your contact info to
             unlock this analysis and get personalized recommendations from a
             certified financial advisor
@@ -79,20 +79,20 @@ const GateModal = memo(function GateModal({
         </DialogHeader>
 
         {!isSubmitted ? (
-          <div className='space-y-6 px-2 sm:px-0'>
+          <div className='space-y-4 sm:space-y-6 px-1 sm:px-2'>
             {/* Benefits Section */}
-            <div className='space-y-4'>
-              <h4 className='font-semibold text-base sm:text-lg text-foreground flex items-center gap-2'>
-                <Star className='h-5 w-5 text-yellow-500' />
+            <div className='space-y-3 sm:space-y-4'>
+              <h4 className='font-semibold text-sm sm:text-base lg:text-lg text-foreground flex items-center gap-2'>
+                <Star className='h-4 w-4 sm:h-5 sm:w-5 text-yellow-500' />
                 What you&apos;ll get:
               </h4>
-              <div className='space-y-3'>
+              <div className='space-y-2 sm:space-y-3'>
                 {benefits.map((benefit, index) => (
                   <div
                     key={index}
-                    className='flex items-start gap-3 text-sm sm:text-base'
+                    className='flex items-start gap-2 sm:gap-3 text-xs sm:text-sm lg:text-base'
                   >
-                    <div className='w-2.5 h-2.5 rounded-full bg-primary mt-2 flex-shrink-0' />
+                    <div className='w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-primary mt-1.5 sm:mt-2 flex-shrink-0' />
                     <span className='text-muted-foreground leading-relaxed'>
                       {benefit}
                     </span>
@@ -102,19 +102,19 @@ const GateModal = memo(function GateModal({
             </div>
 
             {/* Social Proof */}
-            <div className='bg-muted/50 rounded-lg p-4 sm:p-5 space-y-3'>
-              <div className='flex items-center gap-2 text-sm sm:text-base font-medium text-foreground'>
-                <Users className='h-5 w-5 text-primary' />
+            <div className='bg-muted/50 rounded-lg p-3 sm:p-4 lg:p-5 space-y-2 sm:space-y-3'>
+              <div className='flex items-center gap-2 text-xs sm:text-sm lg:text-base font-medium text-foreground'>
+                <Users className='h-4 w-4 sm:h-5 sm:w-5 text-primary' />
                 Trusted by 500+ investors
               </div>
               <div className='flex items-center gap-1'>
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className='h-5 w-5 fill-yellow-400 text-yellow-400'
+                    className='h-4 w-4 sm:h-5 sm:w-5 fill-yellow-400 text-yellow-400'
                   />
                 ))}
-                <span className='text-sm sm:text-base text-muted-foreground ml-2'>
+                <span className='text-xs sm:text-sm lg:text-base text-muted-foreground ml-2'>
                   4.9/5 rating
                 </span>
               </div>
@@ -125,25 +125,25 @@ const GateModal = memo(function GateModal({
             </div>
 
             {/* Email Signup Form */}
-            <div className='border-t pt-4'>
+            <div className='border-t pt-3 sm:pt-4'>
               <EmailSignup onSubmit={handleEmailSubmit} />
             </div>
           </div>
         ) : (
-          <div className='text-center space-y-6 py-6 px-4 sm:px-6'>
+          <div className='text-center space-y-4 sm:space-y-6 py-4 sm:py-6 px-3 sm:px-4 lg:px-6'>
             {/* Large success icon with better styling */}
             <div className='flex justify-center'>
-              <div className='p-5 sm:p-6 rounded-full bg-green-100 dark:bg-green-900/30 border-2 border-green-200 dark:border-green-800 shadow-sm'>
-                <Shield className='h-10 w-10 sm:h-12 sm:w-12 text-green-600 dark:text-green-400' />
+              <div className='p-4 sm:p-5 lg:p-6 rounded-full bg-green-100 dark:bg-green-900/30 border-2 border-green-200 dark:border-green-800 shadow-sm'>
+                <Shield className='h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-green-600 dark:text-green-400' />
               </div>
             </div>
 
             {/* Success message with improved typography */}
-            <div className='space-y-4'>
-              <h3 className='text-2xl sm:text-3xl font-bold text-green-700 dark:text-green-400'>
+            <div className='space-y-3 sm:space-y-4'>
+              <h3 className='text-xl sm:text-2xl lg:text-3xl font-bold text-green-700 dark:text-green-400'>
                 Thank you!
               </h3>
-              <p className='text-base sm:text-lg text-green-600 dark:text-green-300 leading-relaxed max-w-md mx-auto'>
+              <p className='text-sm sm:text-base lg:text-lg text-green-600 dark:text-green-300 leading-relaxed max-w-md mx-auto px-2'>
                 A financial advisor will contact you within 24 hours to discuss
                 your portfolio analysis and personalized recommendations.
               </p>
@@ -151,14 +151,14 @@ const GateModal = memo(function GateModal({
 
             {/* Visual separator */}
             <div className='flex justify-center'>
-              <div className='w-20 h-1 bg-green-300 dark:bg-green-600 rounded-full'></div>
+              <div className='w-16 sm:w-20 h-1 bg-green-300 dark:bg-green-600 rounded-full'></div>
             </div>
 
             {/* Continue button with better styling */}
             <Button
               onClick={handleClose}
               size='mobile'
-              className='w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white border-0 shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer'
+              className='w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white border-0 shadow-lg hover:shadow-xl active:shadow-inner transition-all duration-200 touch-manipulation select-none cursor-pointer min-h-[48px] sm:min-h-[52px]'
             >
               Continue Exploring
             </Button>

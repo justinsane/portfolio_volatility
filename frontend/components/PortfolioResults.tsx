@@ -53,6 +53,7 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
           icon={<Shield className='h-6 w-6' />}
           triggerType='engagement'
           engagementThreshold={120} // 2 minutes + 30% scroll
+          priority={1} // Highest priority - most important gate
           previewContent={
             <div className='border-2 border-orange-200 bg-orange-50 rounded-xl p-6'>
               <div className='flex items-center gap-3 mb-4'>
@@ -113,6 +114,7 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
         icon={<BarChart3 className='h-6 w-6' />}
         triggerType='engagement'
         engagementThreshold={60} // 1 minute engagement
+        priority={2} // Second priority
         previewContent={
           <div className='border-2 border-blue-200 bg-blue-50 rounded-xl p-6'>
             <div className='flex items-center gap-3 mb-4'>
@@ -174,6 +176,7 @@ export default function PortfolioResults({ result }: PortfolioResultsProps) {
         ]}
         icon={<Users className='h-6 w-6' />}
         triggerType='click' // Change to click-based - only show when user wants advanced tools
+        priority={3} // Lowest priority - only shows when explicitly requested
         previewContent={
           <div className='border-2 border-purple-200 bg-purple-50 rounded-xl p-6'>
             <div className='flex items-center gap-3 mb-4'>

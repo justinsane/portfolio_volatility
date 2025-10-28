@@ -233,7 +233,10 @@ export default function CorrelationAnalysisSection({
               diversification.
             </p>
             <div className='relative group'>
-              <button className='w-full bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium py-2 px-3 rounded-lg border border-primary/20 transition-colors'>
+              <button
+                onClick={() => onLearnMore('portfolio-correlation-info', null)}
+                className='w-full bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium py-2 px-3 rounded-lg border border-primary/20 transition-colors'
+              >
                 Learn More About Diversification
               </button>
             </div>

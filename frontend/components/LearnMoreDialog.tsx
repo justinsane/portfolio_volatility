@@ -198,6 +198,41 @@ export default function LearnMoreDialog({
           { label: 'Sector Analysis Tool', action: 'sector-analysis' },
         ],
       },
+      'portfolio-correlation-info': {
+        title: 'Understanding Portfolio Correlation & Diversification',
+        summary:
+          'Portfolio correlation measures how closely your assets move together. Lower correlation means better diversification and reduced risk.',
+        sections: [
+          {
+            title: 'What is Portfolio Correlation?',
+            content:
+              'Correlation measures how closely assets move together. A high average correlation (above 50%) means your assets tend to move in the same direction, reducing diversification benefits. Lower correlations (below 30%) indicate better diversification.',
+          },
+          {
+            title: 'Why Lower Correlation is Better',
+            content:
+              'When assets have low correlation, they don\'t all decline at the same time. This reduces overall portfolio volatility and protects your investments during market downturns. A diversified portfolio with low correlation can deliver better risk-adjusted returns.',
+          },
+          {
+            title: 'How to Improve Correlation',
+            content:
+              '• Add assets from different sectors (technology, healthcare, finance) • Include international investments with global exposure • Consider alternative assets like real estate (VNQ) and commodities (GLD) • Mix growth and value stocks across different market caps',
+          },
+          {
+            title: 'Target Goals for Diversification',
+            content:
+              'Aim for an average correlation below 30% for optimal diversification. You can achieve this by: • Holding 8-12 diverse assets • Spreading across multiple sectors • Including international exposure • Adding defensive assets like bonds during volatile periods',
+          },
+        ],
+        actions: [
+          { label: 'Explore Low-Correlation Assets', action: 'explore-assets' },
+          {
+            label: 'Diversification Calculator',
+            action: 'diversification-calculator',
+          },
+          { label: 'View Correlation Matrix', action: 'correlation-matrix' },
+        ],
+      },
     };
 
     return content[topic as keyof typeof content] || content['diversification'];
